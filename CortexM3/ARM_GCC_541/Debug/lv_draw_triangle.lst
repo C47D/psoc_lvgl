@@ -1,0 +1,3569 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_draw_triangle.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.lv_draw_polygon,"ax",%progbits
+  20              		.align	2
+  21              		.global	lv_draw_polygon
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	lv_draw_polygon, %function
+  25              	lv_draw_polygon:
+  26              	.LFB37:
+  27              		.file 1 "lvgl\\src\\lv_draw\\lv_draw_triangle.c"
+   1:lvgl\src\lv_draw/lv_draw_triangle.c **** /**
+   2:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @file lv_draw_triangle.c
+   3:lvgl\src\lv_draw/lv_draw_triangle.c ****  *
+   4:lvgl\src\lv_draw/lv_draw_triangle.c ****  */
+   5:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+   6:lvgl\src\lv_draw/lv_draw_triangle.c **** /*********************
+   7:lvgl\src\lv_draw/lv_draw_triangle.c ****  *      INCLUDES
+   8:lvgl\src\lv_draw/lv_draw_triangle.c ****  *********************/
+   9:lvgl\src\lv_draw/lv_draw_triangle.c **** #include "lv_draw_triangle.h"
+  10:lvgl\src\lv_draw/lv_draw_triangle.c **** #include "../lv_misc/lv_math.h"
+  11:lvgl\src\lv_draw/lv_draw_triangle.c **** #include "../lv_misc/lv_mem.h"
+  12:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  13:lvgl\src\lv_draw/lv_draw_triangle.c **** /*********************
+  14:lvgl\src\lv_draw/lv_draw_triangle.c ****  *      DEFINES
+  15:lvgl\src\lv_draw/lv_draw_triangle.c ****  *********************/
+  16:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  17:lvgl\src\lv_draw/lv_draw_triangle.c **** /**********************
+  18:lvgl\src\lv_draw/lv_draw_triangle.c ****  *      TYPEDEFS
+  19:lvgl\src\lv_draw/lv_draw_triangle.c ****  **********************/
+  20:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  21:lvgl\src\lv_draw/lv_draw_triangle.c **** /**********************
+  22:lvgl\src\lv_draw/lv_draw_triangle.c ****  *  STATIC PROTOTYPES
+  23:lvgl\src\lv_draw/lv_draw_triangle.c ****  **********************/
+  24:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  25:lvgl\src\lv_draw/lv_draw_triangle.c **** /**********************
+  26:lvgl\src\lv_draw/lv_draw_triangle.c ****  *  STATIC VARIABLES
+  27:lvgl\src\lv_draw/lv_draw_triangle.c ****  **********************/
+  28:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  29:lvgl\src\lv_draw/lv_draw_triangle.c **** /**********************
+  30:lvgl\src\lv_draw/lv_draw_triangle.c ****  *      MACROS
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 2
+
+
+  31:lvgl\src\lv_draw/lv_draw_triangle.c ****  **********************/
+  32:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  33:lvgl\src\lv_draw/lv_draw_triangle.c **** /**********************
+  34:lvgl\src\lv_draw/lv_draw_triangle.c ****  *   GLOBAL FUNCTIONS
+  35:lvgl\src\lv_draw/lv_draw_triangle.c ****  **********************/
+  36:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  37:lvgl\src\lv_draw/lv_draw_triangle.c **** /**
+  38:lvgl\src\lv_draw/lv_draw_triangle.c ****  * Draw a triangle
+  39:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param points pointer to an array with 3 points
+  40:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param clip_area the triangle will be drawn only in this area
+  41:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
+  42:lvgl\src\lv_draw/lv_draw_triangle.c ****  */
+  43:lvgl\src\lv_draw/lv_draw_triangle.c **** void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, const lv_draw_rect_ds
+  44:lvgl\src\lv_draw/lv_draw_triangle.c **** {
+  45:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_polygon(points, 3, clip_area, draw_dsc);
+  46:lvgl\src\lv_draw/lv_draw_triangle.c **** }
+  47:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  48:lvgl\src\lv_draw/lv_draw_triangle.c **** /**
+  49:lvgl\src\lv_draw/lv_draw_triangle.c ****  * Draw a polygon. Only convex polygons are supported
+  50:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param points an array of points
+  51:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param point_cnt number of points
+  52:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param clip_area polygon will be drawn only in this area
+  53:lvgl\src\lv_draw/lv_draw_triangle.c ****  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
+  54:lvgl\src\lv_draw/lv_draw_triangle.c ****  */
+  55:lvgl\src\lv_draw/lv_draw_triangle.c **** void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
+  56:lvgl\src\lv_draw/lv_draw_triangle.c ****                      const lv_draw_rect_dsc_t * draw_dsc)
+  57:lvgl\src\lv_draw/lv_draw_triangle.c **** {
+  28              		.loc 1 57 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 40
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  58:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(point_cnt < 3) return;
+  33              		.loc 1 58 0
+  34 0000 0229     		cmp	r1, #2
+  35 0002 40F2EF80 		bls	.L29
+  57:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(point_cnt < 3) return;
+  36              		.loc 1 57 0
+  37 0006 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  38              		.cfi_def_cfa_offset 36
+  39              		.cfi_offset 4, -36
+  40              		.cfi_offset 5, -32
+  41              		.cfi_offset 6, -28
+  42              		.cfi_offset 7, -24
+  43              		.cfi_offset 8, -20
+  44              		.cfi_offset 9, -16
+  45              		.cfi_offset 10, -12
+  46              		.cfi_offset 11, -8
+  47              		.cfi_offset 14, -4
+  48 000a 8DB0     		sub	sp, sp, #52
+  49              		.cfi_def_cfa_offset 88
+  50 000c 0446     		mov	r4, r0
+  51 000e 0F46     		mov	r7, r1
+  59:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(points == NULL) return;
+  52              		.loc 1 59 0
+  53 0010 0028     		cmp	r0, #0
+  54 0012 00F0E480 		beq	.L1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 3
+
+
+  60:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  61:lvgl\src\lv_draw/lv_draw_triangle.c ****     int16_t i;
+  62:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_area_t poly_coords = {.x1 = LV_COORD_MAX, .y1 = LV_COORD_MAX, .x2 = LV_COORD_MIN, .y2 = LV_C
+  55              		.loc 1 62 0
+  56 0016 7449     		ldr	r1, .L30
+  57              	.LVL1:
+  58 0018 0AAD     		add	r5, sp, #40
+  59 001a 0868     		ldr	r0, [r1]	@ unaligned
+  60              	.LVL2:
+  61 001c 4968     		ldr	r1, [r1, #4]	@ unaligned
+  62 001e 03C5     		stmia	r5!, {r0, r1}
+  63              	.LVL3:
+  63:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  64:lvgl\src\lv_draw/lv_draw_triangle.c ****     for(i = 0; i < point_cnt; i++) {
+  64              		.loc 1 64 0
+  65 0020 0021     		movs	r1, #0
+  66 0022 23E0     		b	.L3
+  67              	.LVL4:
+  68              	.L4:
+  65:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, points[i].x);
+  69              		.loc 1 65 0 discriminator 3
+  70 0024 04EB8105 		add	r5, r4, r1, lsl #2
+  71 0028 34F921C0 		ldrsh	ip, [r4, r1, lsl #2]
+  72 002c BDF92800 		ldrsh	r0, [sp, #40]
+  73 0030 6045     		cmp	r0, ip
+  74 0032 A8BF     		it	ge
+  75 0034 6046     		movge	r0, ip
+  76 0036 ADF82800 		strh	r0, [sp, #40]	@ movhi
+  66:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.y1 = LV_MATH_MIN(poly_coords.y1, points[i].y);
+  77              		.loc 1 66 0 discriminator 3
+  78 003a B5F902E0 		ldrsh	lr, [r5, #2]
+  79 003e BDF92A60 		ldrsh	r6, [sp, #42]
+  80 0042 7645     		cmp	r6, lr
+  81 0044 A8BF     		it	ge
+  82 0046 7646     		movge	r6, lr
+  83 0048 ADF82A60 		strh	r6, [sp, #42]	@ movhi
+  67:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.x2 = LV_MATH_MAX(poly_coords.x2, points[i].x);
+  84              		.loc 1 67 0 discriminator 3
+  85 004c BDF92C50 		ldrsh	r5, [sp, #44]
+  86 0050 6545     		cmp	r5, ip
+  87 0052 B8BF     		it	lt
+  88 0054 6546     		movlt	r5, ip
+  89 0056 ADF82C50 		strh	r5, [sp, #44]	@ movhi
+  68:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.y2 = LV_MATH_MAX(poly_coords.y2, points[i].y);
+  90              		.loc 1 68 0 discriminator 3
+  91 005a BDF92E00 		ldrsh	r0, [sp, #46]
+  92 005e 7045     		cmp	r0, lr
+  93 0060 B8BF     		it	lt
+  94 0062 7046     		movlt	r0, lr
+  95 0064 ADF82E00 		strh	r0, [sp, #46]	@ movhi
+  64:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, points[i].x);
+  96              		.loc 1 64 0 discriminator 3
+  97 0068 0131     		adds	r1, r1, #1
+  98              	.LVL5:
+  99 006a 09B2     		sxth	r1, r1
+ 100              	.LVL6:
+ 101              	.L3:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 4
+
+
+  64:lvgl\src\lv_draw/lv_draw_triangle.c ****         poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, points[i].x);
+ 102              		.loc 1 64 0 is_stmt 0 discriminator 1
+ 103 006c B846     		mov	r8, r7
+ 104 006e B942     		cmp	r1, r7
+ 105 0070 D8DB     		blt	.L4
+ 106 0072 0793     		str	r3, [sp, #28]
+ 107 0074 0692     		str	r2, [sp, #24]
+  69:lvgl\src\lv_draw/lv_draw_triangle.c ****     }
+  70:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  71:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  72:lvgl\src\lv_draw/lv_draw_triangle.c ****     bool is_common;
+  73:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_area_t poly_mask;
+  74:lvgl\src\lv_draw/lv_draw_triangle.c ****     is_common = _lv_area_intersect(&poly_mask, &poly_coords, clip_area);
+ 108              		.loc 1 74 0 is_stmt 1
+ 109 0076 0AA9     		add	r1, sp, #40
+ 110              	.LVL7:
+ 111 0078 08A8     		add	r0, sp, #32
+ 112 007a FFF7FEFF 		bl	_lv_area_intersect
+ 113              	.LVL8:
+  75:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(!is_common) return;
+ 114              		.loc 1 75 0
+ 115 007e 0028     		cmp	r0, #0
+ 116 0080 00F0AD80 		beq	.L1
+  76:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  77:lvgl\src\lv_draw/lv_draw_triangle.c ****     /*Find the lowest point*/
+  78:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_coord_t y_min = points[0].y;
+ 117              		.loc 1 78 0
+ 118 0084 B4F90210 		ldrsh	r1, [r4, #2]
+ 119              	.LVL9:
+  79:lvgl\src\lv_draw/lv_draw_triangle.c ****     int16_t y_min_i = 0;
+ 120              		.loc 1 79 0
+ 121 0088 0025     		movs	r5, #0
+  80:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  81:lvgl\src\lv_draw/lv_draw_triangle.c ****     for(i = 1; i < point_cnt; i++) {
+ 122              		.loc 1 81 0
+ 123 008a 0123     		movs	r3, #1
+ 124 008c 09E0     		b	.L5
+ 125              	.LVL10:
+ 126              	.L7:
+  82:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(points[i].y < y_min) {
+ 127              		.loc 1 82 0
+ 128 008e 04EB8302 		add	r2, r4, r3, lsl #2
+ 129 0092 B2F90220 		ldrsh	r2, [r2, #2]
+ 130 0096 9142     		cmp	r1, r2
+ 131 0098 01DD     		ble	.L6
+  83:lvgl\src\lv_draw/lv_draw_triangle.c ****             y_min = points[i].y;
+  84:lvgl\src\lv_draw/lv_draw_triangle.c ****             y_min_i = i;
+ 132              		.loc 1 84 0
+ 133 009a 1D46     		mov	r5, r3
+ 134              	.LVL11:
+  83:lvgl\src\lv_draw/lv_draw_triangle.c ****             y_min = points[i].y;
+ 135              		.loc 1 83 0
+ 136 009c 1146     		mov	r1, r2
+ 137              	.LVL12:
+ 138              	.L6:
+  81:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(points[i].y < y_min) {
+ 139              		.loc 1 81 0 discriminator 2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 5
+
+
+ 140 009e 0133     		adds	r3, r3, #1
+ 141              	.LVL13:
+ 142 00a0 1BB2     		sxth	r3, r3
+ 143              	.LVL14:
+ 144              	.L5:
+  81:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(points[i].y < y_min) {
+ 145              		.loc 1 81 0 is_stmt 0 discriminator 1
+ 146 00a2 9845     		cmp	r8, r3
+ 147 00a4 F3DC     		bgt	.L7
+  85:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+  86:lvgl\src\lv_draw/lv_draw_triangle.c ****     }
+  87:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  88:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_mask_line_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_line_param_t) * point_cnt)
+ 148              		.loc 1 88 0 is_stmt 1
+ 149 00a6 BB46     		mov	fp, r7
+ 150 00a8 2C20     		movs	r0, #44
+ 151              	.LVL15:
+ 152 00aa 00FB07F0 		mul	r0, r0, r7
+ 153 00ae FFF7FEFF 		bl	_lv_mem_buf_get
+ 154              	.LVL16:
+ 155 00b2 0490     		str	r0, [sp, #16]
+ 156              	.LVL17:
+  89:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_mask_line_param_t * mp_next = mp;
+  90:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  91:lvgl\src\lv_draw/lv_draw_triangle.c ****     int32_t i_prev_left = y_min_i;
+ 157              		.loc 1 91 0
+ 158 00b4 A946     		mov	r9, r5
+ 159              	.LVL18:
+  92:lvgl\src\lv_draw/lv_draw_triangle.c ****     int32_t i_prev_right = y_min_i;
+  93:lvgl\src\lv_draw/lv_draw_triangle.c ****     int32_t i_next_left;
+  94:lvgl\src\lv_draw/lv_draw_triangle.c ****     int32_t i_next_right;
+  95:lvgl\src\lv_draw/lv_draw_triangle.c ****     uint32_t mask_cnt = 0;
+  96:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+  97:lvgl\src\lv_draw/lv_draw_triangle.c ****     /* Check if the order of points is inverted or not.
+  98:lvgl\src\lv_draw/lv_draw_triangle.c ****      * The normal case is when the left point is on `y_min_i - 1`*/
+  99:lvgl\src\lv_draw/lv_draw_triangle.c ****     i_next_left = y_min_i - 1;
+ 100:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(i_next_left < 0) i_next_left = point_cnt + i_next_left;
+ 160              		.loc 1 100 0
+ 161 00b6 013D     		subs	r5, r5, #1
+ 162              	.LVL19:
+ 163 00b8 00D5     		bpl	.L8
+ 164              		.loc 1 100 0 is_stmt 0 discriminator 1
+ 165 00ba 4544     		add	r5, r5, r8
+ 166              	.LVL20:
+ 167              	.L8:
+ 101:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 102:lvgl\src\lv_draw/lv_draw_triangle.c ****     i_next_right = y_min_i + 1;
+ 168              		.loc 1 102 0 is_stmt 1
+ 169 00bc 09F10103 		add	r3, r9, #1
+ 170              	.LVL21:
+ 103:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(i_next_right > point_cnt - 1) i_next_right = 0;
+ 171              		.loc 1 103 0
+ 172 00c0 08F1FF32 		add	r2, r8, #-1
+ 173 00c4 1646     		mov	r6, r2
+ 174 00c6 9342     		cmp	r3, r2
+ 175 00c8 00DD     		ble	.L9
+ 176 00ca 0023     		movs	r3, #0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 6
+
+
+ 177              	.LVL22:
+ 178              	.L9:
+ 104:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 105:lvgl\src\lv_draw/lv_draw_triangle.c ****     bool inv = false;
+ 106:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(points[i_next_left].x > points[i_next_right].x && points[i_next_left].y < points[i_next_righ
+ 179              		.loc 1 106 0
+ 180 00cc 04EB8500 		add	r0, r4, r5, lsl #2
+ 181              	.LVL23:
+ 182 00d0 34F92520 		ldrsh	r2, [r4, r5, lsl #2]
+ 183 00d4 04EB8301 		add	r1, r4, r3, lsl #2
+ 184 00d8 34F92330 		ldrsh	r3, [r4, r3, lsl #2]
+ 185              	.LVL24:
+ 186 00dc 9A42     		cmp	r2, r3
+ 187 00de 08DD     		ble	.L24
+ 188              		.loc 1 106 0 is_stmt 0 discriminator 1
+ 189 00e0 B0F90220 		ldrsh	r2, [r0, #2]
+ 190 00e4 B1F90230 		ldrsh	r3, [r1, #2]
+ 191 00e8 9A42     		cmp	r2, r3
+ 192 00ea 05DB     		blt	.L25
+ 105:lvgl\src\lv_draw/lv_draw_triangle.c ****     if(points[i_next_left].x > points[i_next_right].x && points[i_next_left].y < points[i_next_righ
+ 193              		.loc 1 105 0 is_stmt 1
+ 194 00ec 0023     		movs	r3, #0
+ 195 00ee 0393     		str	r3, [sp, #12]
+ 196 00f0 04E0     		b	.L10
+ 197              	.L24:
+ 198 00f2 0023     		movs	r3, #0
+ 199 00f4 0393     		str	r3, [sp, #12]
+ 200 00f6 01E0     		b	.L10
+ 201              	.L25:
+ 202              		.loc 1 106 0
+ 203 00f8 0123     		movs	r3, #1
+ 204 00fa 0393     		str	r3, [sp, #12]
+ 205              	.L10:
+ 206 00fc CA46     		mov	r10, r9
+ 207 00fe 049B     		ldr	r3, [sp, #16]
+ 208 0100 9C46     		mov	ip, r3
+ 209 0102 0025     		movs	r5, #0
+ 210              	.LVL25:
+ 211 0104 CDF81480 		str	r8, [sp, #20]
+ 212 0108 B046     		mov	r8, r6
+ 213              	.LVL26:
+ 214              	.L20:
+ 107:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 108:lvgl\src\lv_draw/lv_draw_triangle.c ****     do {
+ 109:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(!inv) {
+ 215              		.loc 1 109 0
+ 216 010a 039B     		ldr	r3, [sp, #12]
+ 217 010c 4BB9     		cbnz	r3, .L11
+ 218              	.LVL27:
+ 110:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_next_left = i_prev_left - 1;
+ 111:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(i_next_left < 0) i_next_left = point_cnt + i_next_left;
+ 219              		.loc 1 111 0
+ 220 010e B9F10106 		subs	r6, r9, #1
+ 221              	.LVL28:
+ 222 0112 01D5     		bpl	.L12
+ 223              		.loc 1 111 0 is_stmt 0 discriminator 1
+ 224 0114 059B     		ldr	r3, [sp, #20]
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 7
+
+
+ 225 0116 1E44     		add	r6, r6, r3
+ 226              	.LVL29:
+ 227              	.L12:
+ 112:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 113:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_next_right = i_prev_right + 1;
+ 228              		.loc 1 113 0 is_stmt 1
+ 229 0118 0AF10107 		add	r7, r10, #1
+ 230              	.LVL30:
+ 114:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(i_next_right > point_cnt - 1) i_next_right = 0;
+ 231              		.loc 1 114 0
+ 232 011c B845     		cmp	r8, r7
+ 233 011e 0BDB     		blt	.L26
+ 234 0120 0BE0     		b	.L13
+ 235              	.LVL31:
+ 236              	.L11:
+ 115:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+ 116:lvgl\src\lv_draw/lv_draw_triangle.c ****         else {
+ 117:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_next_left = i_prev_left + 1;
+ 237              		.loc 1 117 0
+ 238 0122 09F10106 		add	r6, r9, #1
+ 239              	.LVL32:
+ 118:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(i_next_left > point_cnt - 1) i_next_left = 0;
+ 240              		.loc 1 118 0
+ 241 0126 B045     		cmp	r8, r6
+ 242 0128 00DA     		bge	.L14
+ 243 012a 0026     		movs	r6, #0
+ 244              	.LVL33:
+ 245              	.L14:
+ 119:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 120:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_next_right = i_prev_right - 1;
+ 121:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(i_next_right < 0) i_next_right = point_cnt + i_next_right;
+ 246              		.loc 1 121 0
+ 247 012c BAF10107 		subs	r7, r10, #1
+ 248              	.LVL34:
+ 249 0130 03D5     		bpl	.L13
+ 250              		.loc 1 121 0 is_stmt 0 discriminator 1
+ 251 0132 059B     		ldr	r3, [sp, #20]
+ 252 0134 1F44     		add	r7, r7, r3
+ 253              	.LVL35:
+ 254 0136 00E0     		b	.L13
+ 255              	.L26:
+ 114:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+ 256              		.loc 1 114 0 is_stmt 1
+ 257 0138 0027     		movs	r7, #0
+ 258              	.LVL36:
+ 259              	.L13:
+ 122:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+ 123:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 124:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(points[i_next_left].y >=  points[i_prev_left].y) {
+ 260              		.loc 1 124 0
+ 261 013a B300     		lsls	r3, r6, #2
+ 262 013c E218     		adds	r2, r4, r3
+ 263 013e B2F90200 		ldrsh	r0, [r2, #2]
+ 264 0142 4FEA8901 		lsl	r1, r9, #2
+ 265 0146 6218     		adds	r2, r4, r1
+ 266 0148 B2F90220 		ldrsh	r2, [r2, #2]
+ 267 014c 9042     		cmp	r0, r2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 8
+
+
+ 268 014e 16DB     		blt	.L15
+ 125:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(points[i_next_left].y != points[i_prev_left].y &&
+ 269              		.loc 1 125 0
+ 270 0150 13D0     		beq	.L16
+ 126:lvgl\src\lv_draw/lv_draw_triangle.c ****                points[i_next_left].x !=  points[i_prev_left].x) {
+ 271              		.loc 1 126 0 discriminator 1
+ 272 0152 E35E     		ldrsh	r3, [r4, r3]
+ 273 0154 615E     		ldrsh	r1, [r4, r1]
+ 125:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(points[i_next_left].y != points[i_prev_left].y &&
+ 274              		.loc 1 125 0 discriminator 1
+ 275 0156 8B42     		cmp	r3, r1
+ 276 0158 0FD0     		beq	.L16
+ 127:lvgl\src\lv_draw/lv_draw_triangle.c ****                 lv_draw_mask_line_points_init(mp_next, points[i_prev_left].x, points[i_prev_left].y
+ 277              		.loc 1 127 0
+ 278 015a 4FF0010E 		mov	lr, #1
+ 279 015e CDF804E0 		str	lr, [sp, #4]
+ 280 0162 0090     		str	r0, [sp]
+ 281 0164 E146     		mov	r9, ip
+ 282              	.LVL37:
+ 283 0166 6046     		mov	r0, ip
+ 284 0168 FFF7FEFF 		bl	lv_draw_mask_line_points_init
+ 285              	.LVL38:
+ 128:lvgl\src\lv_draw/lv_draw_triangle.c ****                                               points[i_next_left].x, points[i_next_left].y,
+ 129:lvgl\src\lv_draw/lv_draw_triangle.c ****                                               LV_DRAW_MASK_LINE_SIDE_RIGHT);
+ 130:lvgl\src\lv_draw/lv_draw_triangle.c ****                 lv_draw_mask_add(mp_next, mp);
+ 286              		.loc 1 130 0
+ 287 016c 0499     		ldr	r1, [sp, #16]
+ 288 016e 4846     		mov	r0, r9
+ 289 0170 FFF7FEFF 		bl	lv_draw_mask_add
+ 290              	.LVL39:
+ 131:lvgl\src\lv_draw/lv_draw_triangle.c ****                 mp_next++;
+ 291              		.loc 1 131 0
+ 292 0174 4B46     		mov	r3, r9
+ 293 0176 2C33     		adds	r3, r3, #44
+ 294 0178 9C46     		mov	ip, r3
+ 295              	.LVL40:
+ 296              	.L16:
+ 132:lvgl\src\lv_draw/lv_draw_triangle.c ****             }
+ 133:lvgl\src\lv_draw/lv_draw_triangle.c ****             mask_cnt++;
+ 297              		.loc 1 133 0
+ 298 017a 0135     		adds	r5, r5, #1
+ 299              	.LVL41:
+ 134:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_prev_left = i_next_left;
+ 300              		.loc 1 134 0
+ 301 017c B146     		mov	r9, r6
+ 302              	.LVL42:
+ 303              	.L15:
+ 135:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+ 136:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 137:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(mask_cnt == point_cnt) break;
+ 304              		.loc 1 137 0
+ 305 017e 5D45     		cmp	r5, fp
+ 306 0180 21D0     		beq	.L17
+ 138:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 139:lvgl\src\lv_draw/lv_draw_triangle.c ****         if(points[i_next_right].y >=  points[i_prev_right].y) {
+ 307              		.loc 1 139 0
+ 308 0182 BB00     		lsls	r3, r7, #2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 9
+
+
+ 309 0184 E218     		adds	r2, r4, r3
+ 310 0186 B2F90200 		ldrsh	r0, [r2, #2]
+ 311 018a 4FEA8A01 		lsl	r1, r10, #2
+ 312 018e 6218     		adds	r2, r4, r1
+ 313 0190 B2F90220 		ldrsh	r2, [r2, #2]
+ 314 0194 9042     		cmp	r0, r2
+ 315 0196 14DB     		blt	.L18
+ 140:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(points[i_next_right].y != points[i_prev_right].y &&
+ 316              		.loc 1 140 0
+ 317 0198 11D0     		beq	.L19
+ 141:lvgl\src\lv_draw/lv_draw_triangle.c ****                points[i_next_right].x !=  points[i_prev_right].x) {
+ 318              		.loc 1 141 0 discriminator 1
+ 319 019a E35E     		ldrsh	r3, [r4, r3]
+ 320 019c 615E     		ldrsh	r1, [r4, r1]
+ 140:lvgl\src\lv_draw/lv_draw_triangle.c ****             if(points[i_next_right].y != points[i_prev_right].y &&
+ 321              		.loc 1 140 0 discriminator 1
+ 322 019e 8B42     		cmp	r3, r1
+ 323 01a0 0DD0     		beq	.L19
+ 142:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 143:lvgl\src\lv_draw/lv_draw_triangle.c ****                 lv_draw_mask_line_points_init(mp_next, points[i_prev_right].x, points[i_prev_right]
+ 324              		.loc 1 143 0
+ 325 01a2 0026     		movs	r6, #0
+ 326              	.LVL43:
+ 327 01a4 0196     		str	r6, [sp, #4]
+ 328 01a6 0090     		str	r0, [sp]
+ 329 01a8 6646     		mov	r6, ip
+ 330 01aa 6046     		mov	r0, ip
+ 331 01ac FFF7FEFF 		bl	lv_draw_mask_line_points_init
+ 332              	.LVL44:
+ 144:lvgl\src\lv_draw/lv_draw_triangle.c ****                                               points[i_next_right].x, points[i_next_right].y,
+ 145:lvgl\src\lv_draw/lv_draw_triangle.c ****                                               LV_DRAW_MASK_LINE_SIDE_LEFT);
+ 146:lvgl\src\lv_draw/lv_draw_triangle.c ****                 lv_draw_mask_add(mp_next, mp);
+ 333              		.loc 1 146 0
+ 334 01b0 0499     		ldr	r1, [sp, #16]
+ 335 01b2 3046     		mov	r0, r6
+ 336 01b4 FFF7FEFF 		bl	lv_draw_mask_add
+ 337              	.LVL45:
+ 147:lvgl\src\lv_draw/lv_draw_triangle.c ****                 mp_next++;
+ 338              		.loc 1 147 0
+ 339 01b8 3346     		mov	r3, r6
+ 340 01ba 2C33     		adds	r3, r3, #44
+ 341 01bc 9C46     		mov	ip, r3
+ 342              	.LVL46:
+ 343              	.L19:
+ 148:lvgl\src\lv_draw/lv_draw_triangle.c ****             }
+ 149:lvgl\src\lv_draw/lv_draw_triangle.c ****             mask_cnt++;
+ 344              		.loc 1 149 0
+ 345 01be 0135     		adds	r5, r5, #1
+ 346              	.LVL47:
+ 150:lvgl\src\lv_draw/lv_draw_triangle.c ****             i_prev_right = i_next_right;
+ 347              		.loc 1 150 0
+ 348 01c0 BA46     		mov	r10, r7
+ 349              	.LVL48:
+ 350              	.L18:
+ 151:lvgl\src\lv_draw/lv_draw_triangle.c ****         }
+ 152:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 153:lvgl\src\lv_draw/lv_draw_triangle.c ****     } while(mask_cnt < point_cnt);
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 10
+
+
+ 351              		.loc 1 153 0
+ 352 01c2 5D45     		cmp	r5, fp
+ 353 01c4 A1D3     		bcc	.L20
+ 354              	.L17:
+ 154:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 155:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_rect(&poly_coords, clip_area, draw_dsc);
+ 355              		.loc 1 155 0
+ 356 01c6 079A     		ldr	r2, [sp, #28]
+ 357 01c8 0699     		ldr	r1, [sp, #24]
+ 358 01ca 0AA8     		add	r0, sp, #40
+ 359 01cc FFF7FEFF 		bl	lv_draw_rect
+ 360              	.LVL49:
+ 156:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 157:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_mask_remove_custom(mp);
+ 361              		.loc 1 157 0
+ 362 01d0 049C     		ldr	r4, [sp, #16]
+ 363              	.LVL50:
+ 364 01d2 2046     		mov	r0, r4
+ 365 01d4 FFF7FEFF 		bl	lv_draw_mask_remove_custom
+ 366              	.LVL51:
+ 158:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 159:lvgl\src\lv_draw/lv_draw_triangle.c ****     _lv_mem_buf_release(mp);
+ 367              		.loc 1 159 0
+ 368 01d8 2046     		mov	r0, r4
+ 369 01da FFF7FEFF 		bl	_lv_mem_buf_release
+ 370              	.LVL52:
+ 371              	.L1:
+ 160:lvgl\src\lv_draw/lv_draw_triangle.c **** 
+ 161:lvgl\src\lv_draw/lv_draw_triangle.c **** }
+ 372              		.loc 1 161 0
+ 373 01de 0DB0     		add	sp, sp, #52
+ 374              		.cfi_def_cfa_offset 36
+ 375              		@ sp needed
+ 376 01e0 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 377              	.LVL53:
+ 378              	.L29:
+ 379              		.cfi_def_cfa_offset 0
+ 380              		.cfi_restore 4
+ 381              		.cfi_restore 5
+ 382              		.cfi_restore 6
+ 383              		.cfi_restore 7
+ 384              		.cfi_restore 8
+ 385              		.cfi_restore 9
+ 386              		.cfi_restore 10
+ 387              		.cfi_restore 11
+ 388              		.cfi_restore 14
+ 389 01e4 7047     		bx	lr
+ 390              	.L31:
+ 391 01e6 00BF     		.align	2
+ 392              	.L30:
+ 393 01e8 00000000 		.word	.LANCHOR0
+ 394              		.cfi_endproc
+ 395              	.LFE37:
+ 396              		.size	lv_draw_polygon, .-lv_draw_polygon
+ 397              		.section	.text.lv_draw_triangle,"ax",%progbits
+ 398              		.align	2
+ 399              		.global	lv_draw_triangle
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 11
+
+
+ 400              		.thumb
+ 401              		.thumb_func
+ 402              		.type	lv_draw_triangle, %function
+ 403              	lv_draw_triangle:
+ 404              	.LFB36:
+  44:lvgl\src\lv_draw/lv_draw_triangle.c ****     lv_draw_polygon(points, 3, clip_area, draw_dsc);
+ 405              		.loc 1 44 0
+ 406              		.cfi_startproc
+ 407              		@ args = 0, pretend = 0, frame = 0
+ 408              		@ frame_needed = 0, uses_anonymous_args = 0
+ 409              	.LVL54:
+ 410 0000 08B5     		push	{r3, lr}
+ 411              		.cfi_def_cfa_offset 8
+ 412              		.cfi_offset 3, -8
+ 413              		.cfi_offset 14, -4
+  45:lvgl\src\lv_draw/lv_draw_triangle.c **** }
+ 414              		.loc 1 45 0
+ 415 0002 1346     		mov	r3, r2
+ 416 0004 0A46     		mov	r2, r1
+ 417              	.LVL55:
+ 418 0006 0321     		movs	r1, #3
+ 419              	.LVL56:
+ 420 0008 FFF7FEFF 		bl	lv_draw_polygon
+ 421              	.LVL57:
+ 422 000c 08BD     		pop	{r3, pc}
+ 423              		.cfi_endproc
+ 424              	.LFE36:
+ 425              		.size	lv_draw_triangle, .-lv_draw_triangle
+ 426 000e 00BF     		.section	.rodata
+ 427              		.align	2
+ 428              		.set	.LANCHOR0,. + 0
+ 429              	.LC0:
+ 430 0000 187C     		.short	31768
+ 431 0002 187C     		.short	31768
+ 432 0004 E883     		.short	-31768
+ 433 0006 E883     		.short	-31768
+ 434              		.text
+ 435              	.Letext0:
+ 436              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 437              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 438              		.file 4 "lvgl\\src\\lv_draw\\../lv_core/../lv_font/../../../lv_conf.h"
+ 439              		.file 5 "lvgl\\src\\lv_draw\\../lv_core/../lv_font/../lv_misc/lv_area.h"
+ 440              		.file 6 "lvgl\\src\\lv_draw\\../lv_core/../lv_font/lv_font.h"
+ 441              		.file 7 "lvgl\\src\\lv_draw\\../lv_core/../lv_misc/lv_color.h"
+ 442              		.file 8 "lvgl\\src\\lv_draw\\../lv_core/../lv_draw/lv_draw_mask.h"
+ 443              		.file 9 "lvgl\\src\\lv_draw\\../lv_core/../lv_draw/lv_draw_blend.h"
+ 444              		.file 10 "lvgl\\src\\lv_draw\\../lv_core/lv_style.h"
+ 445              		.file 11 "lvgl\\src\\lv_draw\\lv_draw_rect.h"
+ 446              		.file 12 "lvgl\\src\\lv_draw\\../lv_core/../lv_font/../lv_misc/lv_mem.h"
+ 447              		.section	.debug_info,"",%progbits
+ 448              	.Ldebug_info0:
+ 449 0000 F6090000 		.4byte	0x9f6
+ 450 0004 0400     		.2byte	0x4
+ 451 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 452 000a 04       		.byte	0x4
+ 453 000b 01       		.uleb128 0x1
+ 454 000c E7010000 		.4byte	.LASF140
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 12
+
+
+ 455 0010 0C       		.byte	0xc
+ 456 0011 2A060000 		.4byte	.LASF141
+ 457 0015 C7070000 		.4byte	.LASF142
+ 458 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 459 001d 00000000 		.4byte	0
+ 460 0021 00000000 		.4byte	.Ldebug_line0
+ 461 0025 02       		.uleb128 0x2
+ 462 0026 F0040000 		.4byte	.LASF0
+ 463 002a 02       		.byte	0x2
+ 464 002b 1B       		.byte	0x1b
+ 465 002c 30000000 		.4byte	0x30
+ 466 0030 03       		.uleb128 0x3
+ 467 0031 01       		.byte	0x1
+ 468 0032 06       		.byte	0x6
+ 469 0033 7C070000 		.4byte	.LASF2
+ 470 0037 02       		.uleb128 0x2
+ 471 0038 D1050000 		.4byte	.LASF1
+ 472 003c 02       		.byte	0x2
+ 473 003d 1D       		.byte	0x1d
+ 474 003e 42000000 		.4byte	0x42
+ 475 0042 03       		.uleb128 0x3
+ 476 0043 01       		.byte	0x1
+ 477 0044 08       		.byte	0x8
+ 478 0045 D2060000 		.4byte	.LASF3
+ 479 0049 02       		.uleb128 0x2
+ 480 004a 48040000 		.4byte	.LASF4
+ 481 004e 02       		.byte	0x2
+ 482 004f 29       		.byte	0x29
+ 483 0050 54000000 		.4byte	0x54
+ 484 0054 03       		.uleb128 0x3
+ 485 0055 02       		.byte	0x2
+ 486 0056 05       		.byte	0x5
+ 487 0057 66050000 		.4byte	.LASF5
+ 488 005b 02       		.uleb128 0x2
+ 489 005c CC010000 		.4byte	.LASF6
+ 490 0060 02       		.byte	0x2
+ 491 0061 2B       		.byte	0x2b
+ 492 0062 66000000 		.4byte	0x66
+ 493 0066 03       		.uleb128 0x3
+ 494 0067 02       		.byte	0x2
+ 495 0068 07       		.byte	0x7
+ 496 0069 88070000 		.4byte	.LASF7
+ 497 006d 02       		.uleb128 0x2
+ 498 006e B7000000 		.4byte	.LASF8
+ 499 0072 02       		.byte	0x2
+ 500 0073 3F       		.byte	0x3f
+ 501 0074 78000000 		.4byte	0x78
+ 502 0078 03       		.uleb128 0x3
+ 503 0079 04       		.byte	0x4
+ 504 007a 05       		.byte	0x5
+ 505 007b 79050000 		.4byte	.LASF9
+ 506 007f 02       		.uleb128 0x2
+ 507 0080 E0060000 		.4byte	.LASF10
+ 508 0084 02       		.byte	0x2
+ 509 0085 41       		.byte	0x41
+ 510 0086 8A000000 		.4byte	0x8a
+ 511 008a 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 13
+
+
+ 512 008b 04       		.byte	0x4
+ 513 008c 07       		.byte	0x7
+ 514 008d 18060000 		.4byte	.LASF11
+ 515 0091 03       		.uleb128 0x3
+ 516 0092 08       		.byte	0x8
+ 517 0093 05       		.byte	0x5
+ 518 0094 D5030000 		.4byte	.LASF12
+ 519 0098 03       		.uleb128 0x3
+ 520 0099 08       		.byte	0x8
+ 521 009a 07       		.byte	0x7
+ 522 009b A8010000 		.4byte	.LASF13
+ 523 009f 04       		.uleb128 0x4
+ 524 00a0 04       		.byte	0x4
+ 525 00a1 05       		.byte	0x5
+ 526 00a2 696E7400 		.ascii	"int\000"
+ 527 00a6 03       		.uleb128 0x3
+ 528 00a7 04       		.byte	0x4
+ 529 00a8 07       		.byte	0x7
+ 530 00a9 85000000 		.4byte	.LASF14
+ 531 00ad 02       		.uleb128 0x2
+ 532 00ae 4F010000 		.4byte	.LASF15
+ 533 00b2 03       		.byte	0x3
+ 534 00b3 14       		.byte	0x14
+ 535 00b4 25000000 		.4byte	0x25
+ 536 00b8 02       		.uleb128 0x2
+ 537 00b9 68030000 		.4byte	.LASF16
+ 538 00bd 03       		.byte	0x3
+ 539 00be 18       		.byte	0x18
+ 540 00bf 37000000 		.4byte	0x37
+ 541 00c3 02       		.uleb128 0x2
+ 542 00c4 A0010000 		.4byte	.LASF17
+ 543 00c8 03       		.byte	0x3
+ 544 00c9 20       		.byte	0x20
+ 545 00ca 49000000 		.4byte	0x49
+ 546 00ce 02       		.uleb128 0x2
+ 547 00cf 15050000 		.4byte	.LASF18
+ 548 00d3 03       		.byte	0x3
+ 549 00d4 24       		.byte	0x24
+ 550 00d5 5B000000 		.4byte	0x5b
+ 551 00d9 02       		.uleb128 0x2
+ 552 00da 72060000 		.4byte	.LASF19
+ 553 00de 03       		.byte	0x3
+ 554 00df 2C       		.byte	0x2c
+ 555 00e0 6D000000 		.4byte	0x6d
+ 556 00e4 02       		.uleb128 0x2
+ 557 00e5 46010000 		.4byte	.LASF20
+ 558 00e9 03       		.byte	0x3
+ 559 00ea 30       		.byte	0x30
+ 560 00eb 7F000000 		.4byte	0x7f
+ 561 00ef 02       		.uleb128 0x2
+ 562 00f0 BA050000 		.4byte	.LASF21
+ 563 00f4 04       		.byte	0x4
+ 564 00f5 46       		.byte	0x46
+ 565 00f6 C3000000 		.4byte	0xc3
+ 566 00fa 05       		.uleb128 0x5
+ 567 00fb 04       		.byte	0x4
+ 568 00fc 06       		.uleb128 0x6
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 14
+
+
+ 569 00fd C1030000 		.4byte	.LASF22
+ 570 0101 04       		.byte	0x4
+ 571 0102 A901     		.2byte	0x1a9
+ 572 0104 FA000000 		.4byte	0xfa
+ 573 0108 03       		.uleb128 0x3
+ 574 0109 08       		.byte	0x8
+ 575 010a 04       		.byte	0x4
+ 576 010b 09050000 		.4byte	.LASF23
+ 577 010f 03       		.uleb128 0x3
+ 578 0110 04       		.byte	0x4
+ 579 0111 07       		.byte	0x7
+ 580 0112 0F060000 		.4byte	.LASF24
+ 581 0116 03       		.uleb128 0x3
+ 582 0117 01       		.byte	0x1
+ 583 0118 08       		.byte	0x8
+ 584 0119 1D030000 		.4byte	.LASF25
+ 585 011d 07       		.uleb128 0x7
+ 586 011e 04       		.byte	0x4
+ 587 011f 23010000 		.4byte	0x123
+ 588 0123 08       		.uleb128 0x8
+ 589 0124 16010000 		.4byte	0x116
+ 590 0128 09       		.uleb128 0x9
+ 591 0129 04       		.byte	0x4
+ 592 012a 05       		.byte	0x5
+ 593 012b 27       		.byte	0x27
+ 594 012c 45010000 		.4byte	0x145
+ 595 0130 0A       		.uleb128 0xa
+ 596 0131 7800     		.ascii	"x\000"
+ 597 0133 05       		.byte	0x5
+ 598 0134 28       		.byte	0x28
+ 599 0135 EF000000 		.4byte	0xef
+ 600 0139 00       		.byte	0
+ 601 013a 0A       		.uleb128 0xa
+ 602 013b 7900     		.ascii	"y\000"
+ 603 013d 05       		.byte	0x5
+ 604 013e 29       		.byte	0x29
+ 605 013f EF000000 		.4byte	0xef
+ 606 0143 02       		.byte	0x2
+ 607 0144 00       		.byte	0
+ 608 0145 02       		.uleb128 0x2
+ 609 0146 AC000000 		.4byte	.LASF26
+ 610 014a 05       		.byte	0x5
+ 611 014b 2A       		.byte	0x2a
+ 612 014c 28010000 		.4byte	0x128
+ 613 0150 09       		.uleb128 0x9
+ 614 0151 08       		.byte	0x8
+ 615 0152 05       		.byte	0x5
+ 616 0153 2D       		.byte	0x2d
+ 617 0154 85010000 		.4byte	0x185
+ 618 0158 0A       		.uleb128 0xa
+ 619 0159 783100   		.ascii	"x1\000"
+ 620 015c 05       		.byte	0x5
+ 621 015d 2E       		.byte	0x2e
+ 622 015e EF000000 		.4byte	0xef
+ 623 0162 00       		.byte	0
+ 624 0163 0A       		.uleb128 0xa
+ 625 0164 793100   		.ascii	"y1\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 15
+
+
+ 626 0167 05       		.byte	0x5
+ 627 0168 2F       		.byte	0x2f
+ 628 0169 EF000000 		.4byte	0xef
+ 629 016d 02       		.byte	0x2
+ 630 016e 0A       		.uleb128 0xa
+ 631 016f 783200   		.ascii	"x2\000"
+ 632 0172 05       		.byte	0x5
+ 633 0173 30       		.byte	0x30
+ 634 0174 EF000000 		.4byte	0xef
+ 635 0178 04       		.byte	0x4
+ 636 0179 0A       		.uleb128 0xa
+ 637 017a 793200   		.ascii	"y2\000"
+ 638 017d 05       		.byte	0x5
+ 639 017e 31       		.byte	0x31
+ 640 017f EF000000 		.4byte	0xef
+ 641 0183 06       		.byte	0x6
+ 642 0184 00       		.byte	0
+ 643 0185 02       		.uleb128 0x2
+ 644 0186 72070000 		.4byte	.LASF27
+ 645 018a 05       		.byte	0x5
+ 646 018b 32       		.byte	0x32
+ 647 018c 50010000 		.4byte	0x150
+ 648 0190 02       		.uleb128 0x2
+ 649 0191 09040000 		.4byte	.LASF28
+ 650 0195 05       		.byte	0x5
+ 651 0196 4E       		.byte	0x4e
+ 652 0197 B8000000 		.4byte	0xb8
+ 653 019b 09       		.uleb128 0x9
+ 654 019c 0C       		.byte	0xc
+ 655 019d 06       		.byte	0x6
+ 656 019e 2A       		.byte	0x2a
+ 657 019f EC010000 		.4byte	0x1ec
+ 658 01a3 0B       		.uleb128 0xb
+ 659 01a4 25080000 		.4byte	.LASF29
+ 660 01a8 06       		.byte	0x6
+ 661 01a9 2B       		.byte	0x2b
+ 662 01aa CE000000 		.4byte	0xce
+ 663 01ae 00       		.byte	0
+ 664 01af 0B       		.uleb128 0xb
+ 665 01b0 6C060000 		.4byte	.LASF30
+ 666 01b4 06       		.byte	0x6
+ 667 01b5 2C       		.byte	0x2c
+ 668 01b6 CE000000 		.4byte	0xce
+ 669 01ba 02       		.byte	0x2
+ 670 01bb 0B       		.uleb128 0xb
+ 671 01bc FD050000 		.4byte	.LASF31
+ 672 01c0 06       		.byte	0x6
+ 673 01c1 2D       		.byte	0x2d
+ 674 01c2 CE000000 		.4byte	0xce
+ 675 01c6 04       		.byte	0x4
+ 676 01c7 0B       		.uleb128 0xb
+ 677 01c8 92000000 		.4byte	.LASF32
+ 678 01cc 06       		.byte	0x6
+ 679 01cd 2E       		.byte	0x2e
+ 680 01ce C3000000 		.4byte	0xc3
+ 681 01d2 06       		.byte	0x6
+ 682 01d3 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 16
+
+
+ 683 01d4 98000000 		.4byte	.LASF33
+ 684 01d8 06       		.byte	0x6
+ 685 01d9 2F       		.byte	0x2f
+ 686 01da C3000000 		.4byte	0xc3
+ 687 01de 08       		.byte	0x8
+ 688 01df 0A       		.uleb128 0xa
+ 689 01e0 62707000 		.ascii	"bpp\000"
+ 690 01e4 06       		.byte	0x6
+ 691 01e5 30       		.byte	0x30
+ 692 01e6 B8000000 		.4byte	0xb8
+ 693 01ea 0A       		.byte	0xa
+ 694 01eb 00       		.byte	0
+ 695 01ec 02       		.uleb128 0x2
+ 696 01ed 43030000 		.4byte	.LASF34
+ 697 01f1 06       		.byte	0x6
+ 698 01f2 31       		.byte	0x31
+ 699 01f3 9B010000 		.4byte	0x19b
+ 700 01f7 0C       		.uleb128 0xc
+ 701 01f8 D6020000 		.4byte	.LASF143
+ 702 01fc 18       		.byte	0x18
+ 703 01fd 06       		.byte	0x6
+ 704 01fe 3F       		.byte	0x3f
+ 705 01ff 73020000 		.4byte	0x273
+ 706 0203 0B       		.uleb128 0xb
+ 707 0204 9E000000 		.4byte	.LASF35
+ 708 0208 06       		.byte	0x6
+ 709 0209 41       		.byte	0x41
+ 710 020a A9020000 		.4byte	0x2a9
+ 711 020e 00       		.byte	0
+ 712 020f 0B       		.uleb128 0xb
+ 713 0210 EB060000 		.4byte	.LASF36
+ 714 0214 06       		.byte	0x6
+ 715 0215 44       		.byte	0x44
+ 716 0216 CE020000 		.4byte	0x2ce
+ 717 021a 04       		.byte	0x4
+ 718 021b 0B       		.uleb128 0xb
+ 719 021c 04030000 		.4byte	.LASF37
+ 720 0220 06       		.byte	0x6
+ 721 0221 47       		.byte	0x47
+ 722 0222 EF000000 		.4byte	0xef
+ 723 0226 08       		.byte	0x8
+ 724 0227 0B       		.uleb128 0xb
+ 725 0228 7A060000 		.4byte	.LASF38
+ 726 022c 06       		.byte	0x6
+ 727 022d 48       		.byte	0x48
+ 728 022e EF000000 		.4byte	0xef
+ 729 0232 0A       		.byte	0xa
+ 730 0233 0D       		.uleb128 0xd
+ 731 0234 DF040000 		.4byte	.LASF44
+ 732 0238 06       		.byte	0x6
+ 733 0239 49       		.byte	0x49
+ 734 023a B8000000 		.4byte	0xb8
+ 735 023e 01       		.byte	0x1
+ 736 023f 02       		.byte	0x2
+ 737 0240 06       		.byte	0x6
+ 738 0241 0C       		.byte	0xc
+ 739 0242 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 17
+
+
+ 740 0243 7C010000 		.4byte	.LASF39
+ 741 0247 06       		.byte	0x6
+ 742 0248 4B       		.byte	0x4b
+ 743 0249 AD000000 		.4byte	0xad
+ 744 024d 0D       		.byte	0xd
+ 745 024e 0B       		.uleb128 0xb
+ 746 024f 32010000 		.4byte	.LASF40
+ 747 0253 06       		.byte	0x6
+ 748 0254 4C       		.byte	0x4c
+ 749 0255 AD000000 		.4byte	0xad
+ 750 0259 0E       		.byte	0xe
+ 751 025a 0A       		.uleb128 0xa
+ 752 025b 64736300 		.ascii	"dsc\000"
+ 753 025f 06       		.byte	0x6
+ 754 0260 4E       		.byte	0x4e
+ 755 0261 FA000000 		.4byte	0xfa
+ 756 0265 10       		.byte	0x10
+ 757 0266 0B       		.uleb128 0xb
+ 758 0267 B1030000 		.4byte	.LASF41
+ 759 026b 06       		.byte	0x6
+ 760 026c 50       		.byte	0x50
+ 761 026d FC000000 		.4byte	0xfc
+ 762 0271 14       		.byte	0x14
+ 763 0272 00       		.byte	0
+ 764 0273 0E       		.uleb128 0xe
+ 765 0274 91020000 		.4byte	0x291
+ 766 0278 91020000 		.4byte	0x291
+ 767 027c 0F       		.uleb128 0xf
+ 768 027d 98020000 		.4byte	0x298
+ 769 0281 0F       		.uleb128 0xf
+ 770 0282 A3020000 		.4byte	0x2a3
+ 771 0286 0F       		.uleb128 0xf
+ 772 0287 E4000000 		.4byte	0xe4
+ 773 028b 0F       		.uleb128 0xf
+ 774 028c E4000000 		.4byte	0xe4
+ 775 0290 00       		.byte	0
+ 776 0291 03       		.uleb128 0x3
+ 777 0292 01       		.byte	0x1
+ 778 0293 02       		.byte	0x2
+ 779 0294 D0020000 		.4byte	.LASF42
+ 780 0298 07       		.uleb128 0x7
+ 781 0299 04       		.byte	0x4
+ 782 029a 9E020000 		.4byte	0x29e
+ 783 029e 08       		.uleb128 0x8
+ 784 029f F7010000 		.4byte	0x1f7
+ 785 02a3 07       		.uleb128 0x7
+ 786 02a4 04       		.byte	0x4
+ 787 02a5 EC010000 		.4byte	0x1ec
+ 788 02a9 07       		.uleb128 0x7
+ 789 02aa 04       		.byte	0x4
+ 790 02ab 73020000 		.4byte	0x273
+ 791 02af 0E       		.uleb128 0xe
+ 792 02b0 C3020000 		.4byte	0x2c3
+ 793 02b4 C3020000 		.4byte	0x2c3
+ 794 02b8 0F       		.uleb128 0xf
+ 795 02b9 98020000 		.4byte	0x298
+ 796 02bd 0F       		.uleb128 0xf
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 18
+
+
+ 797 02be E4000000 		.4byte	0xe4
+ 798 02c2 00       		.byte	0
+ 799 02c3 07       		.uleb128 0x7
+ 800 02c4 04       		.byte	0x4
+ 801 02c5 C9020000 		.4byte	0x2c9
+ 802 02c9 08       		.uleb128 0x8
+ 803 02ca B8000000 		.4byte	0xb8
+ 804 02ce 07       		.uleb128 0x7
+ 805 02cf 04       		.byte	0x4
+ 806 02d0 AF020000 		.4byte	0x2af
+ 807 02d4 02       		.uleb128 0x2
+ 808 02d5 50050000 		.4byte	.LASF43
+ 809 02d9 06       		.byte	0x6
+ 810 02da 54       		.byte	0x54
+ 811 02db F7010000 		.4byte	0x1f7
+ 812 02df 09       		.uleb128 0x9
+ 813 02e0 02       		.byte	0x2
+ 814 02e1 07       		.byte	0x7
+ 815 02e2 EA       		.byte	0xea
+ 816 02e3 24030000 		.4byte	0x324
+ 817 02e7 0D       		.uleb128 0xd
+ 818 02e8 07080000 		.4byte	.LASF45
+ 819 02ec 07       		.byte	0x7
+ 820 02ed F0       		.byte	0xf0
+ 821 02ee CE000000 		.4byte	0xce
+ 822 02f2 02       		.byte	0x2
+ 823 02f3 03       		.byte	0x3
+ 824 02f4 0D       		.byte	0xd
+ 825 02f5 00       		.byte	0
+ 826 02f6 10       		.uleb128 0x10
+ 827 02f7 72656400 		.ascii	"red\000"
+ 828 02fb 07       		.byte	0x7
+ 829 02fc F1       		.byte	0xf1
+ 830 02fd CE000000 		.4byte	0xce
+ 831 0301 02       		.byte	0x2
+ 832 0302 05       		.byte	0x5
+ 833 0303 08       		.byte	0x8
+ 834 0304 00       		.byte	0
+ 835 0305 0D       		.uleb128 0xd
+ 836 0306 91050000 		.4byte	.LASF46
+ 837 030a 07       		.byte	0x7
+ 838 030b F2       		.byte	0xf2
+ 839 030c CE000000 		.4byte	0xce
+ 840 0310 02       		.byte	0x2
+ 841 0311 05       		.byte	0x5
+ 842 0312 03       		.byte	0x3
+ 843 0313 00       		.byte	0
+ 844 0314 0D       		.uleb128 0xd
+ 845 0315 0F080000 		.4byte	.LASF47
+ 846 0319 07       		.byte	0x7
+ 847 031a F3       		.byte	0xf3
+ 848 031b CE000000 		.4byte	0xce
+ 849 031f 02       		.byte	0x2
+ 850 0320 03       		.byte	0x3
+ 851 0321 00       		.byte	0
+ 852 0322 00       		.byte	0
+ 853 0323 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 19
+
+
+ 854 0324 11       		.uleb128 0x11
+ 855 0325 02       		.byte	0x2
+ 856 0326 07       		.byte	0x7
+ 857 0327 E9       		.byte	0xe9
+ 858 0328 42030000 		.4byte	0x342
+ 859 032c 12       		.uleb128 0x12
+ 860 032d 636800   		.ascii	"ch\000"
+ 861 0330 07       		.byte	0x7
+ 862 0331 F5       		.byte	0xf5
+ 863 0332 DF020000 		.4byte	0x2df
+ 864 0336 13       		.uleb128 0x13
+ 865 0337 26000000 		.4byte	.LASF48
+ 866 033b 07       		.byte	0x7
+ 867 033c F6       		.byte	0xf6
+ 868 033d CE000000 		.4byte	0xce
+ 869 0341 00       		.byte	0
+ 870 0342 02       		.uleb128 0x2
+ 871 0343 1E050000 		.4byte	.LASF49
+ 872 0347 07       		.byte	0x7
+ 873 0348 F7       		.byte	0xf7
+ 874 0349 24030000 		.4byte	0x324
+ 875 034d 06       		.uleb128 0x6
+ 876 034e E5040000 		.4byte	.LASF50
+ 877 0352 07       		.byte	0x7
+ 878 0353 0D01     		.2byte	0x10d
+ 879 0355 42030000 		.4byte	0x342
+ 880 0359 06       		.uleb128 0x6
+ 881 035a 70050000 		.4byte	.LASF51
+ 882 035e 07       		.byte	0x7
+ 883 035f 2001     		.2byte	0x120
+ 884 0361 B8000000 		.4byte	0xb8
+ 885 0365 02       		.uleb128 0x2
+ 886 0366 75020000 		.4byte	.LASF52
+ 887 036a 08       		.byte	0x8
+ 888 036b 25       		.byte	0x25
+ 889 036c B8000000 		.4byte	0xb8
+ 890 0370 02       		.uleb128 0x2
+ 891 0371 E9050000 		.4byte	.LASF53
+ 892 0375 08       		.byte	0x8
+ 893 0376 30       		.byte	0x30
+ 894 0377 B8000000 		.4byte	0xb8
+ 895 037b 14       		.uleb128 0x14
+ 896 037c 01       		.byte	0x1
+ 897 037d 42000000 		.4byte	0x42
+ 898 0381 08       		.byte	0x8
+ 899 0382 32       		.byte	0x32
+ 900 0383 A0030000 		.4byte	0x3a0
+ 901 0387 15       		.uleb128 0x15
+ 902 0388 9E060000 		.4byte	.LASF54
+ 903 038c 00       		.byte	0
+ 904 038d 15       		.uleb128 0x15
+ 905 038e C2040000 		.4byte	.LASF55
+ 906 0392 01       		.byte	0x1
+ 907 0393 15       		.uleb128 0x15
+ 908 0394 2B000000 		.4byte	.LASF56
+ 909 0398 02       		.byte	0x2
+ 910 0399 15       		.uleb128 0x15
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 20
+
+
+ 911 039a 4E060000 		.4byte	.LASF57
+ 912 039e 03       		.byte	0x3
+ 913 039f 00       		.byte	0
+ 914 03a0 02       		.uleb128 0x2
+ 915 03a1 88020000 		.4byte	.LASF58
+ 916 03a5 08       		.byte	0x8
+ 917 03a6 3D       		.byte	0x3d
+ 918 03a7 AB030000 		.4byte	0x3ab
+ 919 03ab 07       		.uleb128 0x7
+ 920 03ac 04       		.byte	0x4
+ 921 03ad B1030000 		.4byte	0x3b1
+ 922 03b1 0E       		.uleb128 0xe
+ 923 03b2 65030000 		.4byte	0x365
+ 924 03b6 D4030000 		.4byte	0x3d4
+ 925 03ba 0F       		.uleb128 0xf
+ 926 03bb D4030000 		.4byte	0x3d4
+ 927 03bf 0F       		.uleb128 0xf
+ 928 03c0 EF000000 		.4byte	0xef
+ 929 03c4 0F       		.uleb128 0xf
+ 930 03c5 EF000000 		.4byte	0xef
+ 931 03c9 0F       		.uleb128 0xf
+ 932 03ca EF000000 		.4byte	0xef
+ 933 03ce 0F       		.uleb128 0xf
+ 934 03cf FA000000 		.4byte	0xfa
+ 935 03d3 00       		.byte	0
+ 936 03d4 07       		.uleb128 0x7
+ 937 03d5 04       		.byte	0x4
+ 938 03d6 59030000 		.4byte	0x359
+ 939 03da 02       		.uleb128 0x2
+ 940 03db 1D070000 		.4byte	.LASF59
+ 941 03df 08       		.byte	0x8
+ 942 03e0 41       		.byte	0x41
+ 943 03e1 B8000000 		.4byte	0xb8
+ 944 03e5 09       		.uleb128 0x9
+ 945 03e6 08       		.byte	0x8
+ 946 03e7 08       		.byte	0x8
+ 947 03e8 43       		.byte	0x43
+ 948 03e9 05040000 		.4byte	0x405
+ 949 03ed 0A       		.uleb128 0xa
+ 950 03ee 636200   		.ascii	"cb\000"
+ 951 03f1 08       		.byte	0x8
+ 952 03f2 44       		.byte	0x44
+ 953 03f3 A0030000 		.4byte	0x3a0
+ 954 03f7 00       		.byte	0
+ 955 03f8 0B       		.uleb128 0xb
+ 956 03f9 CD060000 		.4byte	.LASF60
+ 957 03fd 08       		.byte	0x8
+ 958 03fe 45       		.byte	0x45
+ 959 03ff 70030000 		.4byte	0x370
+ 960 0403 04       		.byte	0x4
+ 961 0404 00       		.byte	0
+ 962 0405 02       		.uleb128 0x2
+ 963 0406 01010000 		.4byte	.LASF61
+ 964 040a 08       		.byte	0x8
+ 965 040b 46       		.byte	0x46
+ 966 040c E5030000 		.4byte	0x3e5
+ 967 0410 09       		.uleb128 0x9
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 21
+
+
+ 968 0411 0A       		.byte	0xa
+ 969 0412 08       		.byte	0x8
+ 970 0413 4C       		.byte	0x4c
+ 971 0414 3E040000 		.4byte	0x43e
+ 972 0418 0A       		.uleb128 0xa
+ 973 0419 703100   		.ascii	"p1\000"
+ 974 041c 08       		.byte	0x8
+ 975 041d 4E       		.byte	0x4e
+ 976 041e 45010000 		.4byte	0x145
+ 977 0422 00       		.byte	0
+ 978 0423 0A       		.uleb128 0xa
+ 979 0424 703200   		.ascii	"p2\000"
+ 980 0427 08       		.byte	0x8
+ 981 0428 51       		.byte	0x51
+ 982 0429 45010000 		.4byte	0x145
+ 983 042d 04       		.byte	0x4
+ 984 042e 0D       		.uleb128 0xd
+ 985 042f CD000000 		.4byte	.LASF62
+ 986 0433 08       		.byte	0x8
+ 987 0434 54       		.byte	0x54
+ 988 0435 DA030000 		.4byte	0x3da
+ 989 0439 01       		.byte	0x1
+ 990 043a 02       		.byte	0x2
+ 991 043b 06       		.byte	0x6
+ 992 043c 08       		.byte	0x8
+ 993 043d 00       		.byte	0
+ 994 043e 09       		.uleb128 0x9
+ 995 043f 2C       		.byte	0x2c
+ 996 0440 08       		.byte	0x8
+ 997 0441 48       		.byte	0x48
+ 998 0442 B9040000 		.4byte	0x4b9
+ 999 0446 0A       		.uleb128 0xa
+ 1000 0447 64736300 		.ascii	"dsc\000"
+ 1001 044b 08       		.byte	0x8
+ 1002 044c 4A       		.byte	0x4a
+ 1003 044d 05040000 		.4byte	0x405
+ 1004 0451 00       		.byte	0
+ 1005 0452 0A       		.uleb128 0xa
+ 1006 0453 63666700 		.ascii	"cfg\000"
+ 1007 0457 08       		.byte	0x8
+ 1008 0458 55       		.byte	0x55
+ 1009 0459 10040000 		.4byte	0x410
+ 1010 045d 08       		.byte	0x8
+ 1011 045e 0B       		.uleb128 0xb
+ 1012 045f 7A040000 		.4byte	.LASF63
+ 1013 0463 08       		.byte	0x8
+ 1014 0464 58       		.byte	0x58
+ 1015 0465 45010000 		.4byte	0x145
+ 1016 0469 12       		.byte	0x12
+ 1017 046a 0B       		.uleb128 0xb
+ 1018 046b 47050000 		.4byte	.LASF64
+ 1019 046f 08       		.byte	0x8
+ 1020 0470 5B       		.byte	0x5b
+ 1021 0471 D9000000 		.4byte	0xd9
+ 1022 0475 18       		.byte	0x18
+ 1023 0476 0B       		.uleb128 0xb
+ 1024 0477 78030000 		.4byte	.LASF65
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 22
+
+
+ 1025 047b 08       		.byte	0x8
+ 1026 047c 5E       		.byte	0x5e
+ 1027 047d D9000000 		.4byte	0xd9
+ 1028 0481 1C       		.byte	0x1c
+ 1029 0482 0B       		.uleb128 0xb
+ 1030 0483 BB030000 		.4byte	.LASF66
+ 1031 0487 08       		.byte	0x8
+ 1032 0488 61       		.byte	0x61
+ 1033 0489 D9000000 		.4byte	0xd9
+ 1034 048d 20       		.byte	0x20
+ 1035 048e 0A       		.uleb128 0xa
+ 1036 048f 73707800 		.ascii	"spx\000"
+ 1037 0493 08       		.byte	0x8
+ 1038 0494 64       		.byte	0x64
+ 1039 0495 D9000000 		.4byte	0xd9
+ 1040 0499 24       		.byte	0x24
+ 1041 049a 0D       		.uleb128 0xd
+ 1042 049b A2050000 		.4byte	.LASF67
+ 1043 049f 08       		.byte	0x8
+ 1044 04a0 67       		.byte	0x67
+ 1045 04a1 B8000000 		.4byte	0xb8
+ 1046 04a5 01       		.byte	0x1
+ 1047 04a6 01       		.byte	0x1
+ 1048 04a7 07       		.byte	0x7
+ 1049 04a8 28       		.byte	0x28
+ 1050 04a9 10       		.uleb128 0x10
+ 1051 04aa 696E7600 		.ascii	"inv\000"
+ 1052 04ae 08       		.byte	0x8
+ 1053 04af 6C       		.byte	0x6c
+ 1054 04b0 B8000000 		.4byte	0xb8
+ 1055 04b4 01       		.byte	0x1
+ 1056 04b5 01       		.byte	0x1
+ 1057 04b6 06       		.byte	0x6
+ 1058 04b7 28       		.byte	0x28
+ 1059 04b8 00       		.byte	0
+ 1060 04b9 02       		.uleb128 0x2
+ 1061 04ba 52040000 		.4byte	.LASF68
+ 1062 04be 08       		.byte	0x8
+ 1063 04bf 6D       		.byte	0x6d
+ 1064 04c0 3E040000 		.4byte	0x43e
+ 1065 04c4 02       		.uleb128 0x2
+ 1066 04c5 E6020000 		.4byte	.LASF69
+ 1067 04c9 09       		.byte	0x9
+ 1068 04ca 23       		.byte	0x23
+ 1069 04cb B8000000 		.4byte	0xb8
+ 1070 04cf 02       		.uleb128 0x2
+ 1071 04d0 6C040000 		.4byte	.LASF70
+ 1072 04d4 0A       		.byte	0xa
+ 1073 04d5 48       		.byte	0x48
+ 1074 04d6 B8000000 		.4byte	0xb8
+ 1075 04da 02       		.uleb128 0x2
+ 1076 04db 2B050000 		.4byte	.LASF71
+ 1077 04df 0A       		.byte	0xa
+ 1078 04e0 DA       		.byte	0xda
+ 1079 04e1 C3000000 		.4byte	0xc3
+ 1080 04e5 09       		.uleb128 0x9
+ 1081 04e6 54       		.byte	0x54
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 23
+
+
+ 1082 04e7 0B       		.byte	0xb
+ 1083 04e8 1A       		.byte	0x1a
+ 1084 04e9 F8060000 		.4byte	0x6f8
+ 1085 04ed 0B       		.uleb128 0xb
+ 1086 04ee 8E060000 		.4byte	.LASF72
+ 1087 04f2 0B       		.byte	0xb
+ 1088 04f3 1B       		.byte	0x1b
+ 1089 04f4 DA040000 		.4byte	0x4da
+ 1090 04f8 00       		.byte	0
+ 1091 04f9 0B       		.uleb128 0xb
+ 1092 04fa 14070000 		.4byte	.LASF73
+ 1093 04fe 0B       		.byte	0xb
+ 1094 04ff 1E       		.byte	0x1e
+ 1095 0500 4D030000 		.4byte	0x34d
+ 1096 0504 02       		.byte	0x2
+ 1097 0505 0B       		.uleb128 0xb
+ 1098 0506 58070000 		.4byte	.LASF74
+ 1099 050a 0B       		.byte	0xb
+ 1100 050b 1F       		.byte	0x1f
+ 1101 050c 4D030000 		.4byte	0x34d
+ 1102 0510 04       		.byte	0x4
+ 1103 0511 0B       		.uleb128 0xb
+ 1104 0512 66070000 		.4byte	.LASF75
+ 1105 0516 0B       		.byte	0xb
+ 1106 0517 20       		.byte	0x20
+ 1107 0518 CF040000 		.4byte	0x4cf
+ 1108 051c 06       		.byte	0x6
+ 1109 051d 0B       		.uleb128 0xb
+ 1110 051e 13000000 		.4byte	.LASF76
+ 1111 0522 0B       		.byte	0xb
+ 1112 0523 21       		.byte	0x21
+ 1113 0524 DA040000 		.4byte	0x4da
+ 1114 0528 08       		.byte	0x8
+ 1115 0529 0B       		.uleb128 0xb
+ 1116 052a BA060000 		.4byte	.LASF77
+ 1117 052e 0B       		.byte	0xb
+ 1118 052f 22       		.byte	0x22
+ 1119 0530 DA040000 		.4byte	0x4da
+ 1120 0534 0A       		.byte	0xa
+ 1121 0535 0B       		.uleb128 0xb
+ 1122 0536 02040000 		.4byte	.LASF78
+ 1123 053a 0B       		.byte	0xb
+ 1124 053b 23       		.byte	0x23
+ 1125 053c 59030000 		.4byte	0x359
+ 1126 0540 0C       		.byte	0xc
+ 1127 0541 0B       		.uleb128 0xb
+ 1128 0542 DB050000 		.4byte	.LASF79
+ 1129 0546 0B       		.byte	0xb
+ 1130 0547 24       		.byte	0x24
+ 1131 0548 C4040000 		.4byte	0x4c4
+ 1132 054c 0D       		.byte	0xd
+ 1133 054d 0B       		.uleb128 0xb
+ 1134 054e 80040000 		.4byte	.LASF80
+ 1135 0552 0B       		.byte	0xb
+ 1136 0553 27       		.byte	0x27
+ 1137 0554 4D030000 		.4byte	0x34d
+ 1138 0558 0E       		.byte	0xe
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 24
+
+
+ 1139 0559 0B       		.uleb128 0xb
+ 1140 055a BF010000 		.4byte	.LASF81
+ 1141 055e 0B       		.byte	0xb
+ 1142 055f 28       		.byte	0x28
+ 1143 0560 DA040000 		.4byte	0x4da
+ 1144 0564 10       		.byte	0x10
+ 1145 0565 0B       		.uleb128 0xb
+ 1146 0566 79000000 		.4byte	.LASF82
+ 1147 056a 0B       		.byte	0xb
+ 1148 056b 29       		.byte	0x29
+ 1149 056c DA040000 		.4byte	0x4da
+ 1150 0570 12       		.byte	0x12
+ 1151 0571 0B       		.uleb128 0xb
+ 1152 0572 56010000 		.4byte	.LASF83
+ 1153 0576 0B       		.byte	0xb
+ 1154 0577 2A       		.byte	0x2a
+ 1155 0578 59030000 		.4byte	0x359
+ 1156 057c 14       		.byte	0x14
+ 1157 057d 0B       		.uleb128 0xb
+ 1158 057e AB070000 		.4byte	.LASF84
+ 1159 0582 0B       		.byte	0xb
+ 1160 0583 2B       		.byte	0x2b
+ 1161 0584 C4040000 		.4byte	0x4c4
+ 1162 0588 15       		.byte	0x15
+ 1163 0589 0D       		.uleb128 0xd
+ 1164 058a 96050000 		.4byte	.LASF85
+ 1165 058e 0B       		.byte	0xb
+ 1166 058f 2C       		.byte	0x2c
+ 1167 0590 B8000000 		.4byte	0xb8
+ 1168 0594 01       		.byte	0x1
+ 1169 0595 01       		.byte	0x1
+ 1170 0596 07       		.byte	0x7
+ 1171 0597 16       		.byte	0x16
+ 1172 0598 0B       		.uleb128 0xb
+ 1173 0599 F6020000 		.4byte	.LASF86
+ 1174 059d 0B       		.byte	0xb
+ 1175 059e 2F       		.byte	0x2f
+ 1176 059f 4D030000 		.4byte	0x34d
+ 1177 05a3 18       		.byte	0x18
+ 1178 05a4 0B       		.uleb128 0xb
+ 1179 05a5 81030000 		.4byte	.LASF87
+ 1180 05a9 0B       		.byte	0xb
+ 1181 05aa 30       		.byte	0x30
+ 1182 05ab DA040000 		.4byte	0x4da
+ 1183 05af 1A       		.byte	0x1a
+ 1184 05b0 0B       		.uleb128 0xb
+ 1185 05b1 14040000 		.4byte	.LASF88
+ 1186 05b5 0B       		.byte	0xb
+ 1187 05b6 31       		.byte	0x31
+ 1188 05b7 DA040000 		.4byte	0x4da
+ 1189 05bb 1C       		.byte	0x1c
+ 1190 05bc 0B       		.uleb128 0xb
+ 1191 05bd C1000000 		.4byte	.LASF89
+ 1192 05c1 0B       		.byte	0xb
+ 1193 05c2 32       		.byte	0x32
+ 1194 05c3 59030000 		.4byte	0x359
+ 1195 05c7 1E       		.byte	0x1e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 25
+
+
+ 1196 05c8 0B       		.uleb128 0xb
+ 1197 05c9 9E030000 		.4byte	.LASF90
+ 1198 05cd 0B       		.byte	0xb
+ 1199 05ce 33       		.byte	0x33
+ 1200 05cf C4040000 		.4byte	0x4c4
+ 1201 05d3 1F       		.byte	0x1f
+ 1202 05d4 0B       		.uleb128 0xb
+ 1203 05d5 1B010000 		.4byte	.LASF91
+ 1204 05d9 0B       		.byte	0xb
+ 1205 05da 36       		.byte	0x36
+ 1206 05db 4D030000 		.4byte	0x34d
+ 1207 05df 20       		.byte	0x20
+ 1208 05e0 0B       		.uleb128 0xb
+ 1209 05e1 41070000 		.4byte	.LASF92
+ 1210 05e5 0B       		.byte	0xb
+ 1211 05e6 37       		.byte	0x37
+ 1212 05e7 DA040000 		.4byte	0x4da
+ 1213 05eb 22       		.byte	0x22
+ 1214 05ec 0B       		.uleb128 0xb
+ 1215 05ed 2E040000 		.4byte	.LASF93
+ 1216 05f1 0B       		.byte	0xb
+ 1217 05f2 38       		.byte	0x38
+ 1218 05f3 DA040000 		.4byte	0x4da
+ 1219 05f7 24       		.byte	0x24
+ 1220 05f8 0B       		.uleb128 0xb
+ 1221 05f9 3B040000 		.4byte	.LASF94
+ 1222 05fd 0B       		.byte	0xb
+ 1223 05fe 39       		.byte	0x39
+ 1224 05ff DA040000 		.4byte	0x4da
+ 1225 0603 26       		.byte	0x26
+ 1226 0604 0B       		.uleb128 0xb
+ 1227 0605 20040000 		.4byte	.LASF95
+ 1228 0609 0B       		.byte	0xb
+ 1229 060a 3A       		.byte	0x3a
+ 1230 060b DA040000 		.4byte	0x4da
+ 1231 060f 28       		.byte	0x28
+ 1232 0610 0B       		.uleb128 0xb
+ 1233 0611 A7020000 		.4byte	.LASF96
+ 1234 0615 0B       		.byte	0xb
+ 1235 0616 3B       		.byte	0x3b
+ 1236 0617 59030000 		.4byte	0x359
+ 1237 061b 2A       		.byte	0x2a
+ 1238 061c 0B       		.uleb128 0xb
+ 1239 061d D2000000 		.4byte	.LASF97
+ 1240 0621 0B       		.byte	0xb
+ 1241 0622 3C       		.byte	0x3c
+ 1242 0623 C4040000 		.4byte	0x4c4
+ 1243 0627 2B       		.byte	0x2b
+ 1244 0628 0B       		.uleb128 0xb
+ 1245 0629 17080000 		.4byte	.LASF98
+ 1246 062d 0B       		.byte	0xb
+ 1247 062e 3F       		.byte	0x3f
+ 1248 062f F8060000 		.4byte	0x6f8
+ 1249 0633 2C       		.byte	0x2c
+ 1250 0634 0B       		.uleb128 0xb
+ 1251 0635 10030000 		.4byte	.LASF99
+ 1252 0639 0B       		.byte	0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 26
+
+
+ 1253 063a 40       		.byte	0x40
+ 1254 063b FF060000 		.4byte	0x6ff
+ 1255 063f 30       		.byte	0x30
+ 1256 0640 0B       		.uleb128 0xb
+ 1257 0641 9B070000 		.4byte	.LASF100
+ 1258 0645 0B       		.byte	0xb
+ 1259 0646 41       		.byte	0x41
+ 1260 0647 4D030000 		.4byte	0x34d
+ 1261 064b 34       		.byte	0x34
+ 1262 064c 0B       		.uleb128 0xb
+ 1263 064d F5000000 		.4byte	.LASF101
+ 1264 0651 0B       		.byte	0xb
+ 1265 0652 42       		.byte	0x42
+ 1266 0653 59030000 		.4byte	0x359
+ 1267 0657 36       		.byte	0x36
+ 1268 0658 0B       		.uleb128 0xb
+ 1269 0659 BC020000 		.4byte	.LASF102
+ 1270 065d 0B       		.byte	0xb
+ 1271 065e 43       		.byte	0x43
+ 1272 065f 59030000 		.4byte	0x359
+ 1273 0663 37       		.byte	0x37
+ 1274 0664 0D       		.uleb128 0xd
+ 1275 0665 8F030000 		.4byte	.LASF103
+ 1276 0669 0B       		.byte	0xb
+ 1277 066a 44       		.byte	0x44
+ 1278 066b B8000000 		.4byte	0xb8
+ 1279 066f 01       		.byte	0x1
+ 1280 0670 01       		.byte	0x1
+ 1281 0671 07       		.byte	0x7
+ 1282 0672 38       		.byte	0x38
+ 1283 0673 0B       		.uleb128 0xb
+ 1284 0674 00000000 		.4byte	.LASF104
+ 1285 0678 0B       		.byte	0xb
+ 1286 0679 45       		.byte	0x45
+ 1287 067a C4040000 		.4byte	0x4c4
+ 1288 067e 39       		.byte	0x39
+ 1289 067f 0B       		.uleb128 0xb
+ 1290 0680 28010000 		.4byte	.LASF105
+ 1291 0684 0B       		.byte	0xb
+ 1292 0685 48       		.byte	0x48
+ 1293 0686 1D010000 		.4byte	0x11d
+ 1294 068a 3C       		.byte	0x3c
+ 1295 068b 0B       		.uleb128 0xb
+ 1296 068c 36070000 		.4byte	.LASF106
+ 1297 0690 0B       		.byte	0xb
+ 1298 0691 49       		.byte	0x49
+ 1299 0692 FF060000 		.4byte	0x6ff
+ 1300 0696 40       		.byte	0x40
+ 1301 0697 0B       		.uleb128 0xb
+ 1302 0698 B2020000 		.4byte	.LASF107
+ 1303 069c 0B       		.byte	0xb
+ 1304 069d 4A       		.byte	0x4a
+ 1305 069e 59030000 		.4byte	0x359
+ 1306 06a2 44       		.byte	0x44
+ 1307 06a3 0B       		.uleb128 0xb
+ 1308 06a4 F6030000 		.4byte	.LASF108
+ 1309 06a8 0B       		.byte	0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 27
+
+
+ 1310 06a9 4B       		.byte	0x4b
+ 1311 06aa 4D030000 		.4byte	0x34d
+ 1312 06ae 46       		.byte	0x46
+ 1313 06af 0B       		.uleb128 0xb
+ 1314 06b0 FC060000 		.4byte	.LASF109
+ 1315 06b4 0B       		.byte	0xb
+ 1316 06b5 4C       		.byte	0x4c
+ 1317 06b6 DA040000 		.4byte	0x4da
+ 1318 06ba 48       		.byte	0x48
+ 1319 06bb 0B       		.uleb128 0xb
+ 1320 06bc 08070000 		.4byte	.LASF110
+ 1321 06c0 0B       		.byte	0xb
+ 1322 06c1 4D       		.byte	0x4d
+ 1323 06c2 DA040000 		.4byte	0x4da
+ 1324 06c6 4A       		.byte	0x4a
+ 1325 06c7 0B       		.uleb128 0xb
+ 1326 06c8 9E040000 		.4byte	.LASF111
+ 1327 06cc 0B       		.byte	0xb
+ 1328 06cd 4E       		.byte	0x4e
+ 1329 06ce DA040000 		.4byte	0x4da
+ 1330 06d2 4C       		.byte	0x4c
+ 1331 06d3 0B       		.uleb128 0xb
+ 1332 06d4 57030000 		.4byte	.LASF112
+ 1333 06d8 0B       		.byte	0xb
+ 1334 06d9 4F       		.byte	0x4f
+ 1335 06da DA040000 		.4byte	0x4da
+ 1336 06de 4E       		.byte	0x4e
+ 1337 06df 0B       		.uleb128 0xb
+ 1338 06e0 C5050000 		.4byte	.LASF113
+ 1339 06e4 0B       		.byte	0xb
+ 1340 06e5 50       		.byte	0x50
+ 1341 06e6 90010000 		.4byte	0x190
+ 1342 06ea 50       		.byte	0x50
+ 1343 06eb 0B       		.uleb128 0xb
+ 1344 06ec B1040000 		.4byte	.LASF114
+ 1345 06f0 0B       		.byte	0xb
+ 1346 06f1 51       		.byte	0x51
+ 1347 06f2 C4040000 		.4byte	0x4c4
+ 1348 06f6 51       		.byte	0x51
+ 1349 06f7 00       		.byte	0
+ 1350 06f8 07       		.uleb128 0x7
+ 1351 06f9 04       		.byte	0x4
+ 1352 06fa FE060000 		.4byte	0x6fe
+ 1353 06fe 16       		.uleb128 0x16
+ 1354 06ff 07       		.uleb128 0x7
+ 1355 0700 04       		.byte	0x4
+ 1356 0701 05070000 		.4byte	0x705
+ 1357 0705 08       		.uleb128 0x8
+ 1358 0706 D4020000 		.4byte	0x2d4
+ 1359 070a 02       		.uleb128 0x2
+ 1360 070b E3030000 		.4byte	.LASF115
+ 1361 070f 0B       		.byte	0xb
+ 1362 0710 52       		.byte	0x52
+ 1363 0711 E5040000 		.4byte	0x4e5
+ 1364 0715 17       		.uleb128 0x17
+ 1365 0716 F9040000 		.4byte	.LASF131
+ 1366 071a 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 28
+
+
+ 1367 071b 37       		.byte	0x37
+ 1368 071c 00000000 		.4byte	.LFB37
+ 1369 0720 EC010000 		.4byte	.LFE37-.LFB37
+ 1370 0724 01       		.uleb128 0x1
+ 1371 0725 9C       		.byte	0x9c
+ 1372 0726 1E090000 		.4byte	0x91e
+ 1373 072a 18       		.uleb128 0x18
+ 1374 072b 8D040000 		.4byte	.LASF116
+ 1375 072f 01       		.byte	0x1
+ 1376 0730 37       		.byte	0x37
+ 1377 0731 1E090000 		.4byte	0x91e
+ 1378 0735 00000000 		.4byte	.LLST0
+ 1379 0739 18       		.uleb128 0x18
+ 1380 073a 94040000 		.4byte	.LASF117
+ 1381 073e 01       		.byte	0x1
+ 1382 073f 37       		.byte	0x37
+ 1383 0740 CE000000 		.4byte	0xce
+ 1384 0744 37000000 		.4byte	.LLST1
+ 1385 0748 18       		.uleb128 0x18
+ 1386 0749 84060000 		.4byte	.LASF118
+ 1387 074d 01       		.byte	0x1
+ 1388 074e 37       		.byte	0x37
+ 1389 074f 29090000 		.4byte	0x929
+ 1390 0753 63000000 		.4byte	.LLST2
+ 1391 0757 18       		.uleb128 0x18
+ 1392 0758 82050000 		.4byte	.LASF119
+ 1393 075c 01       		.byte	0x1
+ 1394 075d 38       		.byte	0x38
+ 1395 075e 34090000 		.4byte	0x934
+ 1396 0762 9B000000 		.4byte	.LLST3
+ 1397 0766 19       		.uleb128 0x19
+ 1398 0767 6900     		.ascii	"i\000"
+ 1399 0769 01       		.byte	0x1
+ 1400 076a 3D       		.byte	0x3d
+ 1401 076b C3000000 		.4byte	0xc3
+ 1402 076f D3000000 		.4byte	.LLST4
+ 1403 0773 1A       		.uleb128 0x1a
+ 1404 0774 03060000 		.4byte	.LASF120
+ 1405 0778 01       		.byte	0x1
+ 1406 0779 3E       		.byte	0x3e
+ 1407 077a 85010000 		.4byte	0x185
+ 1408 077e 02       		.uleb128 0x2
+ 1409 077f 91       		.byte	0x91
+ 1410 0780 50       		.sleb128 -48
+ 1411 0781 1B       		.uleb128 0x1b
+ 1412 0782 BD070000 		.4byte	.LASF121
+ 1413 0786 01       		.byte	0x1
+ 1414 0787 48       		.byte	0x48
+ 1415 0788 91020000 		.4byte	0x291
+ 1416 078c 1F010000 		.4byte	.LLST5
+ 1417 0790 1A       		.uleb128 0x1a
+ 1418 0791 4E070000 		.4byte	.LASF122
+ 1419 0795 01       		.byte	0x1
+ 1420 0796 49       		.byte	0x49
+ 1421 0797 85010000 		.4byte	0x185
+ 1422 079b 02       		.uleb128 0x2
+ 1423 079c 91       		.byte	0x91
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 29
+
+
+ 1424 079d 48       		.sleb128 -56
+ 1425 079e 1B       		.uleb128 0x1b
+ 1426 079f 8B050000 		.4byte	.LASF123
+ 1427 07a3 01       		.byte	0x1
+ 1428 07a4 4E       		.byte	0x4e
+ 1429 07a5 EF000000 		.4byte	0xef
+ 1430 07a9 32010000 		.4byte	.LLST6
+ 1431 07ad 1B       		.uleb128 0x1b
+ 1432 07ae 53000000 		.4byte	.LASF124
+ 1433 07b2 01       		.byte	0x1
+ 1434 07b3 4F       		.byte	0x4f
+ 1435 07b4 C3000000 		.4byte	0xc3
+ 1436 07b8 45010000 		.4byte	.LLST7
+ 1437 07bc 19       		.uleb128 0x19
+ 1438 07bd 6D7000   		.ascii	"mp\000"
+ 1439 07c0 01       		.byte	0x1
+ 1440 07c1 58       		.byte	0x58
+ 1441 07c2 3F090000 		.4byte	0x93f
+ 1442 07c6 6F010000 		.4byte	.LLST8
+ 1443 07ca 1B       		.uleb128 0x1b
+ 1444 07cb 70030000 		.4byte	.LASF125
+ 1445 07cf 01       		.byte	0x1
+ 1446 07d0 59       		.byte	0x59
+ 1447 07d1 3F090000 		.4byte	0x93f
+ 1448 07d5 8F010000 		.4byte	.LLST9
+ 1449 07d9 1B       		.uleb128 0x1b
+ 1450 07da 9B020000 		.4byte	.LASF126
+ 1451 07de 01       		.byte	0x1
+ 1452 07df 5B       		.byte	0x5b
+ 1453 07e0 D9000000 		.4byte	0xd9
+ 1454 07e4 E6010000 		.4byte	.LLST10
+ 1455 07e8 1B       		.uleb128 0x1b
+ 1456 07e9 36030000 		.4byte	.LASF127
+ 1457 07ed 01       		.byte	0x1
+ 1458 07ee 5C       		.byte	0x5c
+ 1459 07ef D9000000 		.4byte	0xd9
+ 1460 07f3 1A020000 		.4byte	.LLST11
+ 1461 07f7 1B       		.uleb128 0x1b
+ 1462 07f8 5A050000 		.4byte	.LASF128
+ 1463 07fc 01       		.byte	0x1
+ 1464 07fd 5D       		.byte	0x5d
+ 1465 07fe D9000000 		.4byte	0xd9
+ 1466 0802 59020000 		.4byte	.LLST12
+ 1467 0806 1B       		.uleb128 0x1b
+ 1468 0807 46000000 		.4byte	.LASF129
+ 1469 080b 01       		.byte	0x1
+ 1470 080c 5E       		.byte	0x5e
+ 1471 080d D9000000 		.4byte	0xd9
+ 1472 0811 9C020000 		.4byte	.LLST13
+ 1473 0815 1B       		.uleb128 0x1b
+ 1474 0816 95060000 		.4byte	.LASF130
+ 1475 081a 01       		.byte	0x1
+ 1476 081b 5F       		.byte	0x5f
+ 1477 081c E4000000 		.4byte	0xe4
+ 1478 0820 D2020000 		.4byte	.LLST14
+ 1479 0824 19       		.uleb128 0x19
+ 1480 0825 696E7600 		.ascii	"inv\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 30
+
+
+ 1481 0829 01       		.byte	0x1
+ 1482 082a 69       		.byte	0x69
+ 1483 082b 91020000 		.4byte	0x291
+ 1484 082f F1020000 		.4byte	.LLST15
+ 1485 0833 1C       		.uleb128 0x1c
+ 1486 0834 7E000000 		.4byte	.LVL8
+ 1487 0838 AC090000 		.4byte	0x9ac
+ 1488 083c 54080000 		.4byte	0x854
+ 1489 0840 1D       		.uleb128 0x1d
+ 1490 0841 01       		.uleb128 0x1
+ 1491 0842 50       		.byte	0x50
+ 1492 0843 02       		.uleb128 0x2
+ 1493 0844 91       		.byte	0x91
+ 1494 0845 48       		.sleb128 -56
+ 1495 0846 1D       		.uleb128 0x1d
+ 1496 0847 01       		.uleb128 0x1
+ 1497 0848 51       		.byte	0x51
+ 1498 0849 02       		.uleb128 0x2
+ 1499 084a 91       		.byte	0x91
+ 1500 084b 50       		.sleb128 -48
+ 1501 084c 1D       		.uleb128 0x1d
+ 1502 084d 01       		.uleb128 0x1
+ 1503 084e 52       		.byte	0x52
+ 1504 084f 03       		.uleb128 0x3
+ 1505 0850 91       		.byte	0x91
+ 1506 0851 40       		.sleb128 -64
+ 1507 0852 06       		.byte	0x6
+ 1508 0853 00       		.byte	0
+ 1509 0854 1C       		.uleb128 0x1c
+ 1510 0855 B2000000 		.4byte	.LVL16
+ 1511 0859 B7090000 		.4byte	0x9b7
+ 1512 085d 6B080000 		.4byte	0x86b
+ 1513 0861 1D       		.uleb128 0x1d
+ 1514 0862 01       		.uleb128 0x1
+ 1515 0863 50       		.byte	0x50
+ 1516 0864 05       		.uleb128 0x5
+ 1517 0865 7B       		.byte	0x7b
+ 1518 0866 00       		.sleb128 0
+ 1519 0867 08       		.byte	0x8
+ 1520 0868 2C       		.byte	0x2c
+ 1521 0869 1E       		.byte	0x1e
+ 1522 086a 00       		.byte	0
+ 1523 086b 1C       		.uleb128 0x1c
+ 1524 086c 6C010000 		.4byte	.LVL38
+ 1525 0870 C2090000 		.4byte	0x9c2
+ 1526 0874 85080000 		.4byte	0x885
+ 1527 0878 1D       		.uleb128 0x1d
+ 1528 0879 01       		.uleb128 0x1
+ 1529 087a 50       		.byte	0x50
+ 1530 087b 02       		.uleb128 0x2
+ 1531 087c 79       		.byte	0x79
+ 1532 087d 00       		.sleb128 0
+ 1533 087e 1D       		.uleb128 0x1d
+ 1534 087f 02       		.uleb128 0x2
+ 1535 0880 7D       		.byte	0x7d
+ 1536 0881 04       		.sleb128 4
+ 1537 0882 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 31
+
+
+ 1538 0883 31       		.byte	0x31
+ 1539 0884 00       		.byte	0
+ 1540 0885 1C       		.uleb128 0x1c
+ 1541 0886 74010000 		.4byte	.LVL39
+ 1542 088a CD090000 		.4byte	0x9cd
+ 1543 088e A1080000 		.4byte	0x8a1
+ 1544 0892 1D       		.uleb128 0x1d
+ 1545 0893 01       		.uleb128 0x1
+ 1546 0894 50       		.byte	0x50
+ 1547 0895 02       		.uleb128 0x2
+ 1548 0896 79       		.byte	0x79
+ 1549 0897 00       		.sleb128 0
+ 1550 0898 1D       		.uleb128 0x1d
+ 1551 0899 01       		.uleb128 0x1
+ 1552 089a 51       		.byte	0x51
+ 1553 089b 04       		.uleb128 0x4
+ 1554 089c 91       		.byte	0x91
+ 1555 089d B87F     		.sleb128 -72
+ 1556 089f 06       		.byte	0x6
+ 1557 08a0 00       		.byte	0
+ 1558 08a1 1C       		.uleb128 0x1c
+ 1559 08a2 B0010000 		.4byte	.LVL44
+ 1560 08a6 C2090000 		.4byte	0x9c2
+ 1561 08aa BB080000 		.4byte	0x8bb
+ 1562 08ae 1D       		.uleb128 0x1d
+ 1563 08af 01       		.uleb128 0x1
+ 1564 08b0 50       		.byte	0x50
+ 1565 08b1 02       		.uleb128 0x2
+ 1566 08b2 76       		.byte	0x76
+ 1567 08b3 00       		.sleb128 0
+ 1568 08b4 1D       		.uleb128 0x1d
+ 1569 08b5 02       		.uleb128 0x2
+ 1570 08b6 7D       		.byte	0x7d
+ 1571 08b7 04       		.sleb128 4
+ 1572 08b8 01       		.uleb128 0x1
+ 1573 08b9 30       		.byte	0x30
+ 1574 08ba 00       		.byte	0
+ 1575 08bb 1C       		.uleb128 0x1c
+ 1576 08bc B8010000 		.4byte	.LVL45
+ 1577 08c0 CD090000 		.4byte	0x9cd
+ 1578 08c4 D7080000 		.4byte	0x8d7
+ 1579 08c8 1D       		.uleb128 0x1d
+ 1580 08c9 01       		.uleb128 0x1
+ 1581 08ca 50       		.byte	0x50
+ 1582 08cb 02       		.uleb128 0x2
+ 1583 08cc 76       		.byte	0x76
+ 1584 08cd 00       		.sleb128 0
+ 1585 08ce 1D       		.uleb128 0x1d
+ 1586 08cf 01       		.uleb128 0x1
+ 1587 08d0 51       		.byte	0x51
+ 1588 08d1 04       		.uleb128 0x4
+ 1589 08d2 91       		.byte	0x91
+ 1590 08d3 B87F     		.sleb128 -72
+ 1591 08d5 06       		.byte	0x6
+ 1592 08d6 00       		.byte	0
+ 1593 08d7 1C       		.uleb128 0x1c
+ 1594 08d8 D0010000 		.4byte	.LVL49
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 32
+
+
+ 1595 08dc D8090000 		.4byte	0x9d8
+ 1596 08e0 F9080000 		.4byte	0x8f9
+ 1597 08e4 1D       		.uleb128 0x1d
+ 1598 08e5 01       		.uleb128 0x1
+ 1599 08e6 50       		.byte	0x50
+ 1600 08e7 02       		.uleb128 0x2
+ 1601 08e8 91       		.byte	0x91
+ 1602 08e9 50       		.sleb128 -48
+ 1603 08ea 1D       		.uleb128 0x1d
+ 1604 08eb 01       		.uleb128 0x1
+ 1605 08ec 51       		.byte	0x51
+ 1606 08ed 03       		.uleb128 0x3
+ 1607 08ee 91       		.byte	0x91
+ 1608 08ef 40       		.sleb128 -64
+ 1609 08f0 06       		.byte	0x6
+ 1610 08f1 1D       		.uleb128 0x1d
+ 1611 08f2 01       		.uleb128 0x1
+ 1612 08f3 52       		.byte	0x52
+ 1613 08f4 03       		.uleb128 0x3
+ 1614 08f5 91       		.byte	0x91
+ 1615 08f6 44       		.sleb128 -60
+ 1616 08f7 06       		.byte	0x6
+ 1617 08f8 00       		.byte	0
+ 1618 08f9 1C       		.uleb128 0x1c
+ 1619 08fa D8010000 		.4byte	.LVL51
+ 1620 08fe E3090000 		.4byte	0x9e3
+ 1621 0902 0D090000 		.4byte	0x90d
+ 1622 0906 1D       		.uleb128 0x1d
+ 1623 0907 01       		.uleb128 0x1
+ 1624 0908 50       		.byte	0x50
+ 1625 0909 02       		.uleb128 0x2
+ 1626 090a 74       		.byte	0x74
+ 1627 090b 00       		.sleb128 0
+ 1628 090c 00       		.byte	0
+ 1629 090d 1E       		.uleb128 0x1e
+ 1630 090e DE010000 		.4byte	.LVL52
+ 1631 0912 EE090000 		.4byte	0x9ee
+ 1632 0916 1D       		.uleb128 0x1d
+ 1633 0917 01       		.uleb128 0x1
+ 1634 0918 50       		.byte	0x50
+ 1635 0919 02       		.uleb128 0x2
+ 1636 091a 74       		.byte	0x74
+ 1637 091b 00       		.sleb128 0
+ 1638 091c 00       		.byte	0
+ 1639 091d 00       		.byte	0
+ 1640 091e 07       		.uleb128 0x7
+ 1641 091f 04       		.byte	0x4
+ 1642 0920 24090000 		.4byte	0x924
+ 1643 0924 08       		.uleb128 0x8
+ 1644 0925 45010000 		.4byte	0x145
+ 1645 0929 07       		.uleb128 0x7
+ 1646 092a 04       		.byte	0x4
+ 1647 092b 2F090000 		.4byte	0x92f
+ 1648 092f 08       		.uleb128 0x8
+ 1649 0930 85010000 		.4byte	0x185
+ 1650 0934 07       		.uleb128 0x7
+ 1651 0935 04       		.byte	0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 33
+
+
+ 1652 0936 3A090000 		.4byte	0x93a
+ 1653 093a 08       		.uleb128 0x8
+ 1654 093b 0A070000 		.4byte	0x70a
+ 1655 093f 07       		.uleb128 0x7
+ 1656 0940 04       		.byte	0x4
+ 1657 0941 B9040000 		.4byte	0x4b9
+ 1658 0945 17       		.uleb128 0x17
+ 1659 0946 8F010000 		.4byte	.LASF132
+ 1660 094a 01       		.byte	0x1
+ 1661 094b 2B       		.byte	0x2b
+ 1662 094c 00000000 		.4byte	.LFB36
+ 1663 0950 0E000000 		.4byte	.LFE36-.LFB36
+ 1664 0954 01       		.uleb128 0x1
+ 1665 0955 9C       		.byte	0x9c
+ 1666 0956 AC090000 		.4byte	0x9ac
+ 1667 095a 18       		.uleb128 0x18
+ 1668 095b 8D040000 		.4byte	.LASF116
+ 1669 095f 01       		.byte	0x1
+ 1670 0960 2B       		.byte	0x2b
+ 1671 0961 1E090000 		.4byte	0x91e
+ 1672 0965 12030000 		.4byte	.LLST16
+ 1673 0969 18       		.uleb128 0x18
+ 1674 096a 84060000 		.4byte	.LASF118
+ 1675 096e 01       		.byte	0x1
+ 1676 096f 2B       		.byte	0x2b
+ 1677 0970 29090000 		.4byte	0x929
+ 1678 0974 33030000 		.4byte	.LLST17
+ 1679 0978 18       		.uleb128 0x18
+ 1680 0979 82050000 		.4byte	.LASF119
+ 1681 097d 01       		.byte	0x1
+ 1682 097e 2B       		.byte	0x2b
+ 1683 097f 34090000 		.4byte	0x934
+ 1684 0983 5F030000 		.4byte	.LLST18
+ 1685 0987 1E       		.uleb128 0x1e
+ 1686 0988 0C000000 		.4byte	.LVL57
+ 1687 098c 15070000 		.4byte	0x715
+ 1688 0990 1D       		.uleb128 0x1d
+ 1689 0991 01       		.uleb128 0x1
+ 1690 0992 50       		.byte	0x50
+ 1691 0993 03       		.uleb128 0x3
+ 1692 0994 F3       		.byte	0xf3
+ 1693 0995 01       		.uleb128 0x1
+ 1694 0996 50       		.byte	0x50
+ 1695 0997 1D       		.uleb128 0x1d
+ 1696 0998 01       		.uleb128 0x1
+ 1697 0999 51       		.byte	0x51
+ 1698 099a 01       		.uleb128 0x1
+ 1699 099b 33       		.byte	0x33
+ 1700 099c 1D       		.uleb128 0x1d
+ 1701 099d 01       		.uleb128 0x1
+ 1702 099e 52       		.byte	0x52
+ 1703 099f 03       		.uleb128 0x3
+ 1704 09a0 F3       		.byte	0xf3
+ 1705 09a1 01       		.uleb128 0x1
+ 1706 09a2 51       		.byte	0x51
+ 1707 09a3 1D       		.uleb128 0x1d
+ 1708 09a4 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 34
+
+
+ 1709 09a5 53       		.byte	0x53
+ 1710 09a6 03       		.uleb128 0x3
+ 1711 09a7 F3       		.byte	0xf3
+ 1712 09a8 01       		.uleb128 0x1
+ 1713 09a9 52       		.byte	0x52
+ 1714 09aa 00       		.byte	0
+ 1715 09ab 00       		.byte	0
+ 1716 09ac 1F       		.uleb128 0x1f
+ 1717 09ad A7050000 		.4byte	.LASF133
+ 1718 09b1 A7050000 		.4byte	.LASF133
+ 1719 09b5 05       		.byte	0x5
+ 1720 09b6 A1       		.byte	0xa1
+ 1721 09b7 1F       		.uleb128 0x1f
+ 1722 09b8 D7010000 		.4byte	.LASF134
+ 1723 09bc D7010000 		.4byte	.LASF134
+ 1724 09c0 0C       		.byte	0xc
+ 1725 09c1 80       		.byte	0x80
+ 1726 09c2 1F       		.uleb128 0x1f
+ 1727 09c3 5B000000 		.4byte	.LASF135
+ 1728 09c7 5B000000 		.4byte	.LASF135
+ 1729 09cb 08       		.byte	0x8
+ 1730 09cc F2       		.byte	0xf2
+ 1731 09cd 1F       		.uleb128 0x1f
+ 1732 09ce E4000000 		.4byte	.LASF136
+ 1733 09d2 E4000000 		.4byte	.LASF136
+ 1734 09d6 08       		.byte	0x8
+ 1735 09d7 B6       		.byte	0xb6
+ 1736 09d8 1F       		.uleb128 0x1f
+ 1737 09d9 3A050000 		.4byte	.LASF137
+ 1738 09dd 3A050000 		.4byte	.LASF137
+ 1739 09e1 0B       		.byte	0xb
+ 1740 09e2 62       		.byte	0x62
+ 1741 09e3 1F       		.uleb128 0x1f
+ 1742 09e4 61010000 		.4byte	.LASF138
+ 1743 09e8 61010000 		.4byte	.LASF138
+ 1744 09ec 08       		.byte	0x8
+ 1745 09ed DA       		.byte	0xda
+ 1746 09ee 1F       		.uleb128 0x1f
+ 1747 09ef 22030000 		.4byte	.LASF139
+ 1748 09f3 22030000 		.4byte	.LASF139
+ 1749 09f7 0C       		.byte	0xc
+ 1750 09f8 86       		.byte	0x86
+ 1751 09f9 00       		.byte	0
+ 1752              		.section	.debug_abbrev,"",%progbits
+ 1753              	.Ldebug_abbrev0:
+ 1754 0000 01       		.uleb128 0x1
+ 1755 0001 11       		.uleb128 0x11
+ 1756 0002 01       		.byte	0x1
+ 1757 0003 25       		.uleb128 0x25
+ 1758 0004 0E       		.uleb128 0xe
+ 1759 0005 13       		.uleb128 0x13
+ 1760 0006 0B       		.uleb128 0xb
+ 1761 0007 03       		.uleb128 0x3
+ 1762 0008 0E       		.uleb128 0xe
+ 1763 0009 1B       		.uleb128 0x1b
+ 1764 000a 0E       		.uleb128 0xe
+ 1765 000b 55       		.uleb128 0x55
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 35
+
+
+ 1766 000c 17       		.uleb128 0x17
+ 1767 000d 11       		.uleb128 0x11
+ 1768 000e 01       		.uleb128 0x1
+ 1769 000f 10       		.uleb128 0x10
+ 1770 0010 17       		.uleb128 0x17
+ 1771 0011 00       		.byte	0
+ 1772 0012 00       		.byte	0
+ 1773 0013 02       		.uleb128 0x2
+ 1774 0014 16       		.uleb128 0x16
+ 1775 0015 00       		.byte	0
+ 1776 0016 03       		.uleb128 0x3
+ 1777 0017 0E       		.uleb128 0xe
+ 1778 0018 3A       		.uleb128 0x3a
+ 1779 0019 0B       		.uleb128 0xb
+ 1780 001a 3B       		.uleb128 0x3b
+ 1781 001b 0B       		.uleb128 0xb
+ 1782 001c 49       		.uleb128 0x49
+ 1783 001d 13       		.uleb128 0x13
+ 1784 001e 00       		.byte	0
+ 1785 001f 00       		.byte	0
+ 1786 0020 03       		.uleb128 0x3
+ 1787 0021 24       		.uleb128 0x24
+ 1788 0022 00       		.byte	0
+ 1789 0023 0B       		.uleb128 0xb
+ 1790 0024 0B       		.uleb128 0xb
+ 1791 0025 3E       		.uleb128 0x3e
+ 1792 0026 0B       		.uleb128 0xb
+ 1793 0027 03       		.uleb128 0x3
+ 1794 0028 0E       		.uleb128 0xe
+ 1795 0029 00       		.byte	0
+ 1796 002a 00       		.byte	0
+ 1797 002b 04       		.uleb128 0x4
+ 1798 002c 24       		.uleb128 0x24
+ 1799 002d 00       		.byte	0
+ 1800 002e 0B       		.uleb128 0xb
+ 1801 002f 0B       		.uleb128 0xb
+ 1802 0030 3E       		.uleb128 0x3e
+ 1803 0031 0B       		.uleb128 0xb
+ 1804 0032 03       		.uleb128 0x3
+ 1805 0033 08       		.uleb128 0x8
+ 1806 0034 00       		.byte	0
+ 1807 0035 00       		.byte	0
+ 1808 0036 05       		.uleb128 0x5
+ 1809 0037 0F       		.uleb128 0xf
+ 1810 0038 00       		.byte	0
+ 1811 0039 0B       		.uleb128 0xb
+ 1812 003a 0B       		.uleb128 0xb
+ 1813 003b 00       		.byte	0
+ 1814 003c 00       		.byte	0
+ 1815 003d 06       		.uleb128 0x6
+ 1816 003e 16       		.uleb128 0x16
+ 1817 003f 00       		.byte	0
+ 1818 0040 03       		.uleb128 0x3
+ 1819 0041 0E       		.uleb128 0xe
+ 1820 0042 3A       		.uleb128 0x3a
+ 1821 0043 0B       		.uleb128 0xb
+ 1822 0044 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 36
+
+
+ 1823 0045 05       		.uleb128 0x5
+ 1824 0046 49       		.uleb128 0x49
+ 1825 0047 13       		.uleb128 0x13
+ 1826 0048 00       		.byte	0
+ 1827 0049 00       		.byte	0
+ 1828 004a 07       		.uleb128 0x7
+ 1829 004b 0F       		.uleb128 0xf
+ 1830 004c 00       		.byte	0
+ 1831 004d 0B       		.uleb128 0xb
+ 1832 004e 0B       		.uleb128 0xb
+ 1833 004f 49       		.uleb128 0x49
+ 1834 0050 13       		.uleb128 0x13
+ 1835 0051 00       		.byte	0
+ 1836 0052 00       		.byte	0
+ 1837 0053 08       		.uleb128 0x8
+ 1838 0054 26       		.uleb128 0x26
+ 1839 0055 00       		.byte	0
+ 1840 0056 49       		.uleb128 0x49
+ 1841 0057 13       		.uleb128 0x13
+ 1842 0058 00       		.byte	0
+ 1843 0059 00       		.byte	0
+ 1844 005a 09       		.uleb128 0x9
+ 1845 005b 13       		.uleb128 0x13
+ 1846 005c 01       		.byte	0x1
+ 1847 005d 0B       		.uleb128 0xb
+ 1848 005e 0B       		.uleb128 0xb
+ 1849 005f 3A       		.uleb128 0x3a
+ 1850 0060 0B       		.uleb128 0xb
+ 1851 0061 3B       		.uleb128 0x3b
+ 1852 0062 0B       		.uleb128 0xb
+ 1853 0063 01       		.uleb128 0x1
+ 1854 0064 13       		.uleb128 0x13
+ 1855 0065 00       		.byte	0
+ 1856 0066 00       		.byte	0
+ 1857 0067 0A       		.uleb128 0xa
+ 1858 0068 0D       		.uleb128 0xd
+ 1859 0069 00       		.byte	0
+ 1860 006a 03       		.uleb128 0x3
+ 1861 006b 08       		.uleb128 0x8
+ 1862 006c 3A       		.uleb128 0x3a
+ 1863 006d 0B       		.uleb128 0xb
+ 1864 006e 3B       		.uleb128 0x3b
+ 1865 006f 0B       		.uleb128 0xb
+ 1866 0070 49       		.uleb128 0x49
+ 1867 0071 13       		.uleb128 0x13
+ 1868 0072 38       		.uleb128 0x38
+ 1869 0073 0B       		.uleb128 0xb
+ 1870 0074 00       		.byte	0
+ 1871 0075 00       		.byte	0
+ 1872 0076 0B       		.uleb128 0xb
+ 1873 0077 0D       		.uleb128 0xd
+ 1874 0078 00       		.byte	0
+ 1875 0079 03       		.uleb128 0x3
+ 1876 007a 0E       		.uleb128 0xe
+ 1877 007b 3A       		.uleb128 0x3a
+ 1878 007c 0B       		.uleb128 0xb
+ 1879 007d 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 37
+
+
+ 1880 007e 0B       		.uleb128 0xb
+ 1881 007f 49       		.uleb128 0x49
+ 1882 0080 13       		.uleb128 0x13
+ 1883 0081 38       		.uleb128 0x38
+ 1884 0082 0B       		.uleb128 0xb
+ 1885 0083 00       		.byte	0
+ 1886 0084 00       		.byte	0
+ 1887 0085 0C       		.uleb128 0xc
+ 1888 0086 13       		.uleb128 0x13
+ 1889 0087 01       		.byte	0x1
+ 1890 0088 03       		.uleb128 0x3
+ 1891 0089 0E       		.uleb128 0xe
+ 1892 008a 0B       		.uleb128 0xb
+ 1893 008b 0B       		.uleb128 0xb
+ 1894 008c 3A       		.uleb128 0x3a
+ 1895 008d 0B       		.uleb128 0xb
+ 1896 008e 3B       		.uleb128 0x3b
+ 1897 008f 0B       		.uleb128 0xb
+ 1898 0090 01       		.uleb128 0x1
+ 1899 0091 13       		.uleb128 0x13
+ 1900 0092 00       		.byte	0
+ 1901 0093 00       		.byte	0
+ 1902 0094 0D       		.uleb128 0xd
+ 1903 0095 0D       		.uleb128 0xd
+ 1904 0096 00       		.byte	0
+ 1905 0097 03       		.uleb128 0x3
+ 1906 0098 0E       		.uleb128 0xe
+ 1907 0099 3A       		.uleb128 0x3a
+ 1908 009a 0B       		.uleb128 0xb
+ 1909 009b 3B       		.uleb128 0x3b
+ 1910 009c 0B       		.uleb128 0xb
+ 1911 009d 49       		.uleb128 0x49
+ 1912 009e 13       		.uleb128 0x13
+ 1913 009f 0B       		.uleb128 0xb
+ 1914 00a0 0B       		.uleb128 0xb
+ 1915 00a1 0D       		.uleb128 0xd
+ 1916 00a2 0B       		.uleb128 0xb
+ 1917 00a3 0C       		.uleb128 0xc
+ 1918 00a4 0B       		.uleb128 0xb
+ 1919 00a5 38       		.uleb128 0x38
+ 1920 00a6 0B       		.uleb128 0xb
+ 1921 00a7 00       		.byte	0
+ 1922 00a8 00       		.byte	0
+ 1923 00a9 0E       		.uleb128 0xe
+ 1924 00aa 15       		.uleb128 0x15
+ 1925 00ab 01       		.byte	0x1
+ 1926 00ac 27       		.uleb128 0x27
+ 1927 00ad 19       		.uleb128 0x19
+ 1928 00ae 49       		.uleb128 0x49
+ 1929 00af 13       		.uleb128 0x13
+ 1930 00b0 01       		.uleb128 0x1
+ 1931 00b1 13       		.uleb128 0x13
+ 1932 00b2 00       		.byte	0
+ 1933 00b3 00       		.byte	0
+ 1934 00b4 0F       		.uleb128 0xf
+ 1935 00b5 05       		.uleb128 0x5
+ 1936 00b6 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 38
+
+
+ 1937 00b7 49       		.uleb128 0x49
+ 1938 00b8 13       		.uleb128 0x13
+ 1939 00b9 00       		.byte	0
+ 1940 00ba 00       		.byte	0
+ 1941 00bb 10       		.uleb128 0x10
+ 1942 00bc 0D       		.uleb128 0xd
+ 1943 00bd 00       		.byte	0
+ 1944 00be 03       		.uleb128 0x3
+ 1945 00bf 08       		.uleb128 0x8
+ 1946 00c0 3A       		.uleb128 0x3a
+ 1947 00c1 0B       		.uleb128 0xb
+ 1948 00c2 3B       		.uleb128 0x3b
+ 1949 00c3 0B       		.uleb128 0xb
+ 1950 00c4 49       		.uleb128 0x49
+ 1951 00c5 13       		.uleb128 0x13
+ 1952 00c6 0B       		.uleb128 0xb
+ 1953 00c7 0B       		.uleb128 0xb
+ 1954 00c8 0D       		.uleb128 0xd
+ 1955 00c9 0B       		.uleb128 0xb
+ 1956 00ca 0C       		.uleb128 0xc
+ 1957 00cb 0B       		.uleb128 0xb
+ 1958 00cc 38       		.uleb128 0x38
+ 1959 00cd 0B       		.uleb128 0xb
+ 1960 00ce 00       		.byte	0
+ 1961 00cf 00       		.byte	0
+ 1962 00d0 11       		.uleb128 0x11
+ 1963 00d1 17       		.uleb128 0x17
+ 1964 00d2 01       		.byte	0x1
+ 1965 00d3 0B       		.uleb128 0xb
+ 1966 00d4 0B       		.uleb128 0xb
+ 1967 00d5 3A       		.uleb128 0x3a
+ 1968 00d6 0B       		.uleb128 0xb
+ 1969 00d7 3B       		.uleb128 0x3b
+ 1970 00d8 0B       		.uleb128 0xb
+ 1971 00d9 01       		.uleb128 0x1
+ 1972 00da 13       		.uleb128 0x13
+ 1973 00db 00       		.byte	0
+ 1974 00dc 00       		.byte	0
+ 1975 00dd 12       		.uleb128 0x12
+ 1976 00de 0D       		.uleb128 0xd
+ 1977 00df 00       		.byte	0
+ 1978 00e0 03       		.uleb128 0x3
+ 1979 00e1 08       		.uleb128 0x8
+ 1980 00e2 3A       		.uleb128 0x3a
+ 1981 00e3 0B       		.uleb128 0xb
+ 1982 00e4 3B       		.uleb128 0x3b
+ 1983 00e5 0B       		.uleb128 0xb
+ 1984 00e6 49       		.uleb128 0x49
+ 1985 00e7 13       		.uleb128 0x13
+ 1986 00e8 00       		.byte	0
+ 1987 00e9 00       		.byte	0
+ 1988 00ea 13       		.uleb128 0x13
+ 1989 00eb 0D       		.uleb128 0xd
+ 1990 00ec 00       		.byte	0
+ 1991 00ed 03       		.uleb128 0x3
+ 1992 00ee 0E       		.uleb128 0xe
+ 1993 00ef 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 39
+
+
+ 1994 00f0 0B       		.uleb128 0xb
+ 1995 00f1 3B       		.uleb128 0x3b
+ 1996 00f2 0B       		.uleb128 0xb
+ 1997 00f3 49       		.uleb128 0x49
+ 1998 00f4 13       		.uleb128 0x13
+ 1999 00f5 00       		.byte	0
+ 2000 00f6 00       		.byte	0
+ 2001 00f7 14       		.uleb128 0x14
+ 2002 00f8 04       		.uleb128 0x4
+ 2003 00f9 01       		.byte	0x1
+ 2004 00fa 0B       		.uleb128 0xb
+ 2005 00fb 0B       		.uleb128 0xb
+ 2006 00fc 49       		.uleb128 0x49
+ 2007 00fd 13       		.uleb128 0x13
+ 2008 00fe 3A       		.uleb128 0x3a
+ 2009 00ff 0B       		.uleb128 0xb
+ 2010 0100 3B       		.uleb128 0x3b
+ 2011 0101 0B       		.uleb128 0xb
+ 2012 0102 01       		.uleb128 0x1
+ 2013 0103 13       		.uleb128 0x13
+ 2014 0104 00       		.byte	0
+ 2015 0105 00       		.byte	0
+ 2016 0106 15       		.uleb128 0x15
+ 2017 0107 28       		.uleb128 0x28
+ 2018 0108 00       		.byte	0
+ 2019 0109 03       		.uleb128 0x3
+ 2020 010a 0E       		.uleb128 0xe
+ 2021 010b 1C       		.uleb128 0x1c
+ 2022 010c 0B       		.uleb128 0xb
+ 2023 010d 00       		.byte	0
+ 2024 010e 00       		.byte	0
+ 2025 010f 16       		.uleb128 0x16
+ 2026 0110 26       		.uleb128 0x26
+ 2027 0111 00       		.byte	0
+ 2028 0112 00       		.byte	0
+ 2029 0113 00       		.byte	0
+ 2030 0114 17       		.uleb128 0x17
+ 2031 0115 2E       		.uleb128 0x2e
+ 2032 0116 01       		.byte	0x1
+ 2033 0117 3F       		.uleb128 0x3f
+ 2034 0118 19       		.uleb128 0x19
+ 2035 0119 03       		.uleb128 0x3
+ 2036 011a 0E       		.uleb128 0xe
+ 2037 011b 3A       		.uleb128 0x3a
+ 2038 011c 0B       		.uleb128 0xb
+ 2039 011d 3B       		.uleb128 0x3b
+ 2040 011e 0B       		.uleb128 0xb
+ 2041 011f 27       		.uleb128 0x27
+ 2042 0120 19       		.uleb128 0x19
+ 2043 0121 11       		.uleb128 0x11
+ 2044 0122 01       		.uleb128 0x1
+ 2045 0123 12       		.uleb128 0x12
+ 2046 0124 06       		.uleb128 0x6
+ 2047 0125 40       		.uleb128 0x40
+ 2048 0126 18       		.uleb128 0x18
+ 2049 0127 9742     		.uleb128 0x2117
+ 2050 0129 19       		.uleb128 0x19
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 40
+
+
+ 2051 012a 01       		.uleb128 0x1
+ 2052 012b 13       		.uleb128 0x13
+ 2053 012c 00       		.byte	0
+ 2054 012d 00       		.byte	0
+ 2055 012e 18       		.uleb128 0x18
+ 2056 012f 05       		.uleb128 0x5
+ 2057 0130 00       		.byte	0
+ 2058 0131 03       		.uleb128 0x3
+ 2059 0132 0E       		.uleb128 0xe
+ 2060 0133 3A       		.uleb128 0x3a
+ 2061 0134 0B       		.uleb128 0xb
+ 2062 0135 3B       		.uleb128 0x3b
+ 2063 0136 0B       		.uleb128 0xb
+ 2064 0137 49       		.uleb128 0x49
+ 2065 0138 13       		.uleb128 0x13
+ 2066 0139 02       		.uleb128 0x2
+ 2067 013a 17       		.uleb128 0x17
+ 2068 013b 00       		.byte	0
+ 2069 013c 00       		.byte	0
+ 2070 013d 19       		.uleb128 0x19
+ 2071 013e 34       		.uleb128 0x34
+ 2072 013f 00       		.byte	0
+ 2073 0140 03       		.uleb128 0x3
+ 2074 0141 08       		.uleb128 0x8
+ 2075 0142 3A       		.uleb128 0x3a
+ 2076 0143 0B       		.uleb128 0xb
+ 2077 0144 3B       		.uleb128 0x3b
+ 2078 0145 0B       		.uleb128 0xb
+ 2079 0146 49       		.uleb128 0x49
+ 2080 0147 13       		.uleb128 0x13
+ 2081 0148 02       		.uleb128 0x2
+ 2082 0149 17       		.uleb128 0x17
+ 2083 014a 00       		.byte	0
+ 2084 014b 00       		.byte	0
+ 2085 014c 1A       		.uleb128 0x1a
+ 2086 014d 34       		.uleb128 0x34
+ 2087 014e 00       		.byte	0
+ 2088 014f 03       		.uleb128 0x3
+ 2089 0150 0E       		.uleb128 0xe
+ 2090 0151 3A       		.uleb128 0x3a
+ 2091 0152 0B       		.uleb128 0xb
+ 2092 0153 3B       		.uleb128 0x3b
+ 2093 0154 0B       		.uleb128 0xb
+ 2094 0155 49       		.uleb128 0x49
+ 2095 0156 13       		.uleb128 0x13
+ 2096 0157 02       		.uleb128 0x2
+ 2097 0158 18       		.uleb128 0x18
+ 2098 0159 00       		.byte	0
+ 2099 015a 00       		.byte	0
+ 2100 015b 1B       		.uleb128 0x1b
+ 2101 015c 34       		.uleb128 0x34
+ 2102 015d 00       		.byte	0
+ 2103 015e 03       		.uleb128 0x3
+ 2104 015f 0E       		.uleb128 0xe
+ 2105 0160 3A       		.uleb128 0x3a
+ 2106 0161 0B       		.uleb128 0xb
+ 2107 0162 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 41
+
+
+ 2108 0163 0B       		.uleb128 0xb
+ 2109 0164 49       		.uleb128 0x49
+ 2110 0165 13       		.uleb128 0x13
+ 2111 0166 02       		.uleb128 0x2
+ 2112 0167 17       		.uleb128 0x17
+ 2113 0168 00       		.byte	0
+ 2114 0169 00       		.byte	0
+ 2115 016a 1C       		.uleb128 0x1c
+ 2116 016b 898201   		.uleb128 0x4109
+ 2117 016e 01       		.byte	0x1
+ 2118 016f 11       		.uleb128 0x11
+ 2119 0170 01       		.uleb128 0x1
+ 2120 0171 31       		.uleb128 0x31
+ 2121 0172 13       		.uleb128 0x13
+ 2122 0173 01       		.uleb128 0x1
+ 2123 0174 13       		.uleb128 0x13
+ 2124 0175 00       		.byte	0
+ 2125 0176 00       		.byte	0
+ 2126 0177 1D       		.uleb128 0x1d
+ 2127 0178 8A8201   		.uleb128 0x410a
+ 2128 017b 00       		.byte	0
+ 2129 017c 02       		.uleb128 0x2
+ 2130 017d 18       		.uleb128 0x18
+ 2131 017e 9142     		.uleb128 0x2111
+ 2132 0180 18       		.uleb128 0x18
+ 2133 0181 00       		.byte	0
+ 2134 0182 00       		.byte	0
+ 2135 0183 1E       		.uleb128 0x1e
+ 2136 0184 898201   		.uleb128 0x4109
+ 2137 0187 01       		.byte	0x1
+ 2138 0188 11       		.uleb128 0x11
+ 2139 0189 01       		.uleb128 0x1
+ 2140 018a 31       		.uleb128 0x31
+ 2141 018b 13       		.uleb128 0x13
+ 2142 018c 00       		.byte	0
+ 2143 018d 00       		.byte	0
+ 2144 018e 1F       		.uleb128 0x1f
+ 2145 018f 2E       		.uleb128 0x2e
+ 2146 0190 00       		.byte	0
+ 2147 0191 3F       		.uleb128 0x3f
+ 2148 0192 19       		.uleb128 0x19
+ 2149 0193 3C       		.uleb128 0x3c
+ 2150 0194 19       		.uleb128 0x19
+ 2151 0195 6E       		.uleb128 0x6e
+ 2152 0196 0E       		.uleb128 0xe
+ 2153 0197 03       		.uleb128 0x3
+ 2154 0198 0E       		.uleb128 0xe
+ 2155 0199 3A       		.uleb128 0x3a
+ 2156 019a 0B       		.uleb128 0xb
+ 2157 019b 3B       		.uleb128 0x3b
+ 2158 019c 0B       		.uleb128 0xb
+ 2159 019d 00       		.byte	0
+ 2160 019e 00       		.byte	0
+ 2161 019f 00       		.byte	0
+ 2162              		.section	.debug_loc,"",%progbits
+ 2163              	.Ldebug_loc0:
+ 2164              	.LLST0:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 42
+
+
+ 2165 0000 00000000 		.4byte	.LVL0
+ 2166 0004 1C000000 		.4byte	.LVL2
+ 2167 0008 0100     		.2byte	0x1
+ 2168 000a 50       		.byte	0x50
+ 2169 000b 1C000000 		.4byte	.LVL2
+ 2170 000f D2010000 		.4byte	.LVL50
+ 2171 0013 0100     		.2byte	0x1
+ 2172 0015 54       		.byte	0x54
+ 2173 0016 D2010000 		.4byte	.LVL50
+ 2174 001a E4010000 		.4byte	.LVL53
+ 2175 001e 0400     		.2byte	0x4
+ 2176 0020 F3       		.byte	0xf3
+ 2177 0021 01       		.uleb128 0x1
+ 2178 0022 50       		.byte	0x50
+ 2179 0023 9F       		.byte	0x9f
+ 2180 0024 E4010000 		.4byte	.LVL53
+ 2181 0028 EC010000 		.4byte	.LFE37
+ 2182 002c 0100     		.2byte	0x1
+ 2183 002e 50       		.byte	0x50
+ 2184 002f 00000000 		.4byte	0
+ 2185 0033 00000000 		.4byte	0
+ 2186              	.LLST1:
+ 2187 0037 00000000 		.4byte	.LVL0
+ 2188 003b 18000000 		.4byte	.LVL1
+ 2189 003f 0100     		.2byte	0x1
+ 2190 0041 51       		.byte	0x51
+ 2191 0042 18000000 		.4byte	.LVL1
+ 2192 0046 E4010000 		.4byte	.LVL53
+ 2193 004a 0400     		.2byte	0x4
+ 2194 004c F3       		.byte	0xf3
+ 2195 004d 01       		.uleb128 0x1
+ 2196 004e 51       		.byte	0x51
+ 2197 004f 9F       		.byte	0x9f
+ 2198 0050 E4010000 		.4byte	.LVL53
+ 2199 0054 EC010000 		.4byte	.LFE37
+ 2200 0058 0100     		.2byte	0x1
+ 2201 005a 51       		.byte	0x51
+ 2202 005b 00000000 		.4byte	0
+ 2203 005f 00000000 		.4byte	0
+ 2204              	.LLST2:
+ 2205 0063 00000000 		.4byte	.LVL0
+ 2206 0067 7D000000 		.4byte	.LVL8-1
+ 2207 006b 0100     		.2byte	0x1
+ 2208 006d 52       		.byte	0x52
+ 2209 006e 7D000000 		.4byte	.LVL8-1
+ 2210 0072 DE010000 		.4byte	.LVL52
+ 2211 0076 0200     		.2byte	0x2
+ 2212 0078 91       		.byte	0x91
+ 2213 0079 40       		.sleb128 -64
+ 2214 007a DE010000 		.4byte	.LVL52
+ 2215 007e E4010000 		.4byte	.LVL53
+ 2216 0082 0400     		.2byte	0x4
+ 2217 0084 F3       		.byte	0xf3
+ 2218 0085 01       		.uleb128 0x1
+ 2219 0086 52       		.byte	0x52
+ 2220 0087 9F       		.byte	0x9f
+ 2221 0088 E4010000 		.4byte	.LVL53
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 43
+
+
+ 2222 008c EC010000 		.4byte	.LFE37
+ 2223 0090 0100     		.2byte	0x1
+ 2224 0092 52       		.byte	0x52
+ 2225 0093 00000000 		.4byte	0
+ 2226 0097 00000000 		.4byte	0
+ 2227              	.LLST3:
+ 2228 009b 00000000 		.4byte	.LVL0
+ 2229 009f 7D000000 		.4byte	.LVL8-1
+ 2230 00a3 0100     		.2byte	0x1
+ 2231 00a5 53       		.byte	0x53
+ 2232 00a6 7D000000 		.4byte	.LVL8-1
+ 2233 00aa DE010000 		.4byte	.LVL52
+ 2234 00ae 0200     		.2byte	0x2
+ 2235 00b0 91       		.byte	0x91
+ 2236 00b1 44       		.sleb128 -60
+ 2237 00b2 DE010000 		.4byte	.LVL52
+ 2238 00b6 E4010000 		.4byte	.LVL53
+ 2239 00ba 0400     		.2byte	0x4
+ 2240 00bc F3       		.byte	0xf3
+ 2241 00bd 01       		.uleb128 0x1
+ 2242 00be 53       		.byte	0x53
+ 2243 00bf 9F       		.byte	0x9f
+ 2244 00c0 E4010000 		.4byte	.LVL53
+ 2245 00c4 EC010000 		.4byte	.LFE37
+ 2246 00c8 0100     		.2byte	0x1
+ 2247 00ca 53       		.byte	0x53
+ 2248 00cb 00000000 		.4byte	0
+ 2249 00cf 00000000 		.4byte	0
+ 2250              	.LLST4:
+ 2251 00d3 20000000 		.4byte	.LVL3
+ 2252 00d7 24000000 		.4byte	.LVL4
+ 2253 00db 0200     		.2byte	0x2
+ 2254 00dd 30       		.byte	0x30
+ 2255 00de 9F       		.byte	0x9f
+ 2256 00df 24000000 		.4byte	.LVL4
+ 2257 00e3 6A000000 		.4byte	.LVL5
+ 2258 00e7 0100     		.2byte	0x1
+ 2259 00e9 51       		.byte	0x51
+ 2260 00ea 6C000000 		.4byte	.LVL6
+ 2261 00ee 78000000 		.4byte	.LVL7
+ 2262 00f2 0100     		.2byte	0x1
+ 2263 00f4 51       		.byte	0x51
+ 2264 00f5 88000000 		.4byte	.LVL9
+ 2265 00f9 8E000000 		.4byte	.LVL10
+ 2266 00fd 0200     		.2byte	0x2
+ 2267 00ff 31       		.byte	0x31
+ 2268 0100 9F       		.byte	0x9f
+ 2269 0101 8E000000 		.4byte	.LVL10
+ 2270 0105 A0000000 		.4byte	.LVL13
+ 2271 0109 0100     		.2byte	0x1
+ 2272 010b 53       		.byte	0x53
+ 2273 010c A2000000 		.4byte	.LVL14
+ 2274 0110 B1000000 		.4byte	.LVL16-1
+ 2275 0114 0100     		.2byte	0x1
+ 2276 0116 53       		.byte	0x53
+ 2277 0117 00000000 		.4byte	0
+ 2278 011b 00000000 		.4byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 44
+
+
+ 2279              	.LLST5:
+ 2280 011f 7E000000 		.4byte	.LVL8
+ 2281 0123 AA000000 		.4byte	.LVL15
+ 2282 0127 0100     		.2byte	0x1
+ 2283 0129 50       		.byte	0x50
+ 2284 012a 00000000 		.4byte	0
+ 2285 012e 00000000 		.4byte	0
+ 2286              	.LLST6:
+ 2287 0132 88000000 		.4byte	.LVL9
+ 2288 0136 B1000000 		.4byte	.LVL16-1
+ 2289 013a 0100     		.2byte	0x1
+ 2290 013c 51       		.byte	0x51
+ 2291 013d 00000000 		.4byte	0
+ 2292 0141 00000000 		.4byte	0
+ 2293              	.LLST7:
+ 2294 0145 88000000 		.4byte	.LVL9
+ 2295 0149 8E000000 		.4byte	.LVL10
+ 2296 014d 0200     		.2byte	0x2
+ 2297 014f 30       		.byte	0x30
+ 2298 0150 9F       		.byte	0x9f
+ 2299 0151 8E000000 		.4byte	.LVL10
+ 2300 0155 9C000000 		.4byte	.LVL11
+ 2301 0159 0100     		.2byte	0x1
+ 2302 015b 55       		.byte	0x55
+ 2303 015c 9E000000 		.4byte	.LVL12
+ 2304 0160 B8000000 		.4byte	.LVL19
+ 2305 0164 0100     		.2byte	0x1
+ 2306 0166 55       		.byte	0x55
+ 2307 0167 00000000 		.4byte	0
+ 2308 016b 00000000 		.4byte	0
+ 2309              	.LLST8:
+ 2310 016f B4000000 		.4byte	.LVL17
+ 2311 0173 D0000000 		.4byte	.LVL23
+ 2312 0177 0100     		.2byte	0x1
+ 2313 0179 50       		.byte	0x50
+ 2314 017a D0000000 		.4byte	.LVL23
+ 2315 017e DE010000 		.4byte	.LVL52
+ 2316 0182 0300     		.2byte	0x3
+ 2317 0184 91       		.byte	0x91
+ 2318 0185 B87F     		.sleb128 -72
+ 2319 0187 00000000 		.4byte	0
+ 2320 018b 00000000 		.4byte	0
+ 2321              	.LLST9:
+ 2322 018f B4000000 		.4byte	.LVL17
+ 2323 0193 D0000000 		.4byte	.LVL23
+ 2324 0197 0100     		.2byte	0x1
+ 2325 0199 50       		.byte	0x50
+ 2326 019a D0000000 		.4byte	.LVL23
+ 2327 019e 0A010000 		.4byte	.LVL26
+ 2328 01a2 0300     		.2byte	0x3
+ 2329 01a4 91       		.byte	0x91
+ 2330 01a5 B87F     		.sleb128 -72
+ 2331 01a7 0A010000 		.4byte	.LVL26
+ 2332 01ab 6B010000 		.4byte	.LVL38-1
+ 2333 01af 0100     		.2byte	0x1
+ 2334 01b1 5C       		.byte	0x5c
+ 2335 01b2 6B010000 		.4byte	.LVL38-1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 45
+
+
+ 2336 01b6 7A010000 		.4byte	.LVL40
+ 2337 01ba 0100     		.2byte	0x1
+ 2338 01bc 59       		.byte	0x59
+ 2339 01bd 7A010000 		.4byte	.LVL40
+ 2340 01c1 AF010000 		.4byte	.LVL44-1
+ 2341 01c5 0100     		.2byte	0x1
+ 2342 01c7 5C       		.byte	0x5c
+ 2343 01c8 AF010000 		.4byte	.LVL44-1
+ 2344 01cc BE010000 		.4byte	.LVL46
+ 2345 01d0 0100     		.2byte	0x1
+ 2346 01d2 56       		.byte	0x56
+ 2347 01d3 BE010000 		.4byte	.LVL46
+ 2348 01d7 CF010000 		.4byte	.LVL49-1
+ 2349 01db 0100     		.2byte	0x1
+ 2350 01dd 5C       		.byte	0x5c
+ 2351 01de 00000000 		.4byte	0
+ 2352 01e2 00000000 		.4byte	0
+ 2353              	.LLST10:
+ 2354 01e6 B6000000 		.4byte	.LVL18
+ 2355 01ea B8000000 		.4byte	.LVL19
+ 2356 01ee 0100     		.2byte	0x1
+ 2357 01f0 55       		.byte	0x55
+ 2358 01f1 B8000000 		.4byte	.LVL19
+ 2359 01f5 66010000 		.4byte	.LVL37
+ 2360 01f9 0100     		.2byte	0x1
+ 2361 01fb 59       		.byte	0x59
+ 2362 01fc 7C010000 		.4byte	.LVL41
+ 2363 0200 7E010000 		.4byte	.LVL42
+ 2364 0204 0100     		.2byte	0x1
+ 2365 0206 56       		.byte	0x56
+ 2366 0207 7E010000 		.4byte	.LVL42
+ 2367 020b DE010000 		.4byte	.LVL52
+ 2368 020f 0100     		.2byte	0x1
+ 2369 0211 59       		.byte	0x59
+ 2370 0212 00000000 		.4byte	0
+ 2371 0216 00000000 		.4byte	0
+ 2372              	.LLST11:
+ 2373 021a B6000000 		.4byte	.LVL18
+ 2374 021e B8000000 		.4byte	.LVL19
+ 2375 0222 0100     		.2byte	0x1
+ 2376 0224 55       		.byte	0x55
+ 2377 0225 B8000000 		.4byte	.LVL19
+ 2378 0229 0A010000 		.4byte	.LVL26
+ 2379 022d 0100     		.2byte	0x1
+ 2380 022f 59       		.byte	0x59
+ 2381 0230 0A010000 		.4byte	.LVL26
+ 2382 0234 C0010000 		.4byte	.LVL47
+ 2383 0238 0100     		.2byte	0x1
+ 2384 023a 5A       		.byte	0x5a
+ 2385 023b C0010000 		.4byte	.LVL47
+ 2386 023f C2010000 		.4byte	.LVL48
+ 2387 0243 0100     		.2byte	0x1
+ 2388 0245 57       		.byte	0x57
+ 2389 0246 C2010000 		.4byte	.LVL48
+ 2390 024a DE010000 		.4byte	.LVL52
+ 2391 024e 0100     		.2byte	0x1
+ 2392 0250 5A       		.byte	0x5a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 46
+
+
+ 2393 0251 00000000 		.4byte	0
+ 2394 0255 00000000 		.4byte	0
+ 2395              	.LLST12:
+ 2396 0259 B6000000 		.4byte	.LVL18
+ 2397 025d B8000000 		.4byte	.LVL19
+ 2398 0261 0300     		.2byte	0x3
+ 2399 0263 75       		.byte	0x75
+ 2400 0264 7F       		.sleb128 -1
+ 2401 0265 9F       		.byte	0x9f
+ 2402 0266 B8000000 		.4byte	.LVL19
+ 2403 026a 04010000 		.4byte	.LVL25
+ 2404 026e 0100     		.2byte	0x1
+ 2405 0270 55       		.byte	0x55
+ 2406 0271 0E010000 		.4byte	.LVL27
+ 2407 0275 12010000 		.4byte	.LVL28
+ 2408 0279 0300     		.2byte	0x3
+ 2409 027b 79       		.byte	0x79
+ 2410 027c 7F       		.sleb128 -1
+ 2411 027d 9F       		.byte	0x9f
+ 2412 027e 12010000 		.4byte	.LVL28
+ 2413 0282 22010000 		.4byte	.LVL31
+ 2414 0286 0100     		.2byte	0x1
+ 2415 0288 56       		.byte	0x56
+ 2416 0289 26010000 		.4byte	.LVL32
+ 2417 028d A4010000 		.4byte	.LVL43
+ 2418 0291 0100     		.2byte	0x1
+ 2419 0293 56       		.byte	0x56
+ 2420 0294 00000000 		.4byte	0
+ 2421 0298 00000000 		.4byte	0
+ 2422              	.LLST13:
+ 2423 029c C0000000 		.4byte	.LVL21
+ 2424 02a0 DC000000 		.4byte	.LVL24
+ 2425 02a4 0100     		.2byte	0x1
+ 2426 02a6 53       		.byte	0x53
+ 2427 02a7 1C010000 		.4byte	.LVL30
+ 2428 02ab 22010000 		.4byte	.LVL31
+ 2429 02af 0100     		.2byte	0x1
+ 2430 02b1 57       		.byte	0x57
+ 2431 02b2 2C010000 		.4byte	.LVL33
+ 2432 02b6 30010000 		.4byte	.LVL34
+ 2433 02ba 0300     		.2byte	0x3
+ 2434 02bc 7A       		.byte	0x7a
+ 2435 02bd 7F       		.sleb128 -1
+ 2436 02be 9F       		.byte	0x9f
+ 2437 02bf 30010000 		.4byte	.LVL34
+ 2438 02c3 DE010000 		.4byte	.LVL52
+ 2439 02c7 0100     		.2byte	0x1
+ 2440 02c9 57       		.byte	0x57
+ 2441 02ca 00000000 		.4byte	0
+ 2442 02ce 00000000 		.4byte	0
+ 2443              	.LLST14:
+ 2444 02d2 B6000000 		.4byte	.LVL18
+ 2445 02d6 0A010000 		.4byte	.LVL26
+ 2446 02da 0200     		.2byte	0x2
+ 2447 02dc 30       		.byte	0x30
+ 2448 02dd 9F       		.byte	0x9f
+ 2449 02de 0A010000 		.4byte	.LVL26
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 47
+
+
+ 2450 02e2 DE010000 		.4byte	.LVL52
+ 2451 02e6 0100     		.2byte	0x1
+ 2452 02e8 55       		.byte	0x55
+ 2453 02e9 00000000 		.4byte	0
+ 2454 02ed 00000000 		.4byte	0
+ 2455              	.LLST15:
+ 2456 02f1 CC000000 		.4byte	.LVL22
+ 2457 02f5 0A010000 		.4byte	.LVL26
+ 2458 02f9 0200     		.2byte	0x2
+ 2459 02fb 30       		.byte	0x30
+ 2460 02fc 9F       		.byte	0x9f
+ 2461 02fd 0A010000 		.4byte	.LVL26
+ 2462 0301 DE010000 		.4byte	.LVL52
+ 2463 0305 0300     		.2byte	0x3
+ 2464 0307 91       		.byte	0x91
+ 2465 0308 B47F     		.sleb128 -76
+ 2466 030a 00000000 		.4byte	0
+ 2467 030e 00000000 		.4byte	0
+ 2468              	.LLST16:
+ 2469 0312 00000000 		.4byte	.LVL54
+ 2470 0316 0B000000 		.4byte	.LVL57-1
+ 2471 031a 0100     		.2byte	0x1
+ 2472 031c 50       		.byte	0x50
+ 2473 031d 0B000000 		.4byte	.LVL57-1
+ 2474 0321 0E000000 		.4byte	.LFE36
+ 2475 0325 0400     		.2byte	0x4
+ 2476 0327 F3       		.byte	0xf3
+ 2477 0328 01       		.uleb128 0x1
+ 2478 0329 50       		.byte	0x50
+ 2479 032a 9F       		.byte	0x9f
+ 2480 032b 00000000 		.4byte	0
+ 2481 032f 00000000 		.4byte	0
+ 2482              	.LLST17:
+ 2483 0333 00000000 		.4byte	.LVL54
+ 2484 0337 08000000 		.4byte	.LVL56
+ 2485 033b 0100     		.2byte	0x1
+ 2486 033d 51       		.byte	0x51
+ 2487 033e 08000000 		.4byte	.LVL56
+ 2488 0342 0B000000 		.4byte	.LVL57-1
+ 2489 0346 0100     		.2byte	0x1
+ 2490 0348 52       		.byte	0x52
+ 2491 0349 0B000000 		.4byte	.LVL57-1
+ 2492 034d 0E000000 		.4byte	.LFE36
+ 2493 0351 0400     		.2byte	0x4
+ 2494 0353 F3       		.byte	0xf3
+ 2495 0354 01       		.uleb128 0x1
+ 2496 0355 51       		.byte	0x51
+ 2497 0356 9F       		.byte	0x9f
+ 2498 0357 00000000 		.4byte	0
+ 2499 035b 00000000 		.4byte	0
+ 2500              	.LLST18:
+ 2501 035f 00000000 		.4byte	.LVL54
+ 2502 0363 06000000 		.4byte	.LVL55
+ 2503 0367 0100     		.2byte	0x1
+ 2504 0369 52       		.byte	0x52
+ 2505 036a 06000000 		.4byte	.LVL55
+ 2506 036e 0B000000 		.4byte	.LVL57-1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 48
+
+
+ 2507 0372 0100     		.2byte	0x1
+ 2508 0374 53       		.byte	0x53
+ 2509 0375 0B000000 		.4byte	.LVL57-1
+ 2510 0379 0E000000 		.4byte	.LFE36
+ 2511 037d 0400     		.2byte	0x4
+ 2512 037f F3       		.byte	0xf3
+ 2513 0380 01       		.uleb128 0x1
+ 2514 0381 52       		.byte	0x52
+ 2515 0382 9F       		.byte	0x9f
+ 2516 0383 00000000 		.4byte	0
+ 2517 0387 00000000 		.4byte	0
+ 2518              		.section	.debug_aranges,"",%progbits
+ 2519 0000 24000000 		.4byte	0x24
+ 2520 0004 0200     		.2byte	0x2
+ 2521 0006 00000000 		.4byte	.Ldebug_info0
+ 2522 000a 04       		.byte	0x4
+ 2523 000b 00       		.byte	0
+ 2524 000c 0000     		.2byte	0
+ 2525 000e 0000     		.2byte	0
+ 2526 0010 00000000 		.4byte	.LFB37
+ 2527 0014 EC010000 		.4byte	.LFE37-.LFB37
+ 2528 0018 00000000 		.4byte	.LFB36
+ 2529 001c 0E000000 		.4byte	.LFE36-.LFB36
+ 2530 0020 00000000 		.4byte	0
+ 2531 0024 00000000 		.4byte	0
+ 2532              		.section	.debug_ranges,"",%progbits
+ 2533              	.Ldebug_ranges0:
+ 2534 0000 00000000 		.4byte	.LFB37
+ 2535 0004 EC010000 		.4byte	.LFE37
+ 2536 0008 00000000 		.4byte	.LFB36
+ 2537 000c 0E000000 		.4byte	.LFE36
+ 2538 0010 00000000 		.4byte	0
+ 2539 0014 00000000 		.4byte	0
+ 2540              		.section	.debug_line,"",%progbits
+ 2541              	.Ldebug_line0:
+ 2542 0000 6A030000 		.section	.debug_str,"MS",%progbits,1
+ 2542      0200B002 
+ 2542      00000201 
+ 2542      FB0E0D00 
+ 2542      01010101 
+ 2543              	.LASF104:
+ 2544 0000 70617474 		.ascii	"pattern_blend_mode\000"
+ 2544      65726E5F 
+ 2544      626C656E 
+ 2544      645F6D6F 
+ 2544      646500
+ 2545              	.LASF76:
+ 2546 0013 62675F6D 		.ascii	"bg_main_color_stop\000"
+ 2546      61696E5F 
+ 2546      636F6C6F 
+ 2546      725F7374 
+ 2546      6F7000
+ 2547              	.LASF48:
+ 2548 0026 66756C6C 		.ascii	"full\000"
+ 2548      00
+ 2549              	.LASF56:
+ 2550 002b 4C565F44 		.ascii	"LV_DRAW_MASK_LINE_SIDE_TOP\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 49
+
+
+ 2550      5241575F 
+ 2550      4D41534B 
+ 2550      5F4C494E 
+ 2550      455F5349 
+ 2551              	.LASF129:
+ 2552 0046 695F6E65 		.ascii	"i_next_right\000"
+ 2552      78745F72 
+ 2552      69676874 
+ 2552      00
+ 2553              	.LASF124:
+ 2554 0053 795F6D69 		.ascii	"y_min_i\000"
+ 2554      6E5F6900 
+ 2555              	.LASF135:
+ 2556 005b 6C765F64 		.ascii	"lv_draw_mask_line_points_init\000"
+ 2556      7261775F 
+ 2556      6D61736B 
+ 2556      5F6C696E 
+ 2556      655F706F 
+ 2557              	.LASF82:
+ 2558 0079 626F7264 		.ascii	"border_side\000"
+ 2558      65725F73 
+ 2558      69646500 
+ 2559              	.LASF14:
+ 2560 0085 756E7369 		.ascii	"unsigned int\000"
+ 2560      676E6564 
+ 2560      20696E74 
+ 2560      00
+ 2561              	.LASF32:
+ 2562 0092 6F66735F 		.ascii	"ofs_x\000"
+ 2562      7800
+ 2563              	.LASF33:
+ 2564 0098 6F66735F 		.ascii	"ofs_y\000"
+ 2564      7900
+ 2565              	.LASF35:
+ 2566 009e 6765745F 		.ascii	"get_glyph_dsc\000"
+ 2566      676C7970 
+ 2566      685F6473 
+ 2566      6300
+ 2567              	.LASF26:
+ 2568 00ac 6C765F70 		.ascii	"lv_point_t\000"
+ 2568      6F696E74 
+ 2568      5F7400
+ 2569              	.LASF8:
+ 2570 00b7 5F5F696E 		.ascii	"__int32_t\000"
+ 2570      7433325F 
+ 2570      7400
+ 2571              	.LASF89:
+ 2572 00c1 6F75746C 		.ascii	"outline_opa\000"
+ 2572      696E655F 
+ 2572      6F706100 
+ 2573              	.LASF62:
+ 2574 00cd 73696465 		.ascii	"side\000"
+ 2574      00
+ 2575              	.LASF97:
+ 2576 00d2 73686164 		.ascii	"shadow_blend_mode\000"
+ 2576      6F775F62 
+ 2576      6C656E64 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 50
+
+
+ 2576      5F6D6F64 
+ 2576      6500
+ 2577              	.LASF136:
+ 2578 00e4 6C765F64 		.ascii	"lv_draw_mask_add\000"
+ 2578      7261775F 
+ 2578      6D61736B 
+ 2578      5F616464 
+ 2578      00
+ 2579              	.LASF101:
+ 2580 00f5 70617474 		.ascii	"pattern_opa\000"
+ 2580      65726E5F 
+ 2580      6F706100 
+ 2581              	.LASF61:
+ 2582 0101 6C765F64 		.ascii	"lv_draw_mask_common_dsc_t\000"
+ 2582      7261775F 
+ 2582      6D61736B 
+ 2582      5F636F6D 
+ 2582      6D6F6E5F 
+ 2583              	.LASF91:
+ 2584 011b 73686164 		.ascii	"shadow_color\000"
+ 2584      6F775F63 
+ 2584      6F6C6F72 
+ 2584      00
+ 2585              	.LASF105:
+ 2586 0128 76616C75 		.ascii	"value_str\000"
+ 2586      655F7374 
+ 2586      7200
+ 2587              	.LASF40:
+ 2588 0132 756E6465 		.ascii	"underline_thickness\000"
+ 2588      726C696E 
+ 2588      655F7468 
+ 2588      69636B6E 
+ 2588      65737300 
+ 2589              	.LASF20:
+ 2590 0146 75696E74 		.ascii	"uint32_t\000"
+ 2590      33325F74 
+ 2590      00
+ 2591              	.LASF15:
+ 2592 014f 696E7438 		.ascii	"int8_t\000"
+ 2592      5F7400
+ 2593              	.LASF83:
+ 2594 0156 626F7264 		.ascii	"border_opa\000"
+ 2594      65725F6F 
+ 2594      706100
+ 2595              	.LASF138:
+ 2596 0161 6C765F64 		.ascii	"lv_draw_mask_remove_custom\000"
+ 2596      7261775F 
+ 2596      6D61736B 
+ 2596      5F72656D 
+ 2596      6F76655F 
+ 2597              	.LASF39:
+ 2598 017c 756E6465 		.ascii	"underline_position\000"
+ 2598      726C696E 
+ 2598      655F706F 
+ 2598      73697469 
+ 2598      6F6E00
+ 2599              	.LASF132:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 51
+
+
+ 2600 018f 6C765F64 		.ascii	"lv_draw_triangle\000"
+ 2600      7261775F 
+ 2600      74726961 
+ 2600      6E676C65 
+ 2600      00
+ 2601              	.LASF17:
+ 2602 01a0 696E7431 		.ascii	"int16_t\000"
+ 2602      365F7400 
+ 2603              	.LASF13:
+ 2604 01a8 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2604      206C6F6E 
+ 2604      6720756E 
+ 2604      7369676E 
+ 2604      65642069 
+ 2605              	.LASF81:
+ 2606 01bf 626F7264 		.ascii	"border_width\000"
+ 2606      65725F77 
+ 2606      69647468 
+ 2606      00
+ 2607              	.LASF6:
+ 2608 01cc 5F5F7569 		.ascii	"__uint16_t\000"
+ 2608      6E743136 
+ 2608      5F7400
+ 2609              	.LASF134:
+ 2610 01d7 5F6C765F 		.ascii	"_lv_mem_buf_get\000"
+ 2610      6D656D5F 
+ 2610      6275665F 
+ 2610      67657400 
+ 2611              	.LASF140:
+ 2612 01e7 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2612      43313120 
+ 2612      352E342E 
+ 2612      31203230 
+ 2612      31363036 
+ 2613 021a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2613      20726576 
+ 2613      6973696F 
+ 2613      6E203233 
+ 2613      37373135 
+ 2614 024d 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2614      66756E63 
+ 2614      74696F6E 
+ 2614      2D736563 
+ 2614      74696F6E 
+ 2615              	.LASF52:
+ 2616 0275 6C765F64 		.ascii	"lv_draw_mask_res_t\000"
+ 2616      7261775F 
+ 2616      6D61736B 
+ 2616      5F726573 
+ 2616      5F7400
+ 2617              	.LASF58:
+ 2618 0288 6C765F64 		.ascii	"lv_draw_mask_xcb_t\000"
+ 2618      7261775F 
+ 2618      6D61736B 
+ 2618      5F786362 
+ 2618      5F7400
+ 2619              	.LASF126:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 52
+
+
+ 2620 029b 695F7072 		.ascii	"i_prev_left\000"
+ 2620      65765F6C 
+ 2620      65667400 
+ 2621              	.LASF96:
+ 2622 02a7 73686164 		.ascii	"shadow_opa\000"
+ 2622      6F775F6F 
+ 2622      706100
+ 2623              	.LASF107:
+ 2624 02b2 76616C75 		.ascii	"value_opa\000"
+ 2624      655F6F70 
+ 2624      6100
+ 2625              	.LASF102:
+ 2626 02bc 70617474 		.ascii	"pattern_recolor_opa\000"
+ 2626      65726E5F 
+ 2626      7265636F 
+ 2626      6C6F725F 
+ 2626      6F706100 
+ 2627              	.LASF42:
+ 2628 02d0 5F426F6F 		.ascii	"_Bool\000"
+ 2628      6C00
+ 2629              	.LASF143:
+ 2630 02d6 5F6C765F 		.ascii	"_lv_font_struct\000"
+ 2630      666F6E74 
+ 2630      5F737472 
+ 2630      75637400 
+ 2631              	.LASF69:
+ 2632 02e6 6C765F62 		.ascii	"lv_blend_mode_t\000"
+ 2632      6C656E64 
+ 2632      5F6D6F64 
+ 2632      655F7400 
+ 2633              	.LASF86:
+ 2634 02f6 6F75746C 		.ascii	"outline_color\000"
+ 2634      696E655F 
+ 2634      636F6C6F 
+ 2634      7200
+ 2635              	.LASF37:
+ 2636 0304 6C696E65 		.ascii	"line_height\000"
+ 2636      5F686569 
+ 2636      67687400 
+ 2637              	.LASF99:
+ 2638 0310 70617474 		.ascii	"pattern_font\000"
+ 2638      65726E5F 
+ 2638      666F6E74 
+ 2638      00
+ 2639              	.LASF25:
+ 2640 031d 63686172 		.ascii	"char\000"
+ 2640      00
+ 2641              	.LASF139:
+ 2642 0322 5F6C765F 		.ascii	"_lv_mem_buf_release\000"
+ 2642      6D656D5F 
+ 2642      6275665F 
+ 2642      72656C65 
+ 2642      61736500 
+ 2643              	.LASF127:
+ 2644 0336 695F7072 		.ascii	"i_prev_right\000"
+ 2644      65765F72 
+ 2644      69676874 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 53
+
+
+ 2644      00
+ 2645              	.LASF34:
+ 2646 0343 6C765F66 		.ascii	"lv_font_glyph_dsc_t\000"
+ 2646      6F6E745F 
+ 2646      676C7970 
+ 2646      685F6473 
+ 2646      635F7400 
+ 2647              	.LASF112:
+ 2648 0357 76616C75 		.ascii	"value_line_space\000"
+ 2648      655F6C69 
+ 2648      6E655F73 
+ 2648      70616365 
+ 2648      00
+ 2649              	.LASF16:
+ 2650 0368 75696E74 		.ascii	"uint8_t\000"
+ 2650      385F7400 
+ 2651              	.LASF125:
+ 2652 0370 6D705F6E 		.ascii	"mp_next\000"
+ 2652      65787400 
+ 2653              	.LASF65:
+ 2654 0378 79785F73 		.ascii	"yx_steep\000"
+ 2654      74656570 
+ 2654      00
+ 2655              	.LASF87:
+ 2656 0381 6F75746C 		.ascii	"outline_width\000"
+ 2656      696E655F 
+ 2656      77696474 
+ 2656      6800
+ 2657              	.LASF103:
+ 2658 038f 70617474 		.ascii	"pattern_repeat\000"
+ 2658      65726E5F 
+ 2658      72657065 
+ 2658      617400
+ 2659              	.LASF90:
+ 2660 039e 6F75746C 		.ascii	"outline_blend_mode\000"
+ 2660      696E655F 
+ 2660      626C656E 
+ 2660      645F6D6F 
+ 2660      646500
+ 2661              	.LASF41:
+ 2662 03b1 75736572 		.ascii	"user_data\000"
+ 2662      5F646174 
+ 2662      6100
+ 2663              	.LASF66:
+ 2664 03bb 73746565 		.ascii	"steep\000"
+ 2664      7000
+ 2665              	.LASF22:
+ 2666 03c1 6C765F66 		.ascii	"lv_font_user_data_t\000"
+ 2666      6F6E745F 
+ 2666      75736572 
+ 2666      5F646174 
+ 2666      615F7400 
+ 2667              	.LASF12:
+ 2668 03d5 6C6F6E67 		.ascii	"long long int\000"
+ 2668      206C6F6E 
+ 2668      6720696E 
+ 2668      7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 54
+
+
+ 2669              	.LASF115:
+ 2670 03e3 6C765F64 		.ascii	"lv_draw_rect_dsc_t\000"
+ 2670      7261775F 
+ 2670      72656374 
+ 2670      5F647363 
+ 2670      5F7400
+ 2671              	.LASF108:
+ 2672 03f6 76616C75 		.ascii	"value_color\000"
+ 2672      655F636F 
+ 2672      6C6F7200 
+ 2673              	.LASF78:
+ 2674 0402 62675F6F 		.ascii	"bg_opa\000"
+ 2674      706100
+ 2675              	.LASF28:
+ 2676 0409 6C765F61 		.ascii	"lv_align_t\000"
+ 2676      6C69676E 
+ 2676      5F7400
+ 2677              	.LASF88:
+ 2678 0414 6F75746C 		.ascii	"outline_pad\000"
+ 2678      696E655F 
+ 2678      70616400 
+ 2679              	.LASF95:
+ 2680 0420 73686164 		.ascii	"shadow_spread\000"
+ 2680      6F775F73 
+ 2680      70726561 
+ 2680      6400
+ 2681              	.LASF93:
+ 2682 042e 73686164 		.ascii	"shadow_ofs_x\000"
+ 2682      6F775F6F 
+ 2682      66735F78 
+ 2682      00
+ 2683              	.LASF94:
+ 2684 043b 73686164 		.ascii	"shadow_ofs_y\000"
+ 2684      6F775F6F 
+ 2684      66735F79 
+ 2684      00
+ 2685              	.LASF4:
+ 2686 0448 5F5F696E 		.ascii	"__int16_t\000"
+ 2686      7431365F 
+ 2686      7400
+ 2687              	.LASF68:
+ 2688 0452 6C765F64 		.ascii	"lv_draw_mask_line_param_t\000"
+ 2688      7261775F 
+ 2688      6D61736B 
+ 2688      5F6C696E 
+ 2688      655F7061 
+ 2689              	.LASF70:
+ 2690 046c 6C765F67 		.ascii	"lv_grad_dir_t\000"
+ 2690      7261645F 
+ 2690      6469725F 
+ 2690      7400
+ 2691              	.LASF63:
+ 2692 047a 6F726967 		.ascii	"origo\000"
+ 2692      6F00
+ 2693              	.LASF80:
+ 2694 0480 626F7264 		.ascii	"border_color\000"
+ 2694      65725F63 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 55
+
+
+ 2694      6F6C6F72 
+ 2694      00
+ 2695              	.LASF116:
+ 2696 048d 706F696E 		.ascii	"points\000"
+ 2696      747300
+ 2697              	.LASF117:
+ 2698 0494 706F696E 		.ascii	"point_cnt\000"
+ 2698      745F636E 
+ 2698      7400
+ 2699              	.LASF111:
+ 2700 049e 76616C75 		.ascii	"value_letter_space\000"
+ 2700      655F6C65 
+ 2700      74746572 
+ 2700      5F737061 
+ 2700      636500
+ 2701              	.LASF114:
+ 2702 04b1 76616C75 		.ascii	"value_blend_mode\000"
+ 2702      655F626C 
+ 2702      656E645F 
+ 2702      6D6F6465 
+ 2702      00
+ 2703              	.LASF55:
+ 2704 04c2 4C565F44 		.ascii	"LV_DRAW_MASK_LINE_SIDE_RIGHT\000"
+ 2704      5241575F 
+ 2704      4D41534B 
+ 2704      5F4C494E 
+ 2704      455F5349 
+ 2705              	.LASF44:
+ 2706 04df 73756270 		.ascii	"subpx\000"
+ 2706      7800
+ 2707              	.LASF50:
+ 2708 04e5 6C765F63 		.ascii	"lv_color_t\000"
+ 2708      6F6C6F72 
+ 2708      5F7400
+ 2709              	.LASF0:
+ 2710 04f0 5F5F696E 		.ascii	"__int8_t\000"
+ 2710      74385F74 
+ 2710      00
+ 2711              	.LASF131:
+ 2712 04f9 6C765F64 		.ascii	"lv_draw_polygon\000"
+ 2712      7261775F 
+ 2712      706F6C79 
+ 2712      676F6E00 
+ 2713              	.LASF23:
+ 2714 0509 6C6F6E67 		.ascii	"long double\000"
+ 2714      20646F75 
+ 2714      626C6500 
+ 2715              	.LASF18:
+ 2716 0515 75696E74 		.ascii	"uint16_t\000"
+ 2716      31365F74 
+ 2716      00
+ 2717              	.LASF49:
+ 2718 051e 6C765F63 		.ascii	"lv_color16_t\000"
+ 2718      6F6C6F72 
+ 2718      31365F74 
+ 2718      00
+ 2719              	.LASF71:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 56
+
+
+ 2720 052b 6C765F73 		.ascii	"lv_style_int_t\000"
+ 2720      74796C65 
+ 2720      5F696E74 
+ 2720      5F7400
+ 2721              	.LASF137:
+ 2722 053a 6C765F64 		.ascii	"lv_draw_rect\000"
+ 2722      7261775F 
+ 2722      72656374 
+ 2722      00
+ 2723              	.LASF64:
+ 2724 0547 78795F73 		.ascii	"xy_steep\000"
+ 2724      74656570 
+ 2724      00
+ 2725              	.LASF43:
+ 2726 0550 6C765F66 		.ascii	"lv_font_t\000"
+ 2726      6F6E745F 
+ 2726      7400
+ 2727              	.LASF128:
+ 2728 055a 695F6E65 		.ascii	"i_next_left\000"
+ 2728      78745F6C 
+ 2728      65667400 
+ 2729              	.LASF5:
+ 2730 0566 73686F72 		.ascii	"short int\000"
+ 2730      7420696E 
+ 2730      7400
+ 2731              	.LASF51:
+ 2732 0570 6C765F6F 		.ascii	"lv_opa_t\000"
+ 2732      70615F74 
+ 2732      00
+ 2733              	.LASF9:
+ 2734 0579 6C6F6E67 		.ascii	"long int\000"
+ 2734      20696E74 
+ 2734      00
+ 2735              	.LASF119:
+ 2736 0582 64726177 		.ascii	"draw_dsc\000"
+ 2736      5F647363 
+ 2736      00
+ 2737              	.LASF123:
+ 2738 058b 795F6D69 		.ascii	"y_min\000"
+ 2738      6E00
+ 2739              	.LASF46:
+ 2740 0591 626C7565 		.ascii	"blue\000"
+ 2740      00
+ 2741              	.LASF85:
+ 2742 0596 626F7264 		.ascii	"border_post\000"
+ 2742      65725F70 
+ 2742      6F737400 
+ 2743              	.LASF67:
+ 2744 05a2 666C6174 		.ascii	"flat\000"
+ 2744      00
+ 2745              	.LASF133:
+ 2746 05a7 5F6C765F 		.ascii	"_lv_area_intersect\000"
+ 2746      61726561 
+ 2746      5F696E74 
+ 2746      65727365 
+ 2746      637400
+ 2747              	.LASF21:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 57
+
+
+ 2748 05ba 6C765F63 		.ascii	"lv_coord_t\000"
+ 2748      6F6F7264 
+ 2748      5F7400
+ 2749              	.LASF113:
+ 2750 05c5 76616C75 		.ascii	"value_align\000"
+ 2750      655F616C 
+ 2750      69676E00 
+ 2751              	.LASF1:
+ 2752 05d1 5F5F7569 		.ascii	"__uint8_t\000"
+ 2752      6E74385F 
+ 2752      7400
+ 2753              	.LASF79:
+ 2754 05db 62675F62 		.ascii	"bg_blend_mode\000"
+ 2754      6C656E64 
+ 2754      5F6D6F64 
+ 2754      6500
+ 2755              	.LASF53:
+ 2756 05e9 6C765F64 		.ascii	"lv_draw_mask_type_t\000"
+ 2756      7261775F 
+ 2756      6D61736B 
+ 2756      5F747970 
+ 2756      655F7400 
+ 2757              	.LASF31:
+ 2758 05fd 626F785F 		.ascii	"box_h\000"
+ 2758      6800
+ 2759              	.LASF120:
+ 2760 0603 706F6C79 		.ascii	"poly_coords\000"
+ 2760      5F636F6F 
+ 2760      72647300 
+ 2761              	.LASF24:
+ 2762 060f 73697A65 		.ascii	"sizetype\000"
+ 2762      74797065 
+ 2762      00
+ 2763              	.LASF11:
+ 2764 0618 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2764      20756E73 
+ 2764      69676E65 
+ 2764      6420696E 
+ 2764      7400
+ 2765              	.LASF141:
+ 2766 062a 6C76676C 		.ascii	"lvgl\\src\\lv_draw\\lv_draw_triangle.c\000"
+ 2766      5C737263 
+ 2766      5C6C765F 
+ 2766      64726177 
+ 2766      5C6C765F 
+ 2767              	.LASF57:
+ 2768 064e 4C565F44 		.ascii	"LV_DRAW_MASK_LINE_SIDE_BOTTOM\000"
+ 2768      5241575F 
+ 2768      4D41534B 
+ 2768      5F4C494E 
+ 2768      455F5349 
+ 2769              	.LASF30:
+ 2770 066c 626F785F 		.ascii	"box_w\000"
+ 2770      7700
+ 2771              	.LASF19:
+ 2772 0672 696E7433 		.ascii	"int32_t\000"
+ 2772      325F7400 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 58
+
+
+ 2773              	.LASF38:
+ 2774 067a 62617365 		.ascii	"base_line\000"
+ 2774      5F6C696E 
+ 2774      6500
+ 2775              	.LASF118:
+ 2776 0684 636C6970 		.ascii	"clip_area\000"
+ 2776      5F617265 
+ 2776      6100
+ 2777              	.LASF72:
+ 2778 068e 72616469 		.ascii	"radius\000"
+ 2778      757300
+ 2779              	.LASF130:
+ 2780 0695 6D61736B 		.ascii	"mask_cnt\000"
+ 2780      5F636E74 
+ 2780      00
+ 2781              	.LASF54:
+ 2782 069e 4C565F44 		.ascii	"LV_DRAW_MASK_LINE_SIDE_LEFT\000"
+ 2782      5241575F 
+ 2782      4D41534B 
+ 2782      5F4C494E 
+ 2782      455F5349 
+ 2783              	.LASF77:
+ 2784 06ba 62675F67 		.ascii	"bg_grad_color_stop\000"
+ 2784      7261645F 
+ 2784      636F6C6F 
+ 2784      725F7374 
+ 2784      6F7000
+ 2785              	.LASF60:
+ 2786 06cd 74797065 		.ascii	"type\000"
+ 2786      00
+ 2787              	.LASF3:
+ 2788 06d2 756E7369 		.ascii	"unsigned char\000"
+ 2788      676E6564 
+ 2788      20636861 
+ 2788      7200
+ 2789              	.LASF10:
+ 2790 06e0 5F5F7569 		.ascii	"__uint32_t\000"
+ 2790      6E743332 
+ 2790      5F7400
+ 2791              	.LASF36:
+ 2792 06eb 6765745F 		.ascii	"get_glyph_bitmap\000"
+ 2792      676C7970 
+ 2792      685F6269 
+ 2792      746D6170 
+ 2792      00
+ 2793              	.LASF109:
+ 2794 06fc 76616C75 		.ascii	"value_ofs_x\000"
+ 2794      655F6F66 
+ 2794      735F7800 
+ 2795              	.LASF110:
+ 2796 0708 76616C75 		.ascii	"value_ofs_y\000"
+ 2796      655F6F66 
+ 2796      735F7900 
+ 2797              	.LASF73:
+ 2798 0714 62675F63 		.ascii	"bg_color\000"
+ 2798      6F6C6F72 
+ 2798      00
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 59
+
+
+ 2799              	.LASF59:
+ 2800 071d 6C765F64 		.ascii	"lv_draw_mask_line_side_t\000"
+ 2800      7261775F 
+ 2800      6D61736B 
+ 2800      5F6C696E 
+ 2800      655F7369 
+ 2801              	.LASF106:
+ 2802 0736 76616C75 		.ascii	"value_font\000"
+ 2802      655F666F 
+ 2802      6E7400
+ 2803              	.LASF92:
+ 2804 0741 73686164 		.ascii	"shadow_width\000"
+ 2804      6F775F77 
+ 2804      69647468 
+ 2804      00
+ 2805              	.LASF122:
+ 2806 074e 706F6C79 		.ascii	"poly_mask\000"
+ 2806      5F6D6173 
+ 2806      6B00
+ 2807              	.LASF74:
+ 2808 0758 62675F67 		.ascii	"bg_grad_color\000"
+ 2808      7261645F 
+ 2808      636F6C6F 
+ 2808      7200
+ 2809              	.LASF75:
+ 2810 0766 62675F67 		.ascii	"bg_grad_dir\000"
+ 2810      7261645F 
+ 2810      64697200 
+ 2811              	.LASF27:
+ 2812 0772 6C765F61 		.ascii	"lv_area_t\000"
+ 2812      7265615F 
+ 2812      7400
+ 2813              	.LASF2:
+ 2814 077c 7369676E 		.ascii	"signed char\000"
+ 2814      65642063 
+ 2814      68617200 
+ 2815              	.LASF7:
+ 2816 0788 73686F72 		.ascii	"short unsigned int\000"
+ 2816      7420756E 
+ 2816      7369676E 
+ 2816      65642069 
+ 2816      6E7400
+ 2817              	.LASF100:
+ 2818 079b 70617474 		.ascii	"pattern_recolor\000"
+ 2818      65726E5F 
+ 2818      7265636F 
+ 2818      6C6F7200 
+ 2819              	.LASF84:
+ 2820 07ab 626F7264 		.ascii	"border_blend_mode\000"
+ 2820      65725F62 
+ 2820      6C656E64 
+ 2820      5F6D6F64 
+ 2820      6500
+ 2821              	.LASF121:
+ 2822 07bd 69735F63 		.ascii	"is_common\000"
+ 2822      6F6D6D6F 
+ 2822      6E00
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccNppe8f.s 			page 60
+
+
+ 2823              	.LASF142:
+ 2824 07c7 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 2824      73657273 
+ 2824      5C737472 
+ 2824      61705C44 
+ 2824      6F63756D 
+ 2825 07f4 69393334 		.ascii	"i9341_master.cydsn\000"
+ 2825      315F6D61 
+ 2825      73746572 
+ 2825      2E637964 
+ 2825      736E00
+ 2826              	.LASF45:
+ 2827 0807 67726565 		.ascii	"green_h\000"
+ 2827      6E5F6800 
+ 2828              	.LASF47:
+ 2829 080f 67726565 		.ascii	"green_l\000"
+ 2829      6E5F6C00 
+ 2830              	.LASF98:
+ 2831 0817 70617474 		.ascii	"pattern_image\000"
+ 2831      65726E5F 
+ 2831      696D6167 
+ 2831      6500
+ 2832              	.LASF29:
+ 2833 0825 6164765F 		.ascii	"adv_w\000"
+ 2833      7700
+ 2834              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

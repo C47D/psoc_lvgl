@@ -1,0 +1,2337 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_gc.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text._lv_gc_clear_roots,"ax",%progbits
+  20              		.align	2
+  21              		.global	_lv_gc_clear_roots
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	_lv_gc_clear_roots, %function
+  25              	_lv_gc_clear_roots:
+  26              	.LFB37:
+  27              		.file 1 "lvgl\\src\\lv_misc\\lv_gc.c"
+   1:lvgl\src\lv_misc/lv_gc.c **** /**
+   2:lvgl\src\lv_misc/lv_gc.c ****  * @file lv_gc.c
+   3:lvgl\src\lv_misc/lv_gc.c ****  *
+   4:lvgl\src\lv_misc/lv_gc.c ****  */
+   5:lvgl\src\lv_misc/lv_gc.c **** 
+   6:lvgl\src\lv_misc/lv_gc.c **** /*********************
+   7:lvgl\src\lv_misc/lv_gc.c ****  *      INCLUDES
+   8:lvgl\src\lv_misc/lv_gc.c ****  *********************/
+   9:lvgl\src\lv_misc/lv_gc.c **** 
+  10:lvgl\src\lv_misc/lv_gc.c **** #include "lv_gc.h"
+  11:lvgl\src\lv_misc/lv_gc.c **** #include "string.h"
+  12:lvgl\src\lv_misc/lv_gc.c **** 
+  13:lvgl\src\lv_misc/lv_gc.c **** #if defined(LV_GC_INCLUDE)
+  14:lvgl\src\lv_misc/lv_gc.c ****     #include LV_GC_INCLUDE
+  15:lvgl\src\lv_misc/lv_gc.c **** #endif /* LV_ENABLE_GC */
+  16:lvgl\src\lv_misc/lv_gc.c **** 
+  17:lvgl\src\lv_misc/lv_gc.c **** /*********************
+  18:lvgl\src\lv_misc/lv_gc.c ****  *      DEFINES
+  19:lvgl\src\lv_misc/lv_gc.c ****  *********************/
+  20:lvgl\src\lv_misc/lv_gc.c **** 
+  21:lvgl\src\lv_misc/lv_gc.c **** /**********************
+  22:lvgl\src\lv_misc/lv_gc.c ****  *      TYPEDEFS
+  23:lvgl\src\lv_misc/lv_gc.c ****  **********************/
+  24:lvgl\src\lv_misc/lv_gc.c **** 
+  25:lvgl\src\lv_misc/lv_gc.c **** /**********************
+  26:lvgl\src\lv_misc/lv_gc.c ****  *  STATIC PROTOTYPES
+  27:lvgl\src\lv_misc/lv_gc.c ****  **********************/
+  28:lvgl\src\lv_misc/lv_gc.c **** 
+  29:lvgl\src\lv_misc/lv_gc.c **** /**********************
+  30:lvgl\src\lv_misc/lv_gc.c ****  *  STATIC VARIABLES
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 2
+
+
+  31:lvgl\src\lv_misc/lv_gc.c ****  **********************/
+  32:lvgl\src\lv_misc/lv_gc.c **** 
+  33:lvgl\src\lv_misc/lv_gc.c **** #if(!defined(LV_ENABLE_GC)) || LV_ENABLE_GC == 0
+  34:lvgl\src\lv_misc/lv_gc.c ****     LV_ROOTS
+  35:lvgl\src\lv_misc/lv_gc.c **** #endif /* LV_ENABLE_GC */
+  36:lvgl\src\lv_misc/lv_gc.c **** 
+  37:lvgl\src\lv_misc/lv_gc.c **** /**********************
+  38:lvgl\src\lv_misc/lv_gc.c ****  *      MACROS
+  39:lvgl\src\lv_misc/lv_gc.c ****  **********************/
+  40:lvgl\src\lv_misc/lv_gc.c **** 
+  41:lvgl\src\lv_misc/lv_gc.c **** /**********************
+  42:lvgl\src\lv_misc/lv_gc.c ****  *   GLOBAL FUNCTIONS
+  43:lvgl\src\lv_misc/lv_gc.c ****  **********************/
+  44:lvgl\src\lv_misc/lv_gc.c **** 
+  45:lvgl\src\lv_misc/lv_gc.c **** void _lv_gc_clear_roots(void)
+  46:lvgl\src\lv_misc/lv_gc.c **** {
+  28              		.loc 1 46 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+  35              		.cfi_offset 14, -4
+  47:lvgl\src\lv_misc/lv_gc.c **** #define LV_CLEAR_ROOT(root_type, root_name) _lv_memset_00(&LV_GC_ROOT(root_name), sizeof(LV_GC_ROOT
+  48:lvgl\src\lv_misc/lv_gc.c ****     LV_ITERATE_ROOTS(LV_CLEAR_ROOT)
+  36              		.loc 1 48 0
+  37 0002 0C21     		movs	r1, #12
+  38 0004 2348     		ldr	r0, .L3
+  39 0006 FFF7FEFF 		bl	_lv_memset_00
+  40              	.LVL0:
+  41 000a 0C21     		movs	r1, #12
+  42 000c 2248     		ldr	r0, .L3+4
+  43 000e FFF7FEFF 		bl	_lv_memset_00
+  44              	.LVL1:
+  45 0012 0C21     		movs	r1, #12
+  46 0014 2148     		ldr	r0, .L3+8
+  47 0016 FFF7FEFF 		bl	_lv_memset_00
+  48              	.LVL2:
+  49 001a 0C21     		movs	r1, #12
+  50 001c 2048     		ldr	r0, .L3+12
+  51 001e FFF7FEFF 		bl	_lv_memset_00
+  52              	.LVL3:
+  53 0022 0C21     		movs	r1, #12
+  54 0024 1F48     		ldr	r0, .L3+16
+  55 0026 FFF7FEFF 		bl	_lv_memset_00
+  56              	.LVL4:
+  57 002a 0C21     		movs	r1, #12
+  58 002c 1E48     		ldr	r0, .L3+20
+  59 002e FFF7FEFF 		bl	_lv_memset_00
+  60              	.LVL5:
+  61 0032 0C21     		movs	r1, #12
+  62 0034 1D48     		ldr	r0, .L3+24
+  63 0036 FFF7FEFF 		bl	_lv_memset_00
+  64              	.LVL6:
+  65 003a 0C21     		movs	r1, #12
+  66 003c 1C48     		ldr	r0, .L3+28
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 3
+
+
+  67 003e FFF7FEFF 		bl	_lv_memset_00
+  68              	.LVL7:
+  69 0042 0C21     		movs	r1, #12
+  70 0044 1B48     		ldr	r0, .L3+32
+  71 0046 FFF7FEFF 		bl	_lv_memset_00
+  72              	.LVL8:
+  73 004a 0421     		movs	r1, #4
+  74 004c 1A48     		ldr	r0, .L3+36
+  75 004e FFF7FEFF 		bl	_lv_memset_00
+  76              	.LVL9:
+  77 0052 0421     		movs	r1, #4
+  78 0054 1948     		ldr	r0, .L3+40
+  79 0056 FFF7FEFF 		bl	_lv_memset_00
+  80              	.LVL10:
+  81 005a 8021     		movs	r1, #128
+  82 005c 1848     		ldr	r0, .L3+44
+  83 005e FFF7FEFF 		bl	_lv_memset_00
+  84              	.LVL11:
+  85 0062 8021     		movs	r1, #128
+  86 0064 1748     		ldr	r0, .L3+48
+  87 0066 FFF7FEFF 		bl	_lv_memset_00
+  88              	.LVL12:
+  89 006a 0421     		movs	r1, #4
+  90 006c 1648     		ldr	r0, .L3+52
+  91 006e FFF7FEFF 		bl	_lv_memset_00
+  92              	.LVL13:
+  93 0072 0421     		movs	r1, #4
+  94 0074 1548     		ldr	r0, .L3+56
+  95 0076 FFF7FEFF 		bl	_lv_memset_00
+  96              	.LVL14:
+  97 007a 0421     		movs	r1, #4
+  98 007c 1448     		ldr	r0, .L3+60
+  99 007e FFF7FEFF 		bl	_lv_memset_00
+ 100              	.LVL15:
+ 101 0082 0421     		movs	r1, #4
+ 102 0084 1348     		ldr	r0, .L3+64
+ 103 0086 FFF7FEFF 		bl	_lv_memset_00
+ 104              	.LVL16:
+ 105 008a 0421     		movs	r1, #4
+ 106 008c 1248     		ldr	r0, .L3+68
+ 107 008e FFF7FEFF 		bl	_lv_memset_00
+ 108              	.LVL17:
+ 109 0092 08BD     		pop	{r3, pc}
+ 110              	.L4:
+ 111              		.align	2
+ 112              	.L3:
+ 113 0094 00000000 		.word	_lv_task_ll
+ 114 0098 00000000 		.word	_lv_disp_ll
+ 115 009c 00000000 		.word	_lv_indev_ll
+ 116 00a0 00000000 		.word	_lv_drv_ll
+ 117 00a4 00000000 		.word	_lv_file_ll
+ 118 00a8 00000000 		.word	_lv_anim_ll
+ 119 00ac 00000000 		.word	_lv_group_ll
+ 120 00b0 00000000 		.word	_lv_img_defoder_ll
+ 121 00b4 00000000 		.word	_lv_obj_style_trans_ll
+ 122 00b8 00000000 		.word	_lv_img_cache_array
+ 123 00bc 00000000 		.word	_lv_task_act
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 4
+
+
+ 124 00c0 00000000 		.word	_lv_mem_buf
+ 125 00c4 00000000 		.word	_lv_draw_mask_list
+ 126 00c8 00000000 		.word	_lv_theme_material_styles
+ 127 00cc 00000000 		.word	_lv_theme_template_styles
+ 128 00d0 00000000 		.word	_lv_theme_mono_styles
+ 129 00d4 00000000 		.word	_lv_theme_empty_styles
+ 130 00d8 00000000 		.word	_lv_font_decompr_buf
+ 131              		.cfi_endproc
+ 132              	.LFE37:
+ 133              		.size	_lv_gc_clear_roots, .-_lv_gc_clear_roots
+ 134              		.comm	_lv_font_decompr_buf,4,4
+ 135              		.comm	_lv_theme_empty_styles,4,4
+ 136              		.comm	_lv_theme_mono_styles,4,4
+ 137              		.comm	_lv_theme_template_styles,4,4
+ 138              		.comm	_lv_theme_material_styles,4,4
+ 139              		.comm	_lv_draw_mask_list,128,4
+ 140              		.comm	_lv_mem_buf,128,4
+ 141              		.comm	_lv_task_act,4,4
+ 142              		.comm	_lv_img_cache_array,4,4
+ 143              		.comm	_lv_obj_style_trans_ll,12,4
+ 144              		.comm	_lv_img_defoder_ll,12,4
+ 145              		.comm	_lv_group_ll,12,4
+ 146              		.comm	_lv_anim_ll,12,4
+ 147              		.comm	_lv_file_ll,12,4
+ 148              		.comm	_lv_drv_ll,12,4
+ 149              		.comm	_lv_indev_ll,12,4
+ 150              		.comm	_lv_disp_ll,12,4
+ 151              		.comm	_lv_task_ll,12,4
+ 152              		.text
+ 153              	.Letext0:
+ 154              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 155              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 156              		.file 4 "lvgl\\src\\lv_misc\\../../../lv_conf.h"
+ 157              		.file 5 "lvgl\\src\\lv_misc\\lv_types.h"
+ 158              		.file 6 "lvgl\\src\\lv_misc\\lv_mem.h"
+ 159              		.file 7 "lvgl\\src\\lv_misc\\lv_ll.h"
+ 160              		.file 8 "lvgl\\src\\lv_misc\\lv_task.h"
+ 161              		.file 9 "lvgl\\src\\lv_misc\\../lv_draw/../lv_misc/lv_color.h"
+ 162              		.file 10 "lvgl\\src\\lv_misc\\../lv_draw/lv_img_buf.h"
+ 163              		.file 11 "lvgl\\src\\lv_misc\\../lv_draw/../lv_core/../lv_draw/lv_draw_mask.h"
+ 164              		.file 12 "lvgl\\src\\lv_misc\\../lv_draw/lv_img_decoder.h"
+ 165              		.file 13 "lvgl\\src\\lv_misc\\../lv_draw/lv_img_cache.h"
+ 166              		.section	.debug_info,"",%progbits
+ 167              	.Ldebug_info0:
+ 168 0000 9A080000 		.4byte	0x89a
+ 169 0004 0400     		.2byte	0x4
+ 170 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 171 000a 04       		.byte	0x4
+ 172 000b 01       		.uleb128 0x1
+ 173 000c 25050000 		.4byte	.LASF98
+ 174 0010 0C       		.byte	0xc
+ 175 0011 0C050000 		.4byte	.LASF99
+ 176 0015 07040000 		.4byte	.LASF100
+ 177 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 178 001d 00000000 		.4byte	0
+ 179 0021 00000000 		.4byte	.Ldebug_line0
+ 180 0025 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 5
+
+
+ 181 0026 01       		.byte	0x1
+ 182 0027 06       		.byte	0x6
+ 183 0028 A4020000 		.4byte	.LASF0
+ 184 002c 03       		.uleb128 0x3
+ 185 002d DB050000 		.4byte	.LASF2
+ 186 0031 02       		.byte	0x2
+ 187 0032 1D       		.byte	0x1d
+ 188 0033 37000000 		.4byte	0x37
+ 189 0037 02       		.uleb128 0x2
+ 190 0038 01       		.byte	0x1
+ 191 0039 08       		.byte	0x8
+ 192 003a 81020000 		.4byte	.LASF1
+ 193 003e 03       		.uleb128 0x3
+ 194 003f 8D040000 		.4byte	.LASF3
+ 195 0043 02       		.byte	0x2
+ 196 0044 29       		.byte	0x29
+ 197 0045 49000000 		.4byte	0x49
+ 198 0049 02       		.uleb128 0x2
+ 199 004a 02       		.byte	0x2
+ 200 004b 05       		.byte	0x5
+ 201 004c A2000000 		.4byte	.LASF4
+ 202 0050 03       		.uleb128 0x3
+ 203 0051 F9000000 		.4byte	.LASF5
+ 204 0055 02       		.byte	0x2
+ 205 0056 2B       		.byte	0x2b
+ 206 0057 5B000000 		.4byte	0x5b
+ 207 005b 02       		.uleb128 0x2
+ 208 005c 02       		.byte	0x2
+ 209 005d 07       		.byte	0x7
+ 210 005e AA030000 		.4byte	.LASF6
+ 211 0062 03       		.uleb128 0x3
+ 212 0063 9A020000 		.4byte	.LASF7
+ 213 0067 02       		.byte	0x2
+ 214 0068 3F       		.byte	0x3f
+ 215 0069 6D000000 		.4byte	0x6d
+ 216 006d 02       		.uleb128 0x2
+ 217 006e 04       		.byte	0x4
+ 218 006f 05       		.byte	0x5
+ 219 0070 FB010000 		.4byte	.LASF8
+ 220 0074 03       		.uleb128 0x3
+ 221 0075 E2000000 		.4byte	.LASF9
+ 222 0079 02       		.byte	0x2
+ 223 007a 41       		.byte	0x41
+ 224 007b 7F000000 		.4byte	0x7f
+ 225 007f 02       		.uleb128 0x2
+ 226 0080 04       		.byte	0x4
+ 227 0081 07       		.byte	0x7
+ 228 0082 FE020000 		.4byte	.LASF10
+ 229 0086 02       		.uleb128 0x2
+ 230 0087 08       		.byte	0x8
+ 231 0088 05       		.byte	0x5
+ 232 0089 C6010000 		.4byte	.LASF11
+ 233 008d 02       		.uleb128 0x2
+ 234 008e 08       		.byte	0x8
+ 235 008f 07       		.byte	0x7
+ 236 0090 B0020000 		.4byte	.LASF12
+ 237 0094 04       		.uleb128 0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 6
+
+
+ 238 0095 04       		.byte	0x4
+ 239 0096 05       		.byte	0x5
+ 240 0097 696E7400 		.ascii	"int\000"
+ 241 009b 02       		.uleb128 0x2
+ 242 009c 04       		.byte	0x4
+ 243 009d 07       		.byte	0x7
+ 244 009e B3050000 		.4byte	.LASF13
+ 245 00a2 03       		.uleb128 0x3
+ 246 00a3 50010000 		.4byte	.LASF14
+ 247 00a7 03       		.byte	0x3
+ 248 00a8 18       		.byte	0x18
+ 249 00a9 2C000000 		.4byte	0x2c
+ 250 00ad 03       		.uleb128 0x3
+ 251 00ae BD030000 		.4byte	.LASF15
+ 252 00b2 03       		.byte	0x3
+ 253 00b3 20       		.byte	0x20
+ 254 00b4 3E000000 		.4byte	0x3e
+ 255 00b8 03       		.uleb128 0x3
+ 256 00b9 F5020000 		.4byte	.LASF16
+ 257 00bd 03       		.byte	0x3
+ 258 00be 24       		.byte	0x24
+ 259 00bf 50000000 		.4byte	0x50
+ 260 00c3 03       		.uleb128 0x3
+ 261 00c4 84030000 		.4byte	.LASF17
+ 262 00c8 03       		.byte	0x3
+ 263 00c9 2C       		.byte	0x2c
+ 264 00ca 62000000 		.4byte	0x62
+ 265 00ce 03       		.uleb128 0x3
+ 266 00cf C7020000 		.4byte	.LASF18
+ 267 00d3 03       		.byte	0x3
+ 268 00d4 30       		.byte	0x30
+ 269 00d5 74000000 		.4byte	0x74
+ 270 00d9 03       		.uleb128 0x3
+ 271 00da 97040000 		.4byte	.LASF19
+ 272 00de 04       		.byte	0x4
+ 273 00df 46       		.byte	0x46
+ 274 00e0 AD000000 		.4byte	0xad
+ 275 00e4 05       		.uleb128 0x5
+ 276 00e5 04       		.byte	0x4
+ 277 00e6 03       		.uleb128 0x3
+ 278 00e7 2D030000 		.4byte	.LASF20
+ 279 00eb 04       		.byte	0x4
+ 280 00ec EA       		.byte	0xea
+ 281 00ed E4000000 		.4byte	0xe4
+ 282 00f1 02       		.uleb128 0x2
+ 283 00f2 08       		.byte	0x8
+ 284 00f3 04       		.byte	0x4
+ 285 00f4 70020000 		.4byte	.LASF21
+ 286 00f8 03       		.uleb128 0x3
+ 287 00f9 D4010000 		.4byte	.LASF22
+ 288 00fd 05       		.byte	0x5
+ 289 00fe 34       		.byte	0x34
+ 290 00ff A2000000 		.4byte	0xa2
+ 291 0103 06       		.uleb128 0x6
+ 292 0104 08       		.byte	0x8
+ 293 0105 06       		.byte	0x6
+ 294 0106 35       		.byte	0x35
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 7
+
+
+ 295 0107 31010000 		.4byte	0x131
+ 296 010b 07       		.uleb128 0x7
+ 297 010c 7000     		.ascii	"p\000"
+ 298 010e 06       		.byte	0x6
+ 299 010f 36       		.byte	0x36
+ 300 0110 E4000000 		.4byte	0xe4
+ 301 0114 00       		.byte	0
+ 302 0115 08       		.uleb128 0x8
+ 303 0116 60040000 		.4byte	.LASF23
+ 304 011a 06       		.byte	0x6
+ 305 011b 37       		.byte	0x37
+ 306 011c B8000000 		.4byte	0xb8
+ 307 0120 04       		.byte	0x4
+ 308 0121 09       		.uleb128 0x9
+ 309 0122 E5020000 		.4byte	.LASF38
+ 310 0126 06       		.byte	0x6
+ 311 0127 38       		.byte	0x38
+ 312 0128 A2000000 		.4byte	0xa2
+ 313 012c 01       		.byte	0x1
+ 314 012d 01       		.byte	0x1
+ 315 012e 07       		.byte	0x7
+ 316 012f 06       		.byte	0x6
+ 317 0130 00       		.byte	0
+ 318 0131 03       		.uleb128 0x3
+ 319 0132 46000000 		.4byte	.LASF24
+ 320 0136 06       		.byte	0x6
+ 321 0137 39       		.byte	0x39
+ 322 0138 03010000 		.4byte	0x103
+ 323 013c 03       		.uleb128 0x3
+ 324 013d 59020000 		.4byte	.LASF25
+ 325 0141 06       		.byte	0x6
+ 326 0142 3B       		.byte	0x3b
+ 327 0143 47010000 		.4byte	0x147
+ 328 0147 0A       		.uleb128 0xa
+ 329 0148 31010000 		.4byte	0x131
+ 330 014c 57010000 		.4byte	0x157
+ 331 0150 0B       		.uleb128 0xb
+ 332 0151 57010000 		.4byte	0x157
+ 333 0155 0F       		.byte	0xf
+ 334 0156 00       		.byte	0
+ 335 0157 02       		.uleb128 0x2
+ 336 0158 04       		.byte	0x4
+ 337 0159 07       		.byte	0x7
+ 338 015a BF000000 		.4byte	.LASF26
+ 339 015e 03       		.uleb128 0x3
+ 340 015f 00000000 		.4byte	.LASF27
+ 341 0163 07       		.byte	0x7
+ 342 0164 1E       		.byte	0x1e
+ 343 0165 A2000000 		.4byte	0xa2
+ 344 0169 06       		.uleb128 0x6
+ 345 016a 0C       		.byte	0xc
+ 346 016b 07       		.byte	0x7
+ 347 016c 21       		.byte	0x21
+ 348 016d 96010000 		.4byte	0x196
+ 349 0171 08       		.uleb128 0x8
+ 350 0172 E5050000 		.4byte	.LASF28
+ 351 0176 07       		.byte	0x7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 8
+
+
+ 352 0177 22       		.byte	0x22
+ 353 0178 CE000000 		.4byte	0xce
+ 354 017c 00       		.byte	0
+ 355 017d 08       		.uleb128 0x8
+ 356 017e 36010000 		.4byte	.LASF29
+ 357 0182 07       		.byte	0x7
+ 358 0183 23       		.byte	0x23
+ 359 0184 96010000 		.4byte	0x196
+ 360 0188 04       		.byte	0x4
+ 361 0189 08       		.uleb128 0x8
+ 362 018a 7C020000 		.4byte	.LASF30
+ 363 018e 07       		.byte	0x7
+ 364 018f 24       		.byte	0x24
+ 365 0190 96010000 		.4byte	0x196
+ 366 0194 08       		.byte	0x8
+ 367 0195 00       		.byte	0
+ 368 0196 0C       		.uleb128 0xc
+ 369 0197 04       		.byte	0x4
+ 370 0198 5E010000 		.4byte	0x15e
+ 371 019c 03       		.uleb128 0x3
+ 372 019d 45020000 		.4byte	.LASF31
+ 373 01a1 07       		.byte	0x7
+ 374 01a2 25       		.byte	0x25
+ 375 01a3 69010000 		.4byte	0x169
+ 376 01a7 03       		.uleb128 0x3
+ 377 01a8 C9050000 		.4byte	.LASF32
+ 378 01ac 08       		.byte	0x8
+ 379 01ad 29       		.byte	0x29
+ 380 01ae B2010000 		.4byte	0x1b2
+ 381 01b2 0C       		.uleb128 0xc
+ 382 01b3 04       		.byte	0x4
+ 383 01b4 B8010000 		.4byte	0x1b8
+ 384 01b8 0D       		.uleb128 0xd
+ 385 01b9 C3010000 		.4byte	0x1c3
+ 386 01bd 0E       		.uleb128 0xe
+ 387 01be C3010000 		.4byte	0x1c3
+ 388 01c2 00       		.byte	0
+ 389 01c3 0C       		.uleb128 0xc
+ 390 01c4 04       		.byte	0x4
+ 391 01c5 C9010000 		.4byte	0x1c9
+ 392 01c9 0F       		.uleb128 0xf
+ 393 01ca BB010000 		.4byte	.LASF58
+ 394 01ce 18       		.byte	0x18
+ 395 01cf 08       		.byte	0x8
+ 396 01d0 3C       		.byte	0x3c
+ 397 01d1 21020000 		.4byte	0x221
+ 398 01d5 08       		.uleb128 0x8
+ 399 01d6 20020000 		.4byte	.LASF33
+ 400 01da 08       		.byte	0x8
+ 401 01db 3D       		.byte	0x3d
+ 402 01dc CE000000 		.4byte	0xce
+ 403 01e0 00       		.byte	0
+ 404 01e1 08       		.uleb128 0x8
+ 405 01e2 2F020000 		.4byte	.LASF34
+ 406 01e6 08       		.byte	0x8
+ 407 01e7 3E       		.byte	0x3e
+ 408 01e8 CE000000 		.4byte	0xce
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 9
+
+
+ 409 01ec 04       		.byte	0x4
+ 410 01ed 08       		.uleb128 0x8
+ 411 01ee A2030000 		.4byte	.LASF35
+ 412 01f2 08       		.byte	0x8
+ 413 01f3 3F       		.byte	0x3f
+ 414 01f4 A7010000 		.4byte	0x1a7
+ 415 01f8 08       		.byte	0x8
+ 416 01f9 08       		.uleb128 0x8
+ 417 01fa A5010000 		.4byte	.LASF36
+ 418 01fe 08       		.byte	0x8
+ 419 01ff 41       		.byte	0x41
+ 420 0200 E4000000 		.4byte	0xe4
+ 421 0204 0C       		.byte	0xc
+ 422 0205 08       		.uleb128 0x8
+ 423 0206 FF040000 		.4byte	.LASF37
+ 424 020a 08       		.byte	0x8
+ 425 020b 43       		.byte	0x43
+ 426 020c C3000000 		.4byte	0xc3
+ 427 0210 10       		.byte	0x10
+ 428 0211 09       		.uleb128 0x9
+ 429 0212 D6050000 		.4byte	.LASF39
+ 430 0216 08       		.byte	0x8
+ 431 0217 44       		.byte	0x44
+ 432 0218 A2000000 		.4byte	0xa2
+ 433 021c 01       		.byte	0x1
+ 434 021d 03       		.byte	0x3
+ 435 021e 05       		.byte	0x5
+ 436 021f 14       		.byte	0x14
+ 437 0220 00       		.byte	0
+ 438 0221 03       		.uleb128 0x3
+ 439 0222 53000000 		.4byte	.LASF40
+ 440 0226 08       		.byte	0x8
+ 441 0227 45       		.byte	0x45
+ 442 0228 C9010000 		.4byte	0x1c9
+ 443 022c 06       		.uleb128 0x6
+ 444 022d 02       		.byte	0x2
+ 445 022e 09       		.byte	0x9
+ 446 022f EA       		.byte	0xea
+ 447 0230 71020000 		.4byte	0x271
+ 448 0234 09       		.uleb128 0x9
+ 449 0235 EB030000 		.4byte	.LASF41
+ 450 0239 09       		.byte	0x9
+ 451 023a F0       		.byte	0xf0
+ 452 023b B8000000 		.4byte	0xb8
+ 453 023f 02       		.byte	0x2
+ 454 0240 03       		.byte	0x3
+ 455 0241 0D       		.byte	0xd
+ 456 0242 00       		.byte	0
+ 457 0243 10       		.uleb128 0x10
+ 458 0244 72656400 		.ascii	"red\000"
+ 459 0248 09       		.byte	0x9
+ 460 0249 F1       		.byte	0xf1
+ 461 024a B8000000 		.4byte	0xb8
+ 462 024e 02       		.byte	0x2
+ 463 024f 05       		.byte	0x5
+ 464 0250 08       		.byte	0x8
+ 465 0251 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 10
+
+
+ 466 0252 09       		.uleb128 0x9
+ 467 0253 29010000 		.4byte	.LASF42
+ 468 0257 09       		.byte	0x9
+ 469 0258 F2       		.byte	0xf2
+ 470 0259 B8000000 		.4byte	0xb8
+ 471 025d 02       		.byte	0x2
+ 472 025e 05       		.byte	0x5
+ 473 025f 03       		.byte	0x3
+ 474 0260 00       		.byte	0
+ 475 0261 09       		.uleb128 0x9
+ 476 0262 FF030000 		.4byte	.LASF43
+ 477 0266 09       		.byte	0x9
+ 478 0267 F3       		.byte	0xf3
+ 479 0268 B8000000 		.4byte	0xb8
+ 480 026c 02       		.byte	0x2
+ 481 026d 03       		.byte	0x3
+ 482 026e 00       		.byte	0
+ 483 026f 00       		.byte	0
+ 484 0270 00       		.byte	0
+ 485 0271 11       		.uleb128 0x11
+ 486 0272 02       		.byte	0x2
+ 487 0273 09       		.byte	0x9
+ 488 0274 E9       		.byte	0xe9
+ 489 0275 8F020000 		.4byte	0x28f
+ 490 0279 12       		.uleb128 0x12
+ 491 027a 636800   		.ascii	"ch\000"
+ 492 027d 09       		.byte	0x9
+ 493 027e F5       		.byte	0xf5
+ 494 027f 2C020000 		.4byte	0x22c
+ 495 0283 13       		.uleb128 0x13
+ 496 0284 88040000 		.4byte	.LASF44
+ 497 0288 09       		.byte	0x9
+ 498 0289 F6       		.byte	0xf6
+ 499 028a B8000000 		.4byte	0xb8
+ 500 028e 00       		.byte	0
+ 501 028f 03       		.uleb128 0x3
+ 502 0290 98010000 		.4byte	.LASF45
+ 503 0294 09       		.byte	0x9
+ 504 0295 F7       		.byte	0xf7
+ 505 0296 71020000 		.4byte	0x271
+ 506 029a 14       		.uleb128 0x14
+ 507 029b EA020000 		.4byte	.LASF46
+ 508 029f 09       		.byte	0x9
+ 509 02a0 0D01     		.2byte	0x10d
+ 510 02a2 8F020000 		.4byte	0x28f
+ 511 02a6 02       		.uleb128 0x2
+ 512 02a7 01       		.byte	0x1
+ 513 02a8 08       		.byte	0x8
+ 514 02a9 8B000000 		.4byte	.LASF47
+ 515 02ad 0C       		.uleb128 0xc
+ 516 02ae 04       		.byte	0x4
+ 517 02af B3020000 		.4byte	0x2b3
+ 518 02b3 15       		.uleb128 0x15
+ 519 02b4 A6020000 		.4byte	0x2a6
+ 520 02b8 06       		.uleb128 0x6
+ 521 02b9 04       		.byte	0x4
+ 522 02ba 0A       		.byte	0xa
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 11
+
+
+ 523 02bb 7E       		.byte	0x7e
+ 524 02bc 07030000 		.4byte	0x307
+ 525 02c0 10       		.uleb128 0x10
+ 526 02c1 636600   		.ascii	"cf\000"
+ 527 02c4 0A       		.byte	0xa
+ 528 02c5 80       		.byte	0x80
+ 529 02c6 CE000000 		.4byte	0xce
+ 530 02ca 04       		.byte	0x4
+ 531 02cb 05       		.byte	0x5
+ 532 02cc 1B       		.byte	0x1b
+ 533 02cd 00       		.byte	0
+ 534 02ce 09       		.uleb128 0x9
+ 535 02cf F3030000 		.4byte	.LASF48
+ 536 02d3 0A       		.byte	0xa
+ 537 02d4 81       		.byte	0x81
+ 538 02d5 CE000000 		.4byte	0xce
+ 539 02d9 04       		.byte	0x4
+ 540 02da 03       		.byte	0x3
+ 541 02db 18       		.byte	0x18
+ 542 02dc 00       		.byte	0
+ 543 02dd 09       		.uleb128 0x9
+ 544 02de C0050000 		.4byte	.LASF49
+ 545 02e2 0A       		.byte	0xa
+ 546 02e3 84       		.byte	0x84
+ 547 02e4 CE000000 		.4byte	0xce
+ 548 02e8 04       		.byte	0x4
+ 549 02e9 02       		.byte	0x2
+ 550 02ea 16       		.byte	0x16
+ 551 02eb 00       		.byte	0
+ 552 02ec 10       		.uleb128 0x10
+ 553 02ed 7700     		.ascii	"w\000"
+ 554 02ef 0A       		.byte	0xa
+ 555 02f0 86       		.byte	0x86
+ 556 02f1 CE000000 		.4byte	0xce
+ 557 02f5 04       		.byte	0x4
+ 558 02f6 0B       		.byte	0xb
+ 559 02f7 0B       		.byte	0xb
+ 560 02f8 00       		.byte	0
+ 561 02f9 10       		.uleb128 0x10
+ 562 02fa 6800     		.ascii	"h\000"
+ 563 02fc 0A       		.byte	0xa
+ 564 02fd 87       		.byte	0x87
+ 565 02fe CE000000 		.4byte	0xce
+ 566 0302 04       		.byte	0x4
+ 567 0303 0B       		.byte	0xb
+ 568 0304 00       		.byte	0
+ 569 0305 00       		.byte	0
+ 570 0306 00       		.byte	0
+ 571 0307 03       		.uleb128 0x3
+ 572 0308 1D030000 		.4byte	.LASF50
+ 573 030c 0A       		.byte	0xa
+ 574 030d 88       		.byte	0x88
+ 575 030e B8020000 		.4byte	0x2b8
+ 576 0312 0C       		.uleb128 0xc
+ 577 0313 04       		.byte	0x4
+ 578 0314 18030000 		.4byte	0x318
+ 579 0318 15       		.uleb128 0x15
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 12
+
+
+ 580 0319 A2000000 		.4byte	0xa2
+ 581 031d 0C       		.uleb128 0xc
+ 582 031e 04       		.byte	0x4
+ 583 031f 23030000 		.4byte	0x323
+ 584 0323 16       		.uleb128 0x16
+ 585 0324 02       		.uleb128 0x2
+ 586 0325 01       		.byte	0x1
+ 587 0326 02       		.byte	0x2
+ 588 0327 C5030000 		.4byte	.LASF51
+ 589 032b 06       		.uleb128 0x6
+ 590 032c 08       		.byte	0x8
+ 591 032d 0B       		.byte	0xb
+ 592 032e A5       		.byte	0xa5
+ 593 032f 4C030000 		.4byte	0x34c
+ 594 0333 08       		.uleb128 0x8
+ 595 0334 5B030000 		.4byte	.LASF52
+ 596 0338 0B       		.byte	0xb
+ 597 0339 A6       		.byte	0xa6
+ 598 033a E4000000 		.4byte	0xe4
+ 599 033e 00       		.byte	0
+ 600 033f 08       		.uleb128 0x8
+ 601 0340 98000000 		.4byte	.LASF53
+ 602 0344 0B       		.byte	0xb
+ 603 0345 A7       		.byte	0xa7
+ 604 0346 E4000000 		.4byte	0xe4
+ 605 034a 04       		.byte	0x4
+ 606 034b 00       		.byte	0
+ 607 034c 03       		.uleb128 0x3
+ 608 034d 58010000 		.4byte	.LASF54
+ 609 0351 0B       		.byte	0xb
+ 610 0352 A8       		.byte	0xa8
+ 611 0353 2B030000 		.4byte	0x32b
+ 612 0357 03       		.uleb128 0x3
+ 613 0358 2C000000 		.4byte	.LASF55
+ 614 035c 0B       		.byte	0xb
+ 615 035d AA       		.byte	0xaa
+ 616 035e 62030000 		.4byte	0x362
+ 617 0362 0A       		.uleb128 0xa
+ 618 0363 4C030000 		.4byte	0x34c
+ 619 0367 72030000 		.4byte	0x372
+ 620 036b 0B       		.uleb128 0xb
+ 621 036c 57010000 		.4byte	0x157
+ 622 0370 0F       		.byte	0xf
+ 623 0371 00       		.byte	0
+ 624 0372 0C       		.uleb128 0xc
+ 625 0373 04       		.byte	0x4
+ 626 0374 A2000000 		.4byte	0xa2
+ 627 0378 03       		.uleb128 0x3
+ 628 0379 04010000 		.4byte	.LASF56
+ 629 037d 0C       		.byte	0xc
+ 630 037e 2A       		.byte	0x2a
+ 631 037f A2000000 		.4byte	0xa2
+ 632 0383 03       		.uleb128 0x3
+ 633 0384 11010000 		.4byte	.LASF57
+ 634 0388 0C       		.byte	0xc
+ 635 0389 38       		.byte	0x38
+ 636 038a 8E030000 		.4byte	0x38e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 13
+
+
+ 637 038e 0C       		.uleb128 0xc
+ 638 038f 04       		.byte	0x4
+ 639 0390 94030000 		.4byte	0x394
+ 640 0394 17       		.uleb128 0x17
+ 641 0395 F8000000 		.4byte	0xf8
+ 642 0399 AD030000 		.4byte	0x3ad
+ 643 039d 0E       		.uleb128 0xe
+ 644 039e AD030000 		.4byte	0x3ad
+ 645 03a2 0E       		.uleb128 0xe
+ 646 03a3 1D030000 		.4byte	0x31d
+ 647 03a7 0E       		.uleb128 0xe
+ 648 03a8 FC030000 		.4byte	0x3fc
+ 649 03ac 00       		.byte	0
+ 650 03ad 0C       		.uleb128 0xc
+ 651 03ae 04       		.byte	0x4
+ 652 03af B3030000 		.4byte	0x3b3
+ 653 03b3 0F       		.uleb128 0xf
+ 654 03b4 04020000 		.4byte	.LASF59
+ 655 03b8 14       		.byte	0x14
+ 656 03b9 0C       		.byte	0xc
+ 657 03ba 57       		.byte	0x57
+ 658 03bb FC030000 		.4byte	0x3fc
+ 659 03bf 08       		.uleb128 0x8
+ 660 03c0 90000000 		.4byte	.LASF60
+ 661 03c4 0C       		.byte	0xc
+ 662 03c5 58       		.byte	0x58
+ 663 03c6 83030000 		.4byte	0x383
+ 664 03ca 00       		.byte	0
+ 665 03cb 08       		.uleb128 0x8
+ 666 03cc 2E010000 		.4byte	.LASF61
+ 667 03d0 0C       		.byte	0xc
+ 668 03d1 59       		.byte	0x59
+ 669 03d2 02040000 		.4byte	0x402
+ 670 03d6 04       		.byte	0x4
+ 671 03d7 08       		.uleb128 0x8
+ 672 03d8 10030000 		.4byte	.LASF62
+ 673 03dc 0C       		.byte	0xc
+ 674 03dd 5A       		.byte	0x5a
+ 675 03de A6040000 		.4byte	0x4a6
+ 676 03e2 08       		.byte	0x8
+ 677 03e3 08       		.uleb128 0x8
+ 678 03e4 B6040000 		.4byte	.LASF63
+ 679 03e8 0C       		.byte	0xc
+ 680 03e9 5B       		.byte	0x5b
+ 681 03ea DF040000 		.4byte	0x4df
+ 682 03ee 0C       		.byte	0xc
+ 683 03ef 08       		.uleb128 0x8
+ 684 03f0 A5010000 		.4byte	.LASF36
+ 685 03f4 0C       		.byte	0xc
+ 686 03f5 5E       		.byte	0x5e
+ 687 03f6 E6000000 		.4byte	0xe6
+ 688 03fa 10       		.byte	0x10
+ 689 03fb 00       		.byte	0
+ 690 03fc 0C       		.uleb128 0xc
+ 691 03fd 04       		.byte	0x4
+ 692 03fe 07030000 		.4byte	0x307
+ 693 0402 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 14
+
+
+ 694 0403 0D000000 		.4byte	.LASF64
+ 695 0407 0C       		.byte	0xc
+ 696 0408 40       		.byte	0x40
+ 697 0409 0D040000 		.4byte	0x40d
+ 698 040d 0C       		.uleb128 0xc
+ 699 040e 04       		.byte	0x4
+ 700 040f 13040000 		.4byte	0x413
+ 701 0413 17       		.uleb128 0x17
+ 702 0414 F8000000 		.4byte	0xf8
+ 703 0418 27040000 		.4byte	0x427
+ 704 041c 0E       		.uleb128 0xe
+ 705 041d AD030000 		.4byte	0x3ad
+ 706 0421 0E       		.uleb128 0xe
+ 707 0422 27040000 		.4byte	0x427
+ 708 0426 00       		.byte	0
+ 709 0427 0C       		.uleb128 0xc
+ 710 0428 04       		.byte	0x4
+ 711 0429 2D040000 		.4byte	0x42d
+ 712 042d 0F       		.uleb128 0xf
+ 713 042e 5D000000 		.4byte	.LASF65
+ 714 0432 20       		.byte	0x20
+ 715 0433 0C       		.byte	0xc
+ 716 0434 63       		.byte	0x63
+ 717 0435 A6040000 		.4byte	0x4a6
+ 718 0439 08       		.uleb128 0x8
+ 719 043a 27020000 		.4byte	.LASF66
+ 720 043e 0C       		.byte	0xc
+ 721 043f 65       		.byte	0x65
+ 722 0440 0B050000 		.4byte	0x50b
+ 723 0444 00       		.byte	0
+ 724 0445 07       		.uleb128 0x7
+ 725 0446 73726300 		.ascii	"src\000"
+ 726 044a 0C       		.byte	0xc
+ 727 044b 68       		.byte	0x68
+ 728 044c 1D030000 		.4byte	0x31d
+ 729 0450 04       		.byte	0x4
+ 730 0451 08       		.uleb128 0x8
+ 731 0452 6A020000 		.4byte	.LASF67
+ 732 0456 0C       		.byte	0xc
+ 733 0457 6B       		.byte	0x6b
+ 734 0458 9A020000 		.4byte	0x29a
+ 735 045c 08       		.byte	0x8
+ 736 045d 08       		.uleb128 0x8
+ 737 045e 48030000 		.4byte	.LASF68
+ 738 0462 0C       		.byte	0xc
+ 739 0463 6E       		.byte	0x6e
+ 740 0464 78030000 		.4byte	0x378
+ 741 0468 0A       		.byte	0xa
+ 742 0469 08       		.uleb128 0x8
+ 743 046a 25000000 		.4byte	.LASF69
+ 744 046e 0C       		.byte	0xc
+ 745 046f 71       		.byte	0x71
+ 746 0470 07030000 		.4byte	0x307
+ 747 0474 0C       		.byte	0xc
+ 748 0475 08       		.uleb128 0x8
+ 749 0476 61030000 		.4byte	.LASF70
+ 750 047a 0C       		.byte	0xc
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 15
+
+
+ 751 047b 75       		.byte	0x75
+ 752 047c 12030000 		.4byte	0x312
+ 753 0480 10       		.byte	0x10
+ 754 0481 08       		.uleb128 0x8
+ 755 0482 EE010000 		.4byte	.LASF71
+ 756 0486 0C       		.byte	0xc
+ 757 0487 79       		.byte	0x79
+ 758 0488 CE000000 		.4byte	0xce
+ 759 048c 14       		.byte	0x14
+ 760 048d 08       		.uleb128 0x8
+ 761 048e 51030000 		.4byte	.LASF72
+ 762 0492 0C       		.byte	0xc
+ 763 0493 7D       		.byte	0x7d
+ 764 0494 AD020000 		.4byte	0x2ad
+ 765 0498 18       		.byte	0x18
+ 766 0499 08       		.uleb128 0x8
+ 767 049a A5010000 		.4byte	.LASF36
+ 768 049e 0C       		.byte	0xc
+ 769 049f 80       		.byte	0x80
+ 770 04a0 E4000000 		.4byte	0xe4
+ 771 04a4 1C       		.byte	0x1c
+ 772 04a5 00       		.byte	0
+ 773 04a6 03       		.uleb128 0x3
+ 774 04a7 7B010000 		.4byte	.LASF73
+ 775 04ab 0C       		.byte	0xc
+ 776 04ac 4D       		.byte	0x4d
+ 777 04ad B1040000 		.4byte	0x4b1
+ 778 04b1 0C       		.uleb128 0xc
+ 779 04b2 04       		.byte	0x4
+ 780 04b3 B7040000 		.4byte	0x4b7
+ 781 04b7 17       		.uleb128 0x17
+ 782 04b8 F8000000 		.4byte	0xf8
+ 783 04bc DF040000 		.4byte	0x4df
+ 784 04c0 0E       		.uleb128 0xe
+ 785 04c1 AD030000 		.4byte	0x3ad
+ 786 04c5 0E       		.uleb128 0xe
+ 787 04c6 27040000 		.4byte	0x427
+ 788 04ca 0E       		.uleb128 0xe
+ 789 04cb D9000000 		.4byte	0xd9
+ 790 04cf 0E       		.uleb128 0xe
+ 791 04d0 D9000000 		.4byte	0xd9
+ 792 04d4 0E       		.uleb128 0xe
+ 793 04d5 D9000000 		.4byte	0xd9
+ 794 04d9 0E       		.uleb128 0xe
+ 795 04da 72030000 		.4byte	0x372
+ 796 04de 00       		.byte	0
+ 797 04df 03       		.uleb128 0x3
+ 798 04e0 47040000 		.4byte	.LASF74
+ 799 04e4 0C       		.byte	0xc
+ 800 04e5 55       		.byte	0x55
+ 801 04e6 EA040000 		.4byte	0x4ea
+ 802 04ea 0C       		.uleb128 0xc
+ 803 04eb 04       		.byte	0x4
+ 804 04ec F0040000 		.4byte	0x4f0
+ 805 04f0 0D       		.uleb128 0xd
+ 806 04f1 00050000 		.4byte	0x500
+ 807 04f5 0E       		.uleb128 0xe
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 16
+
+
+ 808 04f6 AD030000 		.4byte	0x3ad
+ 809 04fa 0E       		.uleb128 0xe
+ 810 04fb 27040000 		.4byte	0x427
+ 811 04ff 00       		.byte	0
+ 812 0500 03       		.uleb128 0x3
+ 813 0501 DD010000 		.4byte	.LASF75
+ 814 0505 0C       		.byte	0xc
+ 815 0506 60       		.byte	0x60
+ 816 0507 B3030000 		.4byte	0x3b3
+ 817 050b 0C       		.uleb128 0xc
+ 818 050c 04       		.byte	0x4
+ 819 050d 00050000 		.4byte	0x500
+ 820 0511 03       		.uleb128 0x3
+ 821 0512 3B010000 		.4byte	.LASF76
+ 822 0516 0C       		.byte	0xc
+ 823 0517 81       		.byte	0x81
+ 824 0518 2D040000 		.4byte	0x42d
+ 825 051c 06       		.uleb128 0x6
+ 826 051d 24       		.byte	0x24
+ 827 051e 0D       		.byte	0xd
+ 828 051f 1F       		.byte	0x1f
+ 829 0520 3D050000 		.4byte	0x53d
+ 830 0524 08       		.uleb128 0x8
+ 831 0525 E9040000 		.4byte	.LASF77
+ 832 0529 0D       		.byte	0xd
+ 833 052a 20       		.byte	0x20
+ 834 052b 11050000 		.4byte	0x511
+ 835 052f 00       		.byte	0
+ 836 0530 08       		.uleb128 0x8
+ 837 0531 C8000000 		.4byte	.LASF78
+ 838 0535 0D       		.byte	0xd
+ 839 0536 25       		.byte	0x25
+ 840 0537 C3000000 		.4byte	0xc3
+ 841 053b 20       		.byte	0x20
+ 842 053c 00       		.byte	0
+ 843 053d 03       		.uleb128 0x3
+ 844 053e CD000000 		.4byte	.LASF79
+ 845 0542 0D       		.byte	0xd
+ 846 0543 26       		.byte	0x26
+ 847 0544 1C050000 		.4byte	0x51c
+ 848 0548 18       		.uleb128 0x18
+ 849 0549 AC000000 		.4byte	.LASF101
+ 850 054d 01       		.byte	0x1
+ 851 054e 2D       		.byte	0x2d
+ 852 054f 00000000 		.4byte	.LFB37
+ 853 0553 DC000000 		.4byte	.LFE37-.LFB37
+ 854 0557 01       		.uleb128 0x1
+ 855 0558 9C       		.byte	0x9c
+ 856 0559 54070000 		.4byte	0x754
+ 857 055d 19       		.uleb128 0x19
+ 858 055e 0A000000 		.4byte	.LVL0
+ 859 0562 92080000 		.4byte	0x892
+ 860 0566 79050000 		.4byte	0x579
+ 861 056a 1A       		.uleb128 0x1a
+ 862 056b 01       		.uleb128 0x1
+ 863 056c 50       		.byte	0x50
+ 864 056d 05       		.uleb128 0x5
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 17
+
+
+ 865 056e 03       		.byte	0x3
+ 866 056f 00000000 		.4byte	_lv_task_ll
+ 867 0573 1A       		.uleb128 0x1a
+ 868 0574 01       		.uleb128 0x1
+ 869 0575 51       		.byte	0x51
+ 870 0576 01       		.uleb128 0x1
+ 871 0577 3C       		.byte	0x3c
+ 872 0578 00       		.byte	0
+ 873 0579 19       		.uleb128 0x19
+ 874 057a 12000000 		.4byte	.LVL1
+ 875 057e 92080000 		.4byte	0x892
+ 876 0582 95050000 		.4byte	0x595
+ 877 0586 1A       		.uleb128 0x1a
+ 878 0587 01       		.uleb128 0x1
+ 879 0588 50       		.byte	0x50
+ 880 0589 05       		.uleb128 0x5
+ 881 058a 03       		.byte	0x3
+ 882 058b 00000000 		.4byte	_lv_disp_ll
+ 883 058f 1A       		.uleb128 0x1a
+ 884 0590 01       		.uleb128 0x1
+ 885 0591 51       		.byte	0x51
+ 886 0592 01       		.uleb128 0x1
+ 887 0593 3C       		.byte	0x3c
+ 888 0594 00       		.byte	0
+ 889 0595 19       		.uleb128 0x19
+ 890 0596 1A000000 		.4byte	.LVL2
+ 891 059a 92080000 		.4byte	0x892
+ 892 059e B1050000 		.4byte	0x5b1
+ 893 05a2 1A       		.uleb128 0x1a
+ 894 05a3 01       		.uleb128 0x1
+ 895 05a4 50       		.byte	0x50
+ 896 05a5 05       		.uleb128 0x5
+ 897 05a6 03       		.byte	0x3
+ 898 05a7 00000000 		.4byte	_lv_indev_ll
+ 899 05ab 1A       		.uleb128 0x1a
+ 900 05ac 01       		.uleb128 0x1
+ 901 05ad 51       		.byte	0x51
+ 902 05ae 01       		.uleb128 0x1
+ 903 05af 3C       		.byte	0x3c
+ 904 05b0 00       		.byte	0
+ 905 05b1 19       		.uleb128 0x19
+ 906 05b2 22000000 		.4byte	.LVL3
+ 907 05b6 92080000 		.4byte	0x892
+ 908 05ba CD050000 		.4byte	0x5cd
+ 909 05be 1A       		.uleb128 0x1a
+ 910 05bf 01       		.uleb128 0x1
+ 911 05c0 50       		.byte	0x50
+ 912 05c1 05       		.uleb128 0x5
+ 913 05c2 03       		.byte	0x3
+ 914 05c3 00000000 		.4byte	_lv_drv_ll
+ 915 05c7 1A       		.uleb128 0x1a
+ 916 05c8 01       		.uleb128 0x1
+ 917 05c9 51       		.byte	0x51
+ 918 05ca 01       		.uleb128 0x1
+ 919 05cb 3C       		.byte	0x3c
+ 920 05cc 00       		.byte	0
+ 921 05cd 19       		.uleb128 0x19
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 18
+
+
+ 922 05ce 2A000000 		.4byte	.LVL4
+ 923 05d2 92080000 		.4byte	0x892
+ 924 05d6 E9050000 		.4byte	0x5e9
+ 925 05da 1A       		.uleb128 0x1a
+ 926 05db 01       		.uleb128 0x1
+ 927 05dc 50       		.byte	0x50
+ 928 05dd 05       		.uleb128 0x5
+ 929 05de 03       		.byte	0x3
+ 930 05df 00000000 		.4byte	_lv_file_ll
+ 931 05e3 1A       		.uleb128 0x1a
+ 932 05e4 01       		.uleb128 0x1
+ 933 05e5 51       		.byte	0x51
+ 934 05e6 01       		.uleb128 0x1
+ 935 05e7 3C       		.byte	0x3c
+ 936 05e8 00       		.byte	0
+ 937 05e9 19       		.uleb128 0x19
+ 938 05ea 32000000 		.4byte	.LVL5
+ 939 05ee 92080000 		.4byte	0x892
+ 940 05f2 05060000 		.4byte	0x605
+ 941 05f6 1A       		.uleb128 0x1a
+ 942 05f7 01       		.uleb128 0x1
+ 943 05f8 50       		.byte	0x50
+ 944 05f9 05       		.uleb128 0x5
+ 945 05fa 03       		.byte	0x3
+ 946 05fb 00000000 		.4byte	_lv_anim_ll
+ 947 05ff 1A       		.uleb128 0x1a
+ 948 0600 01       		.uleb128 0x1
+ 949 0601 51       		.byte	0x51
+ 950 0602 01       		.uleb128 0x1
+ 951 0603 3C       		.byte	0x3c
+ 952 0604 00       		.byte	0
+ 953 0605 19       		.uleb128 0x19
+ 954 0606 3A000000 		.4byte	.LVL6
+ 955 060a 92080000 		.4byte	0x892
+ 956 060e 21060000 		.4byte	0x621
+ 957 0612 1A       		.uleb128 0x1a
+ 958 0613 01       		.uleb128 0x1
+ 959 0614 50       		.byte	0x50
+ 960 0615 05       		.uleb128 0x5
+ 961 0616 03       		.byte	0x3
+ 962 0617 00000000 		.4byte	_lv_group_ll
+ 963 061b 1A       		.uleb128 0x1a
+ 964 061c 01       		.uleb128 0x1
+ 965 061d 51       		.byte	0x51
+ 966 061e 01       		.uleb128 0x1
+ 967 061f 3C       		.byte	0x3c
+ 968 0620 00       		.byte	0
+ 969 0621 19       		.uleb128 0x19
+ 970 0622 42000000 		.4byte	.LVL7
+ 971 0626 92080000 		.4byte	0x892
+ 972 062a 3D060000 		.4byte	0x63d
+ 973 062e 1A       		.uleb128 0x1a
+ 974 062f 01       		.uleb128 0x1
+ 975 0630 50       		.byte	0x50
+ 976 0631 05       		.uleb128 0x5
+ 977 0632 03       		.byte	0x3
+ 978 0633 00000000 		.4byte	_lv_img_defoder_ll
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 19
+
+
+ 979 0637 1A       		.uleb128 0x1a
+ 980 0638 01       		.uleb128 0x1
+ 981 0639 51       		.byte	0x51
+ 982 063a 01       		.uleb128 0x1
+ 983 063b 3C       		.byte	0x3c
+ 984 063c 00       		.byte	0
+ 985 063d 19       		.uleb128 0x19
+ 986 063e 4A000000 		.4byte	.LVL8
+ 987 0642 92080000 		.4byte	0x892
+ 988 0646 59060000 		.4byte	0x659
+ 989 064a 1A       		.uleb128 0x1a
+ 990 064b 01       		.uleb128 0x1
+ 991 064c 50       		.byte	0x50
+ 992 064d 05       		.uleb128 0x5
+ 993 064e 03       		.byte	0x3
+ 994 064f 00000000 		.4byte	_lv_obj_style_trans_ll
+ 995 0653 1A       		.uleb128 0x1a
+ 996 0654 01       		.uleb128 0x1
+ 997 0655 51       		.byte	0x51
+ 998 0656 01       		.uleb128 0x1
+ 999 0657 3C       		.byte	0x3c
+ 1000 0658 00       		.byte	0
+ 1001 0659 19       		.uleb128 0x19
+ 1002 065a 52000000 		.4byte	.LVL9
+ 1003 065e 92080000 		.4byte	0x892
+ 1004 0662 75060000 		.4byte	0x675
+ 1005 0666 1A       		.uleb128 0x1a
+ 1006 0667 01       		.uleb128 0x1
+ 1007 0668 50       		.byte	0x50
+ 1008 0669 05       		.uleb128 0x5
+ 1009 066a 03       		.byte	0x3
+ 1010 066b 00000000 		.4byte	_lv_img_cache_array
+ 1011 066f 1A       		.uleb128 0x1a
+ 1012 0670 01       		.uleb128 0x1
+ 1013 0671 51       		.byte	0x51
+ 1014 0672 01       		.uleb128 0x1
+ 1015 0673 34       		.byte	0x34
+ 1016 0674 00       		.byte	0
+ 1017 0675 19       		.uleb128 0x19
+ 1018 0676 5A000000 		.4byte	.LVL10
+ 1019 067a 92080000 		.4byte	0x892
+ 1020 067e 91060000 		.4byte	0x691
+ 1021 0682 1A       		.uleb128 0x1a
+ 1022 0683 01       		.uleb128 0x1
+ 1023 0684 50       		.byte	0x50
+ 1024 0685 05       		.uleb128 0x5
+ 1025 0686 03       		.byte	0x3
+ 1026 0687 00000000 		.4byte	_lv_task_act
+ 1027 068b 1A       		.uleb128 0x1a
+ 1028 068c 01       		.uleb128 0x1
+ 1029 068d 51       		.byte	0x51
+ 1030 068e 01       		.uleb128 0x1
+ 1031 068f 34       		.byte	0x34
+ 1032 0690 00       		.byte	0
+ 1033 0691 19       		.uleb128 0x19
+ 1034 0692 62000000 		.4byte	.LVL11
+ 1035 0696 92080000 		.4byte	0x892
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 20
+
+
+ 1036 069a AE060000 		.4byte	0x6ae
+ 1037 069e 1A       		.uleb128 0x1a
+ 1038 069f 01       		.uleb128 0x1
+ 1039 06a0 50       		.byte	0x50
+ 1040 06a1 05       		.uleb128 0x5
+ 1041 06a2 03       		.byte	0x3
+ 1042 06a3 00000000 		.4byte	_lv_mem_buf
+ 1043 06a7 1A       		.uleb128 0x1a
+ 1044 06a8 01       		.uleb128 0x1
+ 1045 06a9 51       		.byte	0x51
+ 1046 06aa 02       		.uleb128 0x2
+ 1047 06ab 08       		.byte	0x8
+ 1048 06ac 80       		.byte	0x80
+ 1049 06ad 00       		.byte	0
+ 1050 06ae 19       		.uleb128 0x19
+ 1051 06af 6A000000 		.4byte	.LVL12
+ 1052 06b3 92080000 		.4byte	0x892
+ 1053 06b7 CB060000 		.4byte	0x6cb
+ 1054 06bb 1A       		.uleb128 0x1a
+ 1055 06bc 01       		.uleb128 0x1
+ 1056 06bd 50       		.byte	0x50
+ 1057 06be 05       		.uleb128 0x5
+ 1058 06bf 03       		.byte	0x3
+ 1059 06c0 00000000 		.4byte	_lv_draw_mask_list
+ 1060 06c4 1A       		.uleb128 0x1a
+ 1061 06c5 01       		.uleb128 0x1
+ 1062 06c6 51       		.byte	0x51
+ 1063 06c7 02       		.uleb128 0x2
+ 1064 06c8 08       		.byte	0x8
+ 1065 06c9 80       		.byte	0x80
+ 1066 06ca 00       		.byte	0
+ 1067 06cb 19       		.uleb128 0x19
+ 1068 06cc 72000000 		.4byte	.LVL13
+ 1069 06d0 92080000 		.4byte	0x892
+ 1070 06d4 E7060000 		.4byte	0x6e7
+ 1071 06d8 1A       		.uleb128 0x1a
+ 1072 06d9 01       		.uleb128 0x1
+ 1073 06da 50       		.byte	0x50
+ 1074 06db 05       		.uleb128 0x5
+ 1075 06dc 03       		.byte	0x3
+ 1076 06dd 00000000 		.4byte	_lv_theme_material_styles
+ 1077 06e1 1A       		.uleb128 0x1a
+ 1078 06e2 01       		.uleb128 0x1
+ 1079 06e3 51       		.byte	0x51
+ 1080 06e4 01       		.uleb128 0x1
+ 1081 06e5 34       		.byte	0x34
+ 1082 06e6 00       		.byte	0
+ 1083 06e7 19       		.uleb128 0x19
+ 1084 06e8 7A000000 		.4byte	.LVL14
+ 1085 06ec 92080000 		.4byte	0x892
+ 1086 06f0 03070000 		.4byte	0x703
+ 1087 06f4 1A       		.uleb128 0x1a
+ 1088 06f5 01       		.uleb128 0x1
+ 1089 06f6 50       		.byte	0x50
+ 1090 06f7 05       		.uleb128 0x5
+ 1091 06f8 03       		.byte	0x3
+ 1092 06f9 00000000 		.4byte	_lv_theme_template_styles
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 21
+
+
+ 1093 06fd 1A       		.uleb128 0x1a
+ 1094 06fe 01       		.uleb128 0x1
+ 1095 06ff 51       		.byte	0x51
+ 1096 0700 01       		.uleb128 0x1
+ 1097 0701 34       		.byte	0x34
+ 1098 0702 00       		.byte	0
+ 1099 0703 19       		.uleb128 0x19
+ 1100 0704 82000000 		.4byte	.LVL15
+ 1101 0708 92080000 		.4byte	0x892
+ 1102 070c 1F070000 		.4byte	0x71f
+ 1103 0710 1A       		.uleb128 0x1a
+ 1104 0711 01       		.uleb128 0x1
+ 1105 0712 50       		.byte	0x50
+ 1106 0713 05       		.uleb128 0x5
+ 1107 0714 03       		.byte	0x3
+ 1108 0715 00000000 		.4byte	_lv_theme_mono_styles
+ 1109 0719 1A       		.uleb128 0x1a
+ 1110 071a 01       		.uleb128 0x1
+ 1111 071b 51       		.byte	0x51
+ 1112 071c 01       		.uleb128 0x1
+ 1113 071d 34       		.byte	0x34
+ 1114 071e 00       		.byte	0
+ 1115 071f 19       		.uleb128 0x19
+ 1116 0720 8A000000 		.4byte	.LVL16
+ 1117 0724 92080000 		.4byte	0x892
+ 1118 0728 3B070000 		.4byte	0x73b
+ 1119 072c 1A       		.uleb128 0x1a
+ 1120 072d 01       		.uleb128 0x1
+ 1121 072e 50       		.byte	0x50
+ 1122 072f 05       		.uleb128 0x5
+ 1123 0730 03       		.byte	0x3
+ 1124 0731 00000000 		.4byte	_lv_theme_empty_styles
+ 1125 0735 1A       		.uleb128 0x1a
+ 1126 0736 01       		.uleb128 0x1
+ 1127 0737 51       		.byte	0x51
+ 1128 0738 01       		.uleb128 0x1
+ 1129 0739 34       		.byte	0x34
+ 1130 073a 00       		.byte	0
+ 1131 073b 1B       		.uleb128 0x1b
+ 1132 073c 92000000 		.4byte	.LVL17
+ 1133 0740 92080000 		.4byte	0x892
+ 1134 0744 1A       		.uleb128 0x1a
+ 1135 0745 01       		.uleb128 0x1
+ 1136 0746 50       		.byte	0x50
+ 1137 0747 05       		.uleb128 0x5
+ 1138 0748 03       		.byte	0x3
+ 1139 0749 00000000 		.4byte	_lv_font_decompr_buf
+ 1140 074d 1A       		.uleb128 0x1a
+ 1141 074e 01       		.uleb128 0x1
+ 1142 074f 51       		.byte	0x51
+ 1143 0750 01       		.uleb128 0x1
+ 1144 0751 34       		.byte	0x34
+ 1145 0752 00       		.byte	0
+ 1146 0753 00       		.byte	0
+ 1147 0754 1C       		.uleb128 0x1c
+ 1148 0755 AF010000 		.4byte	.LASF80
+ 1149 0759 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 22
+
+
+ 1150 075a 22       		.byte	0x22
+ 1151 075b 3C010000 		.4byte	0x13c
+ 1152 075f 05       		.uleb128 0x5
+ 1153 0760 03       		.byte	0x3
+ 1154 0761 00000000 		.4byte	_lv_mem_buf
+ 1155 0765 1C       		.uleb128 0x1c
+ 1156 0766 7C040000 		.4byte	.LASF81
+ 1157 076a 01       		.byte	0x1
+ 1158 076b 22       		.byte	0x22
+ 1159 076c 9C010000 		.4byte	0x19c
+ 1160 0770 05       		.uleb128 0x5
+ 1161 0771 03       		.byte	0x3
+ 1162 0772 00000000 		.4byte	_lv_task_ll
+ 1163 0776 1C       		.uleb128 0x1c
+ 1164 0777 14020000 		.4byte	.LASF82
+ 1165 077b 01       		.byte	0x1
+ 1166 077c 22       		.byte	0x22
+ 1167 077d 9C010000 		.4byte	0x19c
+ 1168 0781 05       		.uleb128 0x5
+ 1169 0782 03       		.byte	0x3
+ 1170 0783 00000000 		.4byte	_lv_disp_ll
+ 1171 0787 1C       		.uleb128 0x1c
+ 1172 0788 6E010000 		.4byte	.LASF83
+ 1173 078c 01       		.byte	0x1
+ 1174 078d 22       		.byte	0x22
+ 1175 078e 9C010000 		.4byte	0x19c
+ 1176 0792 05       		.uleb128 0x5
+ 1177 0793 03       		.byte	0x3
+ 1178 0794 00000000 		.4byte	_lv_indev_ll
+ 1179 0798 1C       		.uleb128 0x1c
+ 1180 0799 8F020000 		.4byte	.LASF84
+ 1181 079d 01       		.byte	0x1
+ 1182 079e 22       		.byte	0x22
+ 1183 079f 9C010000 		.4byte	0x19c
+ 1184 07a3 05       		.uleb128 0x5
+ 1185 07a4 03       		.byte	0x3
+ 1186 07a5 00000000 		.4byte	_lv_drv_ll
+ 1187 07a9 1C       		.uleb128 0x1c
+ 1188 07aa ED000000 		.4byte	.LASF85
+ 1189 07ae 01       		.byte	0x1
+ 1190 07af 22       		.byte	0x22
+ 1191 07b0 9C010000 		.4byte	0x19c
+ 1192 07b4 05       		.uleb128 0x5
+ 1193 07b5 03       		.byte	0x3
+ 1194 07b6 00000000 		.4byte	_lv_file_ll
+ 1195 07ba 1C       		.uleb128 0x1c
+ 1196 07bb 4D020000 		.4byte	.LASF86
+ 1197 07bf 01       		.byte	0x1
+ 1198 07c0 22       		.byte	0x22
+ 1199 07c1 9C010000 		.4byte	0x19c
+ 1200 07c5 05       		.uleb128 0x5
+ 1201 07c6 03       		.byte	0x3
+ 1202 07c7 00000000 		.4byte	_lv_anim_ll
+ 1203 07cb 1C       		.uleb128 0x1c
+ 1204 07cc DE030000 		.4byte	.LASF87
+ 1205 07d0 01       		.byte	0x1
+ 1206 07d1 22       		.byte	0x22
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 23
+
+
+ 1207 07d2 9C010000 		.4byte	0x19c
+ 1208 07d6 05       		.uleb128 0x5
+ 1209 07d7 03       		.byte	0x3
+ 1210 07d8 00000000 		.4byte	_lv_group_ll
+ 1211 07dc 1C       		.uleb128 0x1c
+ 1212 07dd BF040000 		.4byte	.LASF88
+ 1213 07e1 01       		.byte	0x1
+ 1214 07e2 22       		.byte	0x22
+ 1215 07e3 9C010000 		.4byte	0x19c
+ 1216 07e7 05       		.uleb128 0x5
+ 1217 07e8 03       		.byte	0x3
+ 1218 07e9 00000000 		.4byte	_lv_img_defoder_ll
+ 1219 07ed 1C       		.uleb128 0x1c
+ 1220 07ee 65040000 		.4byte	.LASF89
+ 1221 07f2 01       		.byte	0x1
+ 1222 07f3 22       		.byte	0x22
+ 1223 07f4 9C010000 		.4byte	0x19c
+ 1224 07f8 05       		.uleb128 0x5
+ 1225 07f9 03       		.byte	0x3
+ 1226 07fa 00000000 		.4byte	_lv_obj_style_trans_ll
+ 1227 07fe 1C       		.uleb128 0x1c
+ 1228 07ff A2040000 		.4byte	.LASF90
+ 1229 0803 01       		.byte	0x1
+ 1230 0804 22       		.byte	0x22
+ 1231 0805 0F080000 		.4byte	0x80f
+ 1232 0809 05       		.uleb128 0x5
+ 1233 080a 03       		.byte	0x3
+ 1234 080b 00000000 		.4byte	_lv_img_cache_array
+ 1235 080f 0C       		.uleb128 0xc
+ 1236 0810 04       		.byte	0x4
+ 1237 0811 3D050000 		.4byte	0x53d
+ 1238 0815 1C       		.uleb128 0x1c
+ 1239 0816 38020000 		.4byte	.LASF91
+ 1240 081a 01       		.byte	0x1
+ 1241 081b 22       		.byte	0x22
+ 1242 081c 26080000 		.4byte	0x826
+ 1243 0820 05       		.uleb128 0x5
+ 1244 0821 03       		.byte	0x3
+ 1245 0822 00000000 		.4byte	_lv_task_act
+ 1246 0826 0C       		.uleb128 0xc
+ 1247 0827 04       		.byte	0x4
+ 1248 0828 21020000 		.4byte	0x221
+ 1249 082c 1C       		.uleb128 0x1c
+ 1250 082d CB030000 		.4byte	.LASF92
+ 1251 0831 01       		.byte	0x1
+ 1252 0832 22       		.byte	0x22
+ 1253 0833 57030000 		.4byte	0x357
+ 1254 0837 05       		.uleb128 0x5
+ 1255 0838 03       		.byte	0x3
+ 1256 0839 00000000 		.4byte	_lv_draw_mask_list
+ 1257 083d 1C       		.uleb128 0x1c
+ 1258 083e 6A030000 		.4byte	.LASF93
+ 1259 0842 01       		.byte	0x1
+ 1260 0843 22       		.byte	0x22
+ 1261 0844 E4000000 		.4byte	0xe4
+ 1262 0848 05       		.uleb128 0x5
+ 1263 0849 03       		.byte	0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 24
+
+
+ 1264 084a 00000000 		.4byte	_lv_theme_material_styles
+ 1265 084e 1C       		.uleb128 0x1c
+ 1266 084f 71000000 		.4byte	.LASF94
+ 1267 0853 01       		.byte	0x1
+ 1268 0854 22       		.byte	0x22
+ 1269 0855 E4000000 		.4byte	0xe4
+ 1270 0859 05       		.uleb128 0x5
+ 1271 085a 03       		.byte	0x3
+ 1272 085b 00000000 		.4byte	_lv_theme_template_styles
+ 1273 085f 1C       		.uleb128 0x1c
+ 1274 0860 8C030000 		.4byte	.LASF95
+ 1275 0864 01       		.byte	0x1
+ 1276 0865 22       		.byte	0x22
+ 1277 0866 E4000000 		.4byte	0xe4
+ 1278 086a 05       		.uleb128 0x5
+ 1279 086b 03       		.byte	0x3
+ 1280 086c 00000000 		.4byte	_lv_theme_mono_styles
+ 1281 0870 1C       		.uleb128 0x1c
+ 1282 0871 D2040000 		.4byte	.LASF96
+ 1283 0875 01       		.byte	0x1
+ 1284 0876 22       		.byte	0x22
+ 1285 0877 E4000000 		.4byte	0xe4
+ 1286 087b 05       		.uleb128 0x5
+ 1287 087c 03       		.byte	0x3
+ 1288 087d 00000000 		.4byte	_lv_theme_empty_styles
+ 1289 0881 1C       		.uleb128 0x1c
+ 1290 0882 D0020000 		.4byte	.LASF97
+ 1291 0886 01       		.byte	0x1
+ 1292 0887 22       		.byte	0x22
+ 1293 0888 72030000 		.4byte	0x372
+ 1294 088c 05       		.uleb128 0x5
+ 1295 088d 03       		.byte	0x3
+ 1296 088e 00000000 		.4byte	_lv_font_decompr_buf
+ 1297 0892 1D       		.uleb128 0x1d
+ 1298 0893 F1040000 		.4byte	.LASF102
+ 1299 0897 F1040000 		.4byte	.LASF102
+ 1300 089b 06       		.byte	0x6
+ 1301 089c F2       		.byte	0xf2
+ 1302 089d 00       		.byte	0
+ 1303              		.section	.debug_abbrev,"",%progbits
+ 1304              	.Ldebug_abbrev0:
+ 1305 0000 01       		.uleb128 0x1
+ 1306 0001 11       		.uleb128 0x11
+ 1307 0002 01       		.byte	0x1
+ 1308 0003 25       		.uleb128 0x25
+ 1309 0004 0E       		.uleb128 0xe
+ 1310 0005 13       		.uleb128 0x13
+ 1311 0006 0B       		.uleb128 0xb
+ 1312 0007 03       		.uleb128 0x3
+ 1313 0008 0E       		.uleb128 0xe
+ 1314 0009 1B       		.uleb128 0x1b
+ 1315 000a 0E       		.uleb128 0xe
+ 1316 000b 55       		.uleb128 0x55
+ 1317 000c 17       		.uleb128 0x17
+ 1318 000d 11       		.uleb128 0x11
+ 1319 000e 01       		.uleb128 0x1
+ 1320 000f 10       		.uleb128 0x10
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 25
+
+
+ 1321 0010 17       		.uleb128 0x17
+ 1322 0011 00       		.byte	0
+ 1323 0012 00       		.byte	0
+ 1324 0013 02       		.uleb128 0x2
+ 1325 0014 24       		.uleb128 0x24
+ 1326 0015 00       		.byte	0
+ 1327 0016 0B       		.uleb128 0xb
+ 1328 0017 0B       		.uleb128 0xb
+ 1329 0018 3E       		.uleb128 0x3e
+ 1330 0019 0B       		.uleb128 0xb
+ 1331 001a 03       		.uleb128 0x3
+ 1332 001b 0E       		.uleb128 0xe
+ 1333 001c 00       		.byte	0
+ 1334 001d 00       		.byte	0
+ 1335 001e 03       		.uleb128 0x3
+ 1336 001f 16       		.uleb128 0x16
+ 1337 0020 00       		.byte	0
+ 1338 0021 03       		.uleb128 0x3
+ 1339 0022 0E       		.uleb128 0xe
+ 1340 0023 3A       		.uleb128 0x3a
+ 1341 0024 0B       		.uleb128 0xb
+ 1342 0025 3B       		.uleb128 0x3b
+ 1343 0026 0B       		.uleb128 0xb
+ 1344 0027 49       		.uleb128 0x49
+ 1345 0028 13       		.uleb128 0x13
+ 1346 0029 00       		.byte	0
+ 1347 002a 00       		.byte	0
+ 1348 002b 04       		.uleb128 0x4
+ 1349 002c 24       		.uleb128 0x24
+ 1350 002d 00       		.byte	0
+ 1351 002e 0B       		.uleb128 0xb
+ 1352 002f 0B       		.uleb128 0xb
+ 1353 0030 3E       		.uleb128 0x3e
+ 1354 0031 0B       		.uleb128 0xb
+ 1355 0032 03       		.uleb128 0x3
+ 1356 0033 08       		.uleb128 0x8
+ 1357 0034 00       		.byte	0
+ 1358 0035 00       		.byte	0
+ 1359 0036 05       		.uleb128 0x5
+ 1360 0037 0F       		.uleb128 0xf
+ 1361 0038 00       		.byte	0
+ 1362 0039 0B       		.uleb128 0xb
+ 1363 003a 0B       		.uleb128 0xb
+ 1364 003b 00       		.byte	0
+ 1365 003c 00       		.byte	0
+ 1366 003d 06       		.uleb128 0x6
+ 1367 003e 13       		.uleb128 0x13
+ 1368 003f 01       		.byte	0x1
+ 1369 0040 0B       		.uleb128 0xb
+ 1370 0041 0B       		.uleb128 0xb
+ 1371 0042 3A       		.uleb128 0x3a
+ 1372 0043 0B       		.uleb128 0xb
+ 1373 0044 3B       		.uleb128 0x3b
+ 1374 0045 0B       		.uleb128 0xb
+ 1375 0046 01       		.uleb128 0x1
+ 1376 0047 13       		.uleb128 0x13
+ 1377 0048 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 26
+
+
+ 1378 0049 00       		.byte	0
+ 1379 004a 07       		.uleb128 0x7
+ 1380 004b 0D       		.uleb128 0xd
+ 1381 004c 00       		.byte	0
+ 1382 004d 03       		.uleb128 0x3
+ 1383 004e 08       		.uleb128 0x8
+ 1384 004f 3A       		.uleb128 0x3a
+ 1385 0050 0B       		.uleb128 0xb
+ 1386 0051 3B       		.uleb128 0x3b
+ 1387 0052 0B       		.uleb128 0xb
+ 1388 0053 49       		.uleb128 0x49
+ 1389 0054 13       		.uleb128 0x13
+ 1390 0055 38       		.uleb128 0x38
+ 1391 0056 0B       		.uleb128 0xb
+ 1392 0057 00       		.byte	0
+ 1393 0058 00       		.byte	0
+ 1394 0059 08       		.uleb128 0x8
+ 1395 005a 0D       		.uleb128 0xd
+ 1396 005b 00       		.byte	0
+ 1397 005c 03       		.uleb128 0x3
+ 1398 005d 0E       		.uleb128 0xe
+ 1399 005e 3A       		.uleb128 0x3a
+ 1400 005f 0B       		.uleb128 0xb
+ 1401 0060 3B       		.uleb128 0x3b
+ 1402 0061 0B       		.uleb128 0xb
+ 1403 0062 49       		.uleb128 0x49
+ 1404 0063 13       		.uleb128 0x13
+ 1405 0064 38       		.uleb128 0x38
+ 1406 0065 0B       		.uleb128 0xb
+ 1407 0066 00       		.byte	0
+ 1408 0067 00       		.byte	0
+ 1409 0068 09       		.uleb128 0x9
+ 1410 0069 0D       		.uleb128 0xd
+ 1411 006a 00       		.byte	0
+ 1412 006b 03       		.uleb128 0x3
+ 1413 006c 0E       		.uleb128 0xe
+ 1414 006d 3A       		.uleb128 0x3a
+ 1415 006e 0B       		.uleb128 0xb
+ 1416 006f 3B       		.uleb128 0x3b
+ 1417 0070 0B       		.uleb128 0xb
+ 1418 0071 49       		.uleb128 0x49
+ 1419 0072 13       		.uleb128 0x13
+ 1420 0073 0B       		.uleb128 0xb
+ 1421 0074 0B       		.uleb128 0xb
+ 1422 0075 0D       		.uleb128 0xd
+ 1423 0076 0B       		.uleb128 0xb
+ 1424 0077 0C       		.uleb128 0xc
+ 1425 0078 0B       		.uleb128 0xb
+ 1426 0079 38       		.uleb128 0x38
+ 1427 007a 0B       		.uleb128 0xb
+ 1428 007b 00       		.byte	0
+ 1429 007c 00       		.byte	0
+ 1430 007d 0A       		.uleb128 0xa
+ 1431 007e 01       		.uleb128 0x1
+ 1432 007f 01       		.byte	0x1
+ 1433 0080 49       		.uleb128 0x49
+ 1434 0081 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 27
+
+
+ 1435 0082 01       		.uleb128 0x1
+ 1436 0083 13       		.uleb128 0x13
+ 1437 0084 00       		.byte	0
+ 1438 0085 00       		.byte	0
+ 1439 0086 0B       		.uleb128 0xb
+ 1440 0087 21       		.uleb128 0x21
+ 1441 0088 00       		.byte	0
+ 1442 0089 49       		.uleb128 0x49
+ 1443 008a 13       		.uleb128 0x13
+ 1444 008b 2F       		.uleb128 0x2f
+ 1445 008c 0B       		.uleb128 0xb
+ 1446 008d 00       		.byte	0
+ 1447 008e 00       		.byte	0
+ 1448 008f 0C       		.uleb128 0xc
+ 1449 0090 0F       		.uleb128 0xf
+ 1450 0091 00       		.byte	0
+ 1451 0092 0B       		.uleb128 0xb
+ 1452 0093 0B       		.uleb128 0xb
+ 1453 0094 49       		.uleb128 0x49
+ 1454 0095 13       		.uleb128 0x13
+ 1455 0096 00       		.byte	0
+ 1456 0097 00       		.byte	0
+ 1457 0098 0D       		.uleb128 0xd
+ 1458 0099 15       		.uleb128 0x15
+ 1459 009a 01       		.byte	0x1
+ 1460 009b 27       		.uleb128 0x27
+ 1461 009c 19       		.uleb128 0x19
+ 1462 009d 01       		.uleb128 0x1
+ 1463 009e 13       		.uleb128 0x13
+ 1464 009f 00       		.byte	0
+ 1465 00a0 00       		.byte	0
+ 1466 00a1 0E       		.uleb128 0xe
+ 1467 00a2 05       		.uleb128 0x5
+ 1468 00a3 00       		.byte	0
+ 1469 00a4 49       		.uleb128 0x49
+ 1470 00a5 13       		.uleb128 0x13
+ 1471 00a6 00       		.byte	0
+ 1472 00a7 00       		.byte	0
+ 1473 00a8 0F       		.uleb128 0xf
+ 1474 00a9 13       		.uleb128 0x13
+ 1475 00aa 01       		.byte	0x1
+ 1476 00ab 03       		.uleb128 0x3
+ 1477 00ac 0E       		.uleb128 0xe
+ 1478 00ad 0B       		.uleb128 0xb
+ 1479 00ae 0B       		.uleb128 0xb
+ 1480 00af 3A       		.uleb128 0x3a
+ 1481 00b0 0B       		.uleb128 0xb
+ 1482 00b1 3B       		.uleb128 0x3b
+ 1483 00b2 0B       		.uleb128 0xb
+ 1484 00b3 01       		.uleb128 0x1
+ 1485 00b4 13       		.uleb128 0x13
+ 1486 00b5 00       		.byte	0
+ 1487 00b6 00       		.byte	0
+ 1488 00b7 10       		.uleb128 0x10
+ 1489 00b8 0D       		.uleb128 0xd
+ 1490 00b9 00       		.byte	0
+ 1491 00ba 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 28
+
+
+ 1492 00bb 08       		.uleb128 0x8
+ 1493 00bc 3A       		.uleb128 0x3a
+ 1494 00bd 0B       		.uleb128 0xb
+ 1495 00be 3B       		.uleb128 0x3b
+ 1496 00bf 0B       		.uleb128 0xb
+ 1497 00c0 49       		.uleb128 0x49
+ 1498 00c1 13       		.uleb128 0x13
+ 1499 00c2 0B       		.uleb128 0xb
+ 1500 00c3 0B       		.uleb128 0xb
+ 1501 00c4 0D       		.uleb128 0xd
+ 1502 00c5 0B       		.uleb128 0xb
+ 1503 00c6 0C       		.uleb128 0xc
+ 1504 00c7 0B       		.uleb128 0xb
+ 1505 00c8 38       		.uleb128 0x38
+ 1506 00c9 0B       		.uleb128 0xb
+ 1507 00ca 00       		.byte	0
+ 1508 00cb 00       		.byte	0
+ 1509 00cc 11       		.uleb128 0x11
+ 1510 00cd 17       		.uleb128 0x17
+ 1511 00ce 01       		.byte	0x1
+ 1512 00cf 0B       		.uleb128 0xb
+ 1513 00d0 0B       		.uleb128 0xb
+ 1514 00d1 3A       		.uleb128 0x3a
+ 1515 00d2 0B       		.uleb128 0xb
+ 1516 00d3 3B       		.uleb128 0x3b
+ 1517 00d4 0B       		.uleb128 0xb
+ 1518 00d5 01       		.uleb128 0x1
+ 1519 00d6 13       		.uleb128 0x13
+ 1520 00d7 00       		.byte	0
+ 1521 00d8 00       		.byte	0
+ 1522 00d9 12       		.uleb128 0x12
+ 1523 00da 0D       		.uleb128 0xd
+ 1524 00db 00       		.byte	0
+ 1525 00dc 03       		.uleb128 0x3
+ 1526 00dd 08       		.uleb128 0x8
+ 1527 00de 3A       		.uleb128 0x3a
+ 1528 00df 0B       		.uleb128 0xb
+ 1529 00e0 3B       		.uleb128 0x3b
+ 1530 00e1 0B       		.uleb128 0xb
+ 1531 00e2 49       		.uleb128 0x49
+ 1532 00e3 13       		.uleb128 0x13
+ 1533 00e4 00       		.byte	0
+ 1534 00e5 00       		.byte	0
+ 1535 00e6 13       		.uleb128 0x13
+ 1536 00e7 0D       		.uleb128 0xd
+ 1537 00e8 00       		.byte	0
+ 1538 00e9 03       		.uleb128 0x3
+ 1539 00ea 0E       		.uleb128 0xe
+ 1540 00eb 3A       		.uleb128 0x3a
+ 1541 00ec 0B       		.uleb128 0xb
+ 1542 00ed 3B       		.uleb128 0x3b
+ 1543 00ee 0B       		.uleb128 0xb
+ 1544 00ef 49       		.uleb128 0x49
+ 1545 00f0 13       		.uleb128 0x13
+ 1546 00f1 00       		.byte	0
+ 1547 00f2 00       		.byte	0
+ 1548 00f3 14       		.uleb128 0x14
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 29
+
+
+ 1549 00f4 16       		.uleb128 0x16
+ 1550 00f5 00       		.byte	0
+ 1551 00f6 03       		.uleb128 0x3
+ 1552 00f7 0E       		.uleb128 0xe
+ 1553 00f8 3A       		.uleb128 0x3a
+ 1554 00f9 0B       		.uleb128 0xb
+ 1555 00fa 3B       		.uleb128 0x3b
+ 1556 00fb 05       		.uleb128 0x5
+ 1557 00fc 49       		.uleb128 0x49
+ 1558 00fd 13       		.uleb128 0x13
+ 1559 00fe 00       		.byte	0
+ 1560 00ff 00       		.byte	0
+ 1561 0100 15       		.uleb128 0x15
+ 1562 0101 26       		.uleb128 0x26
+ 1563 0102 00       		.byte	0
+ 1564 0103 49       		.uleb128 0x49
+ 1565 0104 13       		.uleb128 0x13
+ 1566 0105 00       		.byte	0
+ 1567 0106 00       		.byte	0
+ 1568 0107 16       		.uleb128 0x16
+ 1569 0108 26       		.uleb128 0x26
+ 1570 0109 00       		.byte	0
+ 1571 010a 00       		.byte	0
+ 1572 010b 00       		.byte	0
+ 1573 010c 17       		.uleb128 0x17
+ 1574 010d 15       		.uleb128 0x15
+ 1575 010e 01       		.byte	0x1
+ 1576 010f 27       		.uleb128 0x27
+ 1577 0110 19       		.uleb128 0x19
+ 1578 0111 49       		.uleb128 0x49
+ 1579 0112 13       		.uleb128 0x13
+ 1580 0113 01       		.uleb128 0x1
+ 1581 0114 13       		.uleb128 0x13
+ 1582 0115 00       		.byte	0
+ 1583 0116 00       		.byte	0
+ 1584 0117 18       		.uleb128 0x18
+ 1585 0118 2E       		.uleb128 0x2e
+ 1586 0119 01       		.byte	0x1
+ 1587 011a 3F       		.uleb128 0x3f
+ 1588 011b 19       		.uleb128 0x19
+ 1589 011c 03       		.uleb128 0x3
+ 1590 011d 0E       		.uleb128 0xe
+ 1591 011e 3A       		.uleb128 0x3a
+ 1592 011f 0B       		.uleb128 0xb
+ 1593 0120 3B       		.uleb128 0x3b
+ 1594 0121 0B       		.uleb128 0xb
+ 1595 0122 27       		.uleb128 0x27
+ 1596 0123 19       		.uleb128 0x19
+ 1597 0124 11       		.uleb128 0x11
+ 1598 0125 01       		.uleb128 0x1
+ 1599 0126 12       		.uleb128 0x12
+ 1600 0127 06       		.uleb128 0x6
+ 1601 0128 40       		.uleb128 0x40
+ 1602 0129 18       		.uleb128 0x18
+ 1603 012a 9742     		.uleb128 0x2117
+ 1604 012c 19       		.uleb128 0x19
+ 1605 012d 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 30
+
+
+ 1606 012e 13       		.uleb128 0x13
+ 1607 012f 00       		.byte	0
+ 1608 0130 00       		.byte	0
+ 1609 0131 19       		.uleb128 0x19
+ 1610 0132 898201   		.uleb128 0x4109
+ 1611 0135 01       		.byte	0x1
+ 1612 0136 11       		.uleb128 0x11
+ 1613 0137 01       		.uleb128 0x1
+ 1614 0138 31       		.uleb128 0x31
+ 1615 0139 13       		.uleb128 0x13
+ 1616 013a 01       		.uleb128 0x1
+ 1617 013b 13       		.uleb128 0x13
+ 1618 013c 00       		.byte	0
+ 1619 013d 00       		.byte	0
+ 1620 013e 1A       		.uleb128 0x1a
+ 1621 013f 8A8201   		.uleb128 0x410a
+ 1622 0142 00       		.byte	0
+ 1623 0143 02       		.uleb128 0x2
+ 1624 0144 18       		.uleb128 0x18
+ 1625 0145 9142     		.uleb128 0x2111
+ 1626 0147 18       		.uleb128 0x18
+ 1627 0148 00       		.byte	0
+ 1628 0149 00       		.byte	0
+ 1629 014a 1B       		.uleb128 0x1b
+ 1630 014b 898201   		.uleb128 0x4109
+ 1631 014e 01       		.byte	0x1
+ 1632 014f 11       		.uleb128 0x11
+ 1633 0150 01       		.uleb128 0x1
+ 1634 0151 31       		.uleb128 0x31
+ 1635 0152 13       		.uleb128 0x13
+ 1636 0153 00       		.byte	0
+ 1637 0154 00       		.byte	0
+ 1638 0155 1C       		.uleb128 0x1c
+ 1639 0156 34       		.uleb128 0x34
+ 1640 0157 00       		.byte	0
+ 1641 0158 03       		.uleb128 0x3
+ 1642 0159 0E       		.uleb128 0xe
+ 1643 015a 3A       		.uleb128 0x3a
+ 1644 015b 0B       		.uleb128 0xb
+ 1645 015c 3B       		.uleb128 0x3b
+ 1646 015d 0B       		.uleb128 0xb
+ 1647 015e 49       		.uleb128 0x49
+ 1648 015f 13       		.uleb128 0x13
+ 1649 0160 3F       		.uleb128 0x3f
+ 1650 0161 19       		.uleb128 0x19
+ 1651 0162 02       		.uleb128 0x2
+ 1652 0163 18       		.uleb128 0x18
+ 1653 0164 00       		.byte	0
+ 1654 0165 00       		.byte	0
+ 1655 0166 1D       		.uleb128 0x1d
+ 1656 0167 2E       		.uleb128 0x2e
+ 1657 0168 00       		.byte	0
+ 1658 0169 3F       		.uleb128 0x3f
+ 1659 016a 19       		.uleb128 0x19
+ 1660 016b 3C       		.uleb128 0x3c
+ 1661 016c 19       		.uleb128 0x19
+ 1662 016d 6E       		.uleb128 0x6e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 31
+
+
+ 1663 016e 0E       		.uleb128 0xe
+ 1664 016f 03       		.uleb128 0x3
+ 1665 0170 0E       		.uleb128 0xe
+ 1666 0171 3A       		.uleb128 0x3a
+ 1667 0172 0B       		.uleb128 0xb
+ 1668 0173 3B       		.uleb128 0x3b
+ 1669 0174 0B       		.uleb128 0xb
+ 1670 0175 00       		.byte	0
+ 1671 0176 00       		.byte	0
+ 1672 0177 00       		.byte	0
+ 1673              		.section	.debug_aranges,"",%progbits
+ 1674 0000 1C000000 		.4byte	0x1c
+ 1675 0004 0200     		.2byte	0x2
+ 1676 0006 00000000 		.4byte	.Ldebug_info0
+ 1677 000a 04       		.byte	0x4
+ 1678 000b 00       		.byte	0
+ 1679 000c 0000     		.2byte	0
+ 1680 000e 0000     		.2byte	0
+ 1681 0010 00000000 		.4byte	.LFB37
+ 1682 0014 DC000000 		.4byte	.LFE37-.LFB37
+ 1683 0018 00000000 		.4byte	0
+ 1684 001c 00000000 		.4byte	0
+ 1685              		.section	.debug_ranges,"",%progbits
+ 1686              	.Ldebug_ranges0:
+ 1687 0000 00000000 		.4byte	.LFB37
+ 1688 0004 DC000000 		.4byte	.LFE37
+ 1689 0008 00000000 		.4byte	0
+ 1690 000c 00000000 		.4byte	0
+ 1691              		.section	.debug_line,"",%progbits
+ 1692              	.Ldebug_line0:
+ 1693 0000 66020000 		.section	.debug_str,"MS",%progbits,1
+ 1693      02005002 
+ 1693      00000201 
+ 1693      FB0E0D00 
+ 1693      01010101 
+ 1694              	.LASF27:
+ 1695 0000 6C765F6C 		.ascii	"lv_ll_node_t\000"
+ 1695      6C5F6E6F 
+ 1695      64655F74 
+ 1695      00
+ 1696              	.LASF64:
+ 1697 000d 6C765F69 		.ascii	"lv_img_decoder_open_f_t\000"
+ 1697      6D675F64 
+ 1697      65636F64 
+ 1697      65725F6F 
+ 1697      70656E5F 
+ 1698              	.LASF69:
+ 1699 0025 68656164 		.ascii	"header\000"
+ 1699      657200
+ 1700              	.LASF55:
+ 1701 002c 5F6C765F 		.ascii	"_lv_draw_mask_saved_arr_t\000"
+ 1701      64726177 
+ 1701      5F6D6173 
+ 1701      6B5F7361 
+ 1701      7665645F 
+ 1702              	.LASF24:
+ 1703 0046 6C765F6D 		.ascii	"lv_mem_buf_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 32
+
+
+ 1703      656D5F62 
+ 1703      75665F74 
+ 1703      00
+ 1704              	.LASF40:
+ 1705 0053 6C765F74 		.ascii	"lv_task_t\000"
+ 1705      61736B5F 
+ 1705      7400
+ 1706              	.LASF65:
+ 1707 005d 5F6C765F 		.ascii	"_lv_img_decoder_dsc\000"
+ 1707      696D675F 
+ 1707      6465636F 
+ 1707      6465725F 
+ 1707      64736300 
+ 1708              	.LASF94:
+ 1709 0071 5F6C765F 		.ascii	"_lv_theme_template_styles\000"
+ 1709      7468656D 
+ 1709      655F7465 
+ 1709      6D706C61 
+ 1709      74655F73 
+ 1710              	.LASF47:
+ 1711 008b 63686172 		.ascii	"char\000"
+ 1711      00
+ 1712              	.LASF60:
+ 1713 0090 696E666F 		.ascii	"info_cb\000"
+ 1713      5F636200 
+ 1714              	.LASF53:
+ 1715 0098 63757374 		.ascii	"custom_id\000"
+ 1715      6F6D5F69 
+ 1715      6400
+ 1716              	.LASF4:
+ 1717 00a2 73686F72 		.ascii	"short int\000"
+ 1717      7420696E 
+ 1717      7400
+ 1718              	.LASF101:
+ 1719 00ac 5F6C765F 		.ascii	"_lv_gc_clear_roots\000"
+ 1719      67635F63 
+ 1719      6C656172 
+ 1719      5F726F6F 
+ 1719      747300
+ 1720              	.LASF26:
+ 1721 00bf 73697A65 		.ascii	"sizetype\000"
+ 1721      74797065 
+ 1721      00
+ 1722              	.LASF78:
+ 1723 00c8 6C696665 		.ascii	"life\000"
+ 1723      00
+ 1724              	.LASF79:
+ 1725 00cd 6C765F69 		.ascii	"lv_img_cache_entry_t\000"
+ 1725      6D675F63 
+ 1725      61636865 
+ 1725      5F656E74 
+ 1725      72795F74 
+ 1726              	.LASF9:
+ 1727 00e2 5F5F7569 		.ascii	"__uint32_t\000"
+ 1727      6E743332 
+ 1727      5F7400
+ 1728              	.LASF85:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 33
+
+
+ 1729 00ed 5F6C765F 		.ascii	"_lv_file_ll\000"
+ 1729      66696C65 
+ 1729      5F6C6C00 
+ 1730              	.LASF5:
+ 1731 00f9 5F5F7569 		.ascii	"__uint16_t\000"
+ 1731      6E743136 
+ 1731      5F7400
+ 1732              	.LASF56:
+ 1733 0104 6C765F69 		.ascii	"lv_img_src_t\000"
+ 1733      6D675F73 
+ 1733      72635F74 
+ 1733      00
+ 1734              	.LASF57:
+ 1735 0111 6C765F69 		.ascii	"lv_img_decoder_info_f_t\000"
+ 1735      6D675F64 
+ 1735      65636F64 
+ 1735      65725F69 
+ 1735      6E666F5F 
+ 1736              	.LASF42:
+ 1737 0129 626C7565 		.ascii	"blue\000"
+ 1737      00
+ 1738              	.LASF61:
+ 1739 012e 6F70656E 		.ascii	"open_cb\000"
+ 1739      5F636200 
+ 1740              	.LASF29:
+ 1741 0136 68656164 		.ascii	"head\000"
+ 1741      00
+ 1742              	.LASF76:
+ 1743 013b 6C765F69 		.ascii	"lv_img_decoder_dsc_t\000"
+ 1743      6D675F64 
+ 1743      65636F64 
+ 1743      65725F64 
+ 1743      73635F74 
+ 1744              	.LASF14:
+ 1745 0150 75696E74 		.ascii	"uint8_t\000"
+ 1745      385F7400 
+ 1746              	.LASF54:
+ 1747 0158 5F6C765F 		.ascii	"_lv_draw_mask_saved_t\000"
+ 1747      64726177 
+ 1747      5F6D6173 
+ 1747      6B5F7361 
+ 1747      7665645F 
+ 1748              	.LASF83:
+ 1749 016e 5F6C765F 		.ascii	"_lv_indev_ll\000"
+ 1749      696E6465 
+ 1749      765F6C6C 
+ 1749      00
+ 1750              	.LASF73:
+ 1751 017b 6C765F69 		.ascii	"lv_img_decoder_read_line_f_t\000"
+ 1751      6D675F64 
+ 1751      65636F64 
+ 1751      65725F72 
+ 1751      6561645F 
+ 1752              	.LASF45:
+ 1753 0198 6C765F63 		.ascii	"lv_color16_t\000"
+ 1753      6F6C6F72 
+ 1753      31365F74 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 34
+
+
+ 1753      00
+ 1754              	.LASF36:
+ 1755 01a5 75736572 		.ascii	"user_data\000"
+ 1755      5F646174 
+ 1755      6100
+ 1756              	.LASF80:
+ 1757 01af 5F6C765F 		.ascii	"_lv_mem_buf\000"
+ 1757      6D656D5F 
+ 1757      62756600 
+ 1758              	.LASF58:
+ 1759 01bb 5F6C765F 		.ascii	"_lv_task_t\000"
+ 1759      7461736B 
+ 1759      5F7400
+ 1760              	.LASF11:
+ 1761 01c6 6C6F6E67 		.ascii	"long long int\000"
+ 1761      206C6F6E 
+ 1761      6720696E 
+ 1761      7400
+ 1762              	.LASF22:
+ 1763 01d4 6C765F72 		.ascii	"lv_res_t\000"
+ 1763      65735F74 
+ 1763      00
+ 1764              	.LASF75:
+ 1765 01dd 6C765F69 		.ascii	"lv_img_decoder_t\000"
+ 1765      6D675F64 
+ 1765      65636F64 
+ 1765      65725F74 
+ 1765      00
+ 1766              	.LASF71:
+ 1767 01ee 74696D65 		.ascii	"time_to_open\000"
+ 1767      5F746F5F 
+ 1767      6F70656E 
+ 1767      00
+ 1768              	.LASF8:
+ 1769 01fb 6C6F6E67 		.ascii	"long int\000"
+ 1769      20696E74 
+ 1769      00
+ 1770              	.LASF59:
+ 1771 0204 5F6C765F 		.ascii	"_lv_img_decoder\000"
+ 1771      696D675F 
+ 1771      6465636F 
+ 1771      64657200 
+ 1772              	.LASF82:
+ 1773 0214 5F6C765F 		.ascii	"_lv_disp_ll\000"
+ 1773      64697370 
+ 1773      5F6C6C00 
+ 1774              	.LASF33:
+ 1775 0220 70657269 		.ascii	"period\000"
+ 1775      6F6400
+ 1776              	.LASF66:
+ 1777 0227 6465636F 		.ascii	"decoder\000"
+ 1777      64657200 
+ 1778              	.LASF34:
+ 1779 022f 6C617374 		.ascii	"last_run\000"
+ 1779      5F72756E 
+ 1779      00
+ 1780              	.LASF91:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 35
+
+
+ 1781 0238 5F6C765F 		.ascii	"_lv_task_act\000"
+ 1781      7461736B 
+ 1781      5F616374 
+ 1781      00
+ 1782              	.LASF31:
+ 1783 0245 6C765F6C 		.ascii	"lv_ll_t\000"
+ 1783      6C5F7400 
+ 1784              	.LASF86:
+ 1785 024d 5F6C765F 		.ascii	"_lv_anim_ll\000"
+ 1785      616E696D 
+ 1785      5F6C6C00 
+ 1786              	.LASF25:
+ 1787 0259 6C765F6D 		.ascii	"lv_mem_buf_arr_t\000"
+ 1787      656D5F62 
+ 1787      75665F61 
+ 1787      72725F74 
+ 1787      00
+ 1788              	.LASF67:
+ 1789 026a 636F6C6F 		.ascii	"color\000"
+ 1789      7200
+ 1790              	.LASF21:
+ 1791 0270 6C6F6E67 		.ascii	"long double\000"
+ 1791      20646F75 
+ 1791      626C6500 
+ 1792              	.LASF30:
+ 1793 027c 7461696C 		.ascii	"tail\000"
+ 1793      00
+ 1794              	.LASF1:
+ 1795 0281 756E7369 		.ascii	"unsigned char\000"
+ 1795      676E6564 
+ 1795      20636861 
+ 1795      7200
+ 1796              	.LASF84:
+ 1797 028f 5F6C765F 		.ascii	"_lv_drv_ll\000"
+ 1797      6472765F 
+ 1797      6C6C00
+ 1798              	.LASF7:
+ 1799 029a 5F5F696E 		.ascii	"__int32_t\000"
+ 1799      7433325F 
+ 1799      7400
+ 1800              	.LASF0:
+ 1801 02a4 7369676E 		.ascii	"signed char\000"
+ 1801      65642063 
+ 1801      68617200 
+ 1802              	.LASF12:
+ 1803 02b0 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1803      206C6F6E 
+ 1803      6720756E 
+ 1803      7369676E 
+ 1803      65642069 
+ 1804              	.LASF18:
+ 1805 02c7 75696E74 		.ascii	"uint32_t\000"
+ 1805      33325F74 
+ 1805      00
+ 1806              	.LASF97:
+ 1807 02d0 5F6C765F 		.ascii	"_lv_font_decompr_buf\000"
+ 1807      666F6E74 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 36
+
+
+ 1807      5F646563 
+ 1807      6F6D7072 
+ 1807      5F627566 
+ 1808              	.LASF38:
+ 1809 02e5 75736564 		.ascii	"used\000"
+ 1809      00
+ 1810              	.LASF46:
+ 1811 02ea 6C765F63 		.ascii	"lv_color_t\000"
+ 1811      6F6C6F72 
+ 1811      5F7400
+ 1812              	.LASF16:
+ 1813 02f5 75696E74 		.ascii	"uint16_t\000"
+ 1813      31365F74 
+ 1813      00
+ 1814              	.LASF10:
+ 1815 02fe 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1815      20756E73 
+ 1815      69676E65 
+ 1815      6420696E 
+ 1815      7400
+ 1816              	.LASF62:
+ 1817 0310 72656164 		.ascii	"read_line_cb\000"
+ 1817      5F6C696E 
+ 1817      655F6362 
+ 1817      00
+ 1818              	.LASF50:
+ 1819 031d 6C765F69 		.ascii	"lv_img_header_t\000"
+ 1819      6D675F68 
+ 1819      65616465 
+ 1819      725F7400 
+ 1820              	.LASF20:
+ 1821 032d 6C765F69 		.ascii	"lv_img_decoder_user_data_t\000"
+ 1821      6D675F64 
+ 1821      65636F64 
+ 1821      65725F75 
+ 1821      7365725F 
+ 1822              	.LASF68:
+ 1823 0348 7372635F 		.ascii	"src_type\000"
+ 1823      74797065 
+ 1823      00
+ 1824              	.LASF72:
+ 1825 0351 6572726F 		.ascii	"error_msg\000"
+ 1825      725F6D73 
+ 1825      6700
+ 1826              	.LASF52:
+ 1827 035b 70617261 		.ascii	"param\000"
+ 1827      6D00
+ 1828              	.LASF70:
+ 1829 0361 696D675F 		.ascii	"img_data\000"
+ 1829      64617461 
+ 1829      00
+ 1830              	.LASF93:
+ 1831 036a 5F6C765F 		.ascii	"_lv_theme_material_styles\000"
+ 1831      7468656D 
+ 1831      655F6D61 
+ 1831      74657269 
+ 1831      616C5F73 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 37
+
+
+ 1832              	.LASF17:
+ 1833 0384 696E7433 		.ascii	"int32_t\000"
+ 1833      325F7400 
+ 1834              	.LASF95:
+ 1835 038c 5F6C765F 		.ascii	"_lv_theme_mono_styles\000"
+ 1835      7468656D 
+ 1835      655F6D6F 
+ 1835      6E6F5F73 
+ 1835      74796C65 
+ 1836              	.LASF35:
+ 1837 03a2 7461736B 		.ascii	"task_cb\000"
+ 1837      5F636200 
+ 1838              	.LASF6:
+ 1839 03aa 73686F72 		.ascii	"short unsigned int\000"
+ 1839      7420756E 
+ 1839      7369676E 
+ 1839      65642069 
+ 1839      6E7400
+ 1840              	.LASF15:
+ 1841 03bd 696E7431 		.ascii	"int16_t\000"
+ 1841      365F7400 
+ 1842              	.LASF51:
+ 1843 03c5 5F426F6F 		.ascii	"_Bool\000"
+ 1843      6C00
+ 1844              	.LASF92:
+ 1845 03cb 5F6C765F 		.ascii	"_lv_draw_mask_list\000"
+ 1845      64726177 
+ 1845      5F6D6173 
+ 1845      6B5F6C69 
+ 1845      737400
+ 1846              	.LASF87:
+ 1847 03de 5F6C765F 		.ascii	"_lv_group_ll\000"
+ 1847      67726F75 
+ 1847      705F6C6C 
+ 1847      00
+ 1848              	.LASF41:
+ 1849 03eb 67726565 		.ascii	"green_h\000"
+ 1849      6E5F6800 
+ 1850              	.LASF48:
+ 1851 03f3 616C7761 		.ascii	"always_zero\000"
+ 1851      79735F7A 
+ 1851      65726F00 
+ 1852              	.LASF43:
+ 1853 03ff 67726565 		.ascii	"green_l\000"
+ 1853      6E5F6C00 
+ 1854              	.LASF100:
+ 1855 0407 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 1855      73657273 
+ 1855      5C737472 
+ 1855      61705C44 
+ 1855      6F63756D 
+ 1856 0434 69393334 		.ascii	"i9341_master.cydsn\000"
+ 1856      315F6D61 
+ 1856      73746572 
+ 1856      2E637964 
+ 1856      736E00
+ 1857              	.LASF74:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 38
+
+
+ 1858 0447 6C765F69 		.ascii	"lv_img_decoder_close_f_t\000"
+ 1858      6D675F64 
+ 1858      65636F64 
+ 1858      65725F63 
+ 1858      6C6F7365 
+ 1859              	.LASF23:
+ 1860 0460 73697A65 		.ascii	"size\000"
+ 1860      00
+ 1861              	.LASF89:
+ 1862 0465 5F6C765F 		.ascii	"_lv_obj_style_trans_ll\000"
+ 1862      6F626A5F 
+ 1862      7374796C 
+ 1862      655F7472 
+ 1862      616E735F 
+ 1863              	.LASF81:
+ 1864 047c 5F6C765F 		.ascii	"_lv_task_ll\000"
+ 1864      7461736B 
+ 1864      5F6C6C00 
+ 1865              	.LASF44:
+ 1866 0488 66756C6C 		.ascii	"full\000"
+ 1866      00
+ 1867              	.LASF3:
+ 1868 048d 5F5F696E 		.ascii	"__int16_t\000"
+ 1868      7431365F 
+ 1868      7400
+ 1869              	.LASF19:
+ 1870 0497 6C765F63 		.ascii	"lv_coord_t\000"
+ 1870      6F6F7264 
+ 1870      5F7400
+ 1871              	.LASF90:
+ 1872 04a2 5F6C765F 		.ascii	"_lv_img_cache_array\000"
+ 1872      696D675F 
+ 1872      63616368 
+ 1872      655F6172 
+ 1872      72617900 
+ 1873              	.LASF63:
+ 1874 04b6 636C6F73 		.ascii	"close_cb\000"
+ 1874      655F6362 
+ 1874      00
+ 1875              	.LASF88:
+ 1876 04bf 5F6C765F 		.ascii	"_lv_img_defoder_ll\000"
+ 1876      696D675F 
+ 1876      6465666F 
+ 1876      6465725F 
+ 1876      6C6C00
+ 1877              	.LASF96:
+ 1878 04d2 5F6C765F 		.ascii	"_lv_theme_empty_styles\000"
+ 1878      7468656D 
+ 1878      655F656D 
+ 1878      7074795F 
+ 1878      7374796C 
+ 1879              	.LASF77:
+ 1880 04e9 6465635F 		.ascii	"dec_dsc\000"
+ 1880      64736300 
+ 1881              	.LASF102:
+ 1882 04f1 5F6C765F 		.ascii	"_lv_memset_00\000"
+ 1882      6D656D73 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc496Z68.s 			page 39
+
+
+ 1882      65745F30 
+ 1882      3000
+ 1883              	.LASF37:
+ 1884 04ff 72657065 		.ascii	"repeat_count\000"
+ 1884      61745F63 
+ 1884      6F756E74 
+ 1884      00
+ 1885              	.LASF99:
+ 1886 050c 6C76676C 		.ascii	"lvgl\\src\\lv_misc\\lv_gc.c\000"
+ 1886      5C737263 
+ 1886      5C6C765F 
+ 1886      6D697363 
+ 1886      5C6C765F 
+ 1887              	.LASF98:
+ 1888 0525 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1888      43313120 
+ 1888      352E342E 
+ 1888      31203230 
+ 1888      31363036 
+ 1889 0558 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1889      20726576 
+ 1889      6973696F 
+ 1889      6E203233 
+ 1889      37373135 
+ 1890 058b 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1890      66756E63 
+ 1890      74696F6E 
+ 1890      2D736563 
+ 1890      74696F6E 
+ 1891              	.LASF13:
+ 1892 05b3 756E7369 		.ascii	"unsigned int\000"
+ 1892      676E6564 
+ 1892      20696E74 
+ 1892      00
+ 1893              	.LASF49:
+ 1894 05c0 72657365 		.ascii	"reserved\000"
+ 1894      72766564 
+ 1894      00
+ 1895              	.LASF32:
+ 1896 05c9 6C765F74 		.ascii	"lv_task_cb_t\000"
+ 1896      61736B5F 
+ 1896      63625F74 
+ 1896      00
+ 1897              	.LASF39:
+ 1898 05d6 7072696F 		.ascii	"prio\000"
+ 1898      00
+ 1899              	.LASF2:
+ 1900 05db 5F5F7569 		.ascii	"__uint8_t\000"
+ 1900      6E74385F 
+ 1900      7400
+ 1901              	.LASF28:
+ 1902 05e5 6E5F7369 		.ascii	"n_size\000"
+ 1902      7A6500
+ 1903              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

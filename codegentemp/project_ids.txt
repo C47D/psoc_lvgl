@@ -1,0 +1,10 @@
+C:\Users\strap\Documents\Creator\test_lvgl\ili9341_master.cydsn\ili9341_master.cyprj|772f80ed-47af-4bb9-b42e-85a52211da12
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|ebf5c2ff-d8f2-41e8-a18c-f9e8f861d5e8
+C:\Users\strap\Documents\PSoC Creator\4.4\Downloads ( 4.4).cylib\Downloads ( 4.4).cyprj|8af1bdfe-c3ce-4c77-a028-509c1bb81353
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|10ad1187-4592-4d84-ad67-c0b686ebf65b
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|a6ee79bc-e173-4eac-a3d7-86efd42c69f9
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|78a261ba-eb38-41fb-b2c6-9b85cd7a5a2b
+C:\Users\strap\Documents\Creator\test_lvgl\Pruebas_systick.cydsn\Pruebas_systick.cyprj|97237c20-948c-4e18-b5a6-d79b376e7af7
+C:\Users\strap\Documents\Creator\test_lvgl\quadrature_decoder.cydsn\quadrature_decoder.cyprj|48aea968-19c1-4202-b7e9-352878a1ea9f
+C:\Users\strap\Documents\Creator\test_lvgl\touch_controller.cydsn\touch_controller.cyprj|f2f509ff-b431-4e80-860c-3b6fd8820daf
+C:\Users\strap\Documents\Creator\test_lvgl\pulse_counter.cydsn\pulse_counter.cyprj|6c20be8d-057b-4671-8ac3-d50b8ff76814

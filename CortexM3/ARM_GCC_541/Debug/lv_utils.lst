@@ -1,0 +1,1341 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_utils.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text._lv_utils_num_to_str,"ax",%progbits
+  20              		.align	2
+  21              		.global	_lv_utils_num_to_str
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	_lv_utils_num_to_str, %function
+  25              	_lv_utils_num_to_str:
+  26              	.LFB5:
+  27              		.file 1 "lvgl\\src\\lv_misc\\lv_utils.c"
+   1:lvgl\src\lv_misc/lv_utils.c **** /**
+   2:lvgl\src\lv_misc/lv_utils.c ****  * @file lv_utils.c
+   3:lvgl\src\lv_misc/lv_utils.c ****  *
+   4:lvgl\src\lv_misc/lv_utils.c ****  */
+   5:lvgl\src\lv_misc/lv_utils.c **** 
+   6:lvgl\src\lv_misc/lv_utils.c **** /*********************
+   7:lvgl\src\lv_misc/lv_utils.c ****  *      INCLUDES
+   8:lvgl\src\lv_misc/lv_utils.c ****  *********************/
+   9:lvgl\src\lv_misc/lv_utils.c **** #include <stdbool.h>
+  10:lvgl\src\lv_misc/lv_utils.c **** 
+  11:lvgl\src\lv_misc/lv_utils.c **** #include "lv_utils.h"
+  12:lvgl\src\lv_misc/lv_utils.c **** #include "lv_math.h"
+  13:lvgl\src\lv_misc/lv_utils.c **** #include "lv_printf.h"
+  14:lvgl\src\lv_misc/lv_utils.c **** #include "lv_txt.h"
+  15:lvgl\src\lv_misc/lv_utils.c **** 
+  16:lvgl\src\lv_misc/lv_utils.c **** /*********************
+  17:lvgl\src\lv_misc/lv_utils.c ****  *      DEFINES
+  18:lvgl\src\lv_misc/lv_utils.c ****  *********************/
+  19:lvgl\src\lv_misc/lv_utils.c **** 
+  20:lvgl\src\lv_misc/lv_utils.c **** /**********************
+  21:lvgl\src\lv_misc/lv_utils.c ****  *      TYPEDEFS
+  22:lvgl\src\lv_misc/lv_utils.c ****  **********************/
+  23:lvgl\src\lv_misc/lv_utils.c **** 
+  24:lvgl\src\lv_misc/lv_utils.c **** /**********************
+  25:lvgl\src\lv_misc/lv_utils.c ****  *  STATIC PROTOTYPES
+  26:lvgl\src\lv_misc/lv_utils.c ****  **********************/
+  27:lvgl\src\lv_misc/lv_utils.c **** 
+  28:lvgl\src\lv_misc/lv_utils.c **** /**********************
+  29:lvgl\src\lv_misc/lv_utils.c ****  *  STATIC VARIABLES
+  30:lvgl\src\lv_misc/lv_utils.c ****  **********************/
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 2
+
+
+  31:lvgl\src\lv_misc/lv_utils.c **** 
+  32:lvgl\src\lv_misc/lv_utils.c **** /**********************
+  33:lvgl\src\lv_misc/lv_utils.c ****  *      MACROS
+  34:lvgl\src\lv_misc/lv_utils.c ****  **********************/
+  35:lvgl\src\lv_misc/lv_utils.c **** 
+  36:lvgl\src\lv_misc/lv_utils.c **** /**********************
+  37:lvgl\src\lv_misc/lv_utils.c ****  *   GLOBAL FUNCTIONS
+  38:lvgl\src\lv_misc/lv_utils.c ****  **********************/
+  39:lvgl\src\lv_misc/lv_utils.c **** 
+  40:lvgl\src\lv_misc/lv_utils.c **** /**
+  41:lvgl\src\lv_misc/lv_utils.c ****  * Convert a number to string
+  42:lvgl\src\lv_misc/lv_utils.c ****  * @param num a number
+  43:lvgl\src\lv_misc/lv_utils.c ****  * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
+  44:lvgl\src\lv_misc/lv_utils.c ****  * @return same as `buf` (just for convenience)
+  45:lvgl\src\lv_misc/lv_utils.c ****  */
+  46:lvgl\src\lv_misc/lv_utils.c **** char * _lv_utils_num_to_str(int32_t num, char * buf)
+  47:lvgl\src\lv_misc/lv_utils.c **** {
+  28              		.loc 1 47 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  48:lvgl\src\lv_misc/lv_utils.c ****     if(num == 0) {
+  34              		.loc 1 48 0
+  35 0000 28B9     		cbnz	r0, .L2
+  49:lvgl\src\lv_misc/lv_utils.c ****         buf[0] = '0';
+  36              		.loc 1 49 0
+  37 0002 3023     		movs	r3, #48
+  38 0004 0B70     		strb	r3, [r1]
+  50:lvgl\src\lv_misc/lv_utils.c ****         buf[1] = '\0';
+  39              		.loc 1 50 0
+  40 0006 0023     		movs	r3, #0
+  41 0008 4B70     		strb	r3, [r1, #1]
+  51:lvgl\src\lv_misc/lv_utils.c ****         return buf;
+  52:lvgl\src\lv_misc/lv_utils.c ****     }
+  53:lvgl\src\lv_misc/lv_utils.c ****     int8_t digitCount = 0;
+  54:lvgl\src\lv_misc/lv_utils.c ****     int8_t i          = 0;
+  55:lvgl\src\lv_misc/lv_utils.c ****     if(num < 0) {
+  56:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount++] = '-';
+  57:lvgl\src\lv_misc/lv_utils.c ****         num               = LV_MATH_ABS(num);
+  58:lvgl\src\lv_misc/lv_utils.c ****         ++i;
+  59:lvgl\src\lv_misc/lv_utils.c ****     }
+  60:lvgl\src\lv_misc/lv_utils.c ****     while(num) {
+  61:lvgl\src\lv_misc/lv_utils.c ****         char digit        = num % 10;
+  62:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount++] = digit + 48;
+  63:lvgl\src\lv_misc/lv_utils.c ****         num /= 10;
+  64:lvgl\src\lv_misc/lv_utils.c ****     }
+  65:lvgl\src\lv_misc/lv_utils.c ****     buf[digitCount] = '\0';
+  66:lvgl\src\lv_misc/lv_utils.c ****     digitCount--;
+  67:lvgl\src\lv_misc/lv_utils.c ****     while(digitCount > i) {
+  68:lvgl\src\lv_misc/lv_utils.c ****         char temp       = buf[i];
+  69:lvgl\src\lv_misc/lv_utils.c ****         buf[i]          = buf[digitCount];
+  70:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount] = temp;
+  71:lvgl\src\lv_misc/lv_utils.c ****         digitCount--;
+  72:lvgl\src\lv_misc/lv_utils.c ****         i++;
+  73:lvgl\src\lv_misc/lv_utils.c ****     }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 3
+
+
+  74:lvgl\src\lv_misc/lv_utils.c ****     return buf;
+  75:lvgl\src\lv_misc/lv_utils.c **** }
+  42              		.loc 1 75 0
+  43 000a 0846     		mov	r0, r1
+  44              	.LVL1:
+  45 000c 7047     		bx	lr
+  46              	.LVL2:
+  47              	.L2:
+  47:lvgl\src\lv_misc/lv_utils.c ****     if(num == 0) {
+  48              		.loc 1 47 0
+  49 000e 70B4     		push	{r4, r5, r6}
+  50              		.cfi_def_cfa_offset 12
+  51              		.cfi_offset 4, -12
+  52              		.cfi_offset 5, -8
+  53              		.cfi_offset 6, -4
+  54 0010 0446     		mov	r4, r0
+  55              	.LVL3:
+  55:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount++] = '-';
+  56              		.loc 1 55 0
+  57 0012 0028     		cmp	r0, #0
+  58 0014 07DA     		bge	.L9
+  59              	.LVL4:
+  56:lvgl\src\lv_misc/lv_utils.c ****         num               = LV_MATH_ABS(num);
+  60              		.loc 1 56 0
+  61 0016 2D23     		movs	r3, #45
+  62 0018 0B70     		strb	r3, [r1]
+  57:lvgl\src\lv_misc/lv_utils.c ****         ++i;
+  63              		.loc 1 57 0
+  64 001a 0028     		cmp	r0, #0
+  65 001c B8BF     		it	lt
+  66 001e 4442     		rsblt	r4, r0, #0
+  67              	.LVL5:
+  58:lvgl\src\lv_misc/lv_utils.c ****     }
+  68              		.loc 1 58 0
+  69 0020 0120     		movs	r0, #1
+  56:lvgl\src\lv_misc/lv_utils.c ****         num               = LV_MATH_ABS(num);
+  70              		.loc 1 56 0
+  71 0022 0246     		mov	r2, r0
+  72 0024 13E0     		b	.L5
+  73              	.LVL6:
+  74              	.L9:
+  54:lvgl\src\lv_misc/lv_utils.c ****     if(num < 0) {
+  75              		.loc 1 54 0
+  76 0026 0020     		movs	r0, #0
+  77              	.LVL7:
+  53:lvgl\src\lv_misc/lv_utils.c ****     int8_t i          = 0;
+  78              		.loc 1 53 0
+  79 0028 0246     		mov	r2, r0
+  80 002a 10E0     		b	.L5
+  81              	.LVL8:
+  82              	.L6:
+  83              	.LBB2:
+  61:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount++] = digit + 48;
+  84              		.loc 1 61 0
+  85 002c 124B     		ldr	r3, .L11
+  86 002e 83FB0435 		smull	r3, r5, r3, r4
+  87 0032 E317     		asrs	r3, r4, #31
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 4
+
+
+  88 0034 C3EBA503 		rsb	r3, r3, r5, asr #2
+  89 0038 1E46     		mov	r6, r3
+  90 003a 03EB8303 		add	r3, r3, r3, lsl #2
+  91 003e 5D00     		lsls	r5, r3, #1
+  92 0040 631B     		subs	r3, r4, r5
+  93 0042 DBB2     		uxtb	r3, r3
+  94              	.LVL9:
+  62:lvgl\src\lv_misc/lv_utils.c ****         num /= 10;
+  95              		.loc 1 62 0
+  96 0044 551C     		adds	r5, r2, #1
+  97              	.LVL10:
+  98 0046 3033     		adds	r3, r3, #48
+  99              	.LVL11:
+ 100 0048 8B54     		strb	r3, [r1, r2]
+  63:lvgl\src\lv_misc/lv_utils.c ****     }
+ 101              		.loc 1 63 0
+ 102 004a 3446     		mov	r4, r6
+ 103              	.LVL12:
+  62:lvgl\src\lv_misc/lv_utils.c ****         num /= 10;
+ 104              		.loc 1 62 0
+ 105 004c 6AB2     		sxtb	r2, r5
+ 106              	.LVL13:
+ 107              	.L5:
+ 108              	.LBE2:
+  60:lvgl\src\lv_misc/lv_utils.c ****         char digit        = num % 10;
+ 109              		.loc 1 60 0
+ 110 004e 002C     		cmp	r4, #0
+ 111 0050 ECD1     		bne	.L6
+  65:lvgl\src\lv_misc/lv_utils.c ****     digitCount--;
+ 112              		.loc 1 65 0
+ 113 0052 0023     		movs	r3, #0
+ 114 0054 8B54     		strb	r3, [r1, r2]
+  66:lvgl\src\lv_misc/lv_utils.c ****     while(digitCount > i) {
+ 115              		.loc 1 66 0
+ 116 0056 531E     		subs	r3, r2, #1
+ 117 0058 5BB2     		sxtb	r3, r3
+ 118              	.LVL14:
+  67:lvgl\src\lv_misc/lv_utils.c ****         char temp       = buf[i];
+ 119              		.loc 1 67 0
+ 120 005a 07E0     		b	.L7
+ 121              	.LVL15:
+ 122              	.L8:
+ 123              	.LBB3:
+  68:lvgl\src\lv_misc/lv_utils.c ****         buf[i]          = buf[digitCount];
+ 124              		.loc 1 68 0
+ 125 005c 0A5C     		ldrb	r2, [r1, r0]	@ zero_extendqisi2
+ 126              	.LVL16:
+  69:lvgl\src\lv_misc/lv_utils.c ****         buf[digitCount] = temp;
+ 127              		.loc 1 69 0
+ 128 005e CC5C     		ldrb	r4, [r1, r3]	@ zero_extendqisi2
+ 129 0060 0C54     		strb	r4, [r1, r0]
+  70:lvgl\src\lv_misc/lv_utils.c ****         digitCount--;
+ 130              		.loc 1 70 0
+ 131 0062 CA54     		strb	r2, [r1, r3]
+  71:lvgl\src\lv_misc/lv_utils.c ****         i++;
+ 132              		.loc 1 71 0
+ 133 0064 013B     		subs	r3, r3, #1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 5
+
+
+ 134              	.LVL17:
+ 135 0066 5BB2     		sxtb	r3, r3
+ 136              	.LVL18:
+  72:lvgl\src\lv_misc/lv_utils.c ****     }
+ 137              		.loc 1 72 0
+ 138 0068 0130     		adds	r0, r0, #1
+ 139              	.LVL19:
+ 140 006a 40B2     		sxtb	r0, r0
+ 141              	.LVL20:
+ 142              	.L7:
+ 143              	.LBE3:
+  67:lvgl\src\lv_misc/lv_utils.c ****         char temp       = buf[i];
+ 144              		.loc 1 67 0
+ 145 006c 8342     		cmp	r3, r0
+ 146 006e F5DC     		bgt	.L8
+ 147              		.loc 1 75 0
+ 148 0070 0846     		mov	r0, r1
+ 149              	.LVL21:
+ 150 0072 70BC     		pop	{r4, r5, r6}
+ 151              		.cfi_restore 6
+ 152              		.cfi_restore 5
+ 153              		.cfi_restore 4
+ 154              		.cfi_def_cfa_offset 0
+ 155 0074 7047     		bx	lr
+ 156              	.L12:
+ 157 0076 00BF     		.align	2
+ 158              	.L11:
+ 159 0078 67666666 		.word	1717986919
+ 160              		.cfi_endproc
+ 161              	.LFE5:
+ 162              		.size	_lv_utils_num_to_str, .-_lv_utils_num_to_str
+ 163              		.section	.text._lv_utils_bsearch,"ax",%progbits
+ 164              		.align	2
+ 165              		.global	_lv_utils_bsearch
+ 166              		.thumb
+ 167              		.thumb_func
+ 168              		.type	_lv_utils_bsearch, %function
+ 169              	_lv_utils_bsearch:
+ 170              	.LFB6:
+  76:lvgl\src\lv_misc/lv_utils.c **** 
+  77:lvgl\src\lv_misc/lv_utils.c **** /** Searches base[0] to base[n - 1] for an item that matches *key.
+  78:lvgl\src\lv_misc/lv_utils.c ****  *
+  79:lvgl\src\lv_misc/lv_utils.c ****  * @note The function cmp must return negative if its first
+  80:lvgl\src\lv_misc/lv_utils.c ****  *  argument (the search key) is less that its second (a table entry),
+  81:lvgl\src\lv_misc/lv_utils.c ****  *  zero if equal, and positive if greater.
+  82:lvgl\src\lv_misc/lv_utils.c ****  *
+  83:lvgl\src\lv_misc/lv_utils.c ****  *  @note Items in the array must be in ascending order.
+  84:lvgl\src\lv_misc/lv_utils.c ****  *
+  85:lvgl\src\lv_misc/lv_utils.c ****  * @param key    Pointer to item being searched for
+  86:lvgl\src\lv_misc/lv_utils.c ****  * @param base   Pointer to first element to search
+  87:lvgl\src\lv_misc/lv_utils.c ****  * @param n      Number of elements
+  88:lvgl\src\lv_misc/lv_utils.c ****  * @param size   Size of each element
+  89:lvgl\src\lv_misc/lv_utils.c ****  * @param cmp    Pointer to comparison function (see #lv_font_codeCompare as a comparison function
+  90:lvgl\src\lv_misc/lv_utils.c ****  * example)
+  91:lvgl\src\lv_misc/lv_utils.c ****  *
+  92:lvgl\src\lv_misc/lv_utils.c ****  * @return a pointer to a matching item, or NULL if none exists.
+  93:lvgl\src\lv_misc/lv_utils.c ****  */
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 6
+
+
+  94:lvgl\src\lv_misc/lv_utils.c **** void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
+  95:lvgl\src\lv_misc/lv_utils.c ****                          int32_t (*cmp)(const void * pRef, const void * pElement))
+  96:lvgl\src\lv_misc/lv_utils.c **** {
+ 171              		.loc 1 96 0
+ 172              		.cfi_startproc
+ 173              		@ args = 4, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175              	.LVL22:
+ 176 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 177              		.cfi_def_cfa_offset 32
+ 178              		.cfi_offset 4, -32
+ 179              		.cfi_offset 5, -28
+ 180              		.cfi_offset 6, -24
+ 181              		.cfi_offset 7, -20
+ 182              		.cfi_offset 8, -16
+ 183              		.cfi_offset 9, -12
+ 184              		.cfi_offset 10, -8
+ 185              		.cfi_offset 14, -4
+ 186 0004 8246     		mov	r10, r0
+ 187 0006 8846     		mov	r8, r1
+ 188 0008 1446     		mov	r4, r2
+ 189 000a 1F46     		mov	r7, r3
+ 190 000c DDF82090 		ldr	r9, [sp, #32]
+ 191              	.LVL23:
+  97:lvgl\src\lv_misc/lv_utils.c ****     const char * middle;
+  98:lvgl\src\lv_misc/lv_utils.c ****     int32_t c;
+  99:lvgl\src\lv_misc/lv_utils.c **** 
+ 100:lvgl\src\lv_misc/lv_utils.c ****     for(middle = base; n != 0;) {
+ 192              		.loc 1 100 0
+ 193 0010 13E0     		b	.L14
+ 194              	.LVL24:
+ 195              	.L18:
+ 101:lvgl\src\lv_misc/lv_utils.c ****         middle += (n / 2) * size;
+ 196              		.loc 1 101 0
+ 197 0012 6508     		lsrs	r5, r4, #1
+ 198 0014 07FB0586 		mla	r6, r7, r5, r8
+ 199              	.LVL25:
+ 102:lvgl\src\lv_misc/lv_utils.c ****         if((c = (*cmp)(key, middle)) > 0) {
+ 200              		.loc 1 102 0
+ 201 0018 3146     		mov	r1, r6
+ 202 001a 5046     		mov	r0, r10
+ 203 001c C847     		blx	r9
+ 204              	.LVL26:
+ 205 001e 0028     		cmp	r0, #0
+ 206 0020 08DD     		ble	.L15
+ 103:lvgl\src\lv_misc/lv_utils.c ****             n    = (n / 2) - ((n & 1) == 0);
+ 207              		.loc 1 103 0
+ 208 0022 14F0010F 		tst	r4, #1
+ 209 0026 0CBF     		ite	eq
+ 210 0028 0124     		moveq	r4, #1
+ 211              	.LVL27:
+ 212 002a 0024     		movne	r4, #0
+ 213 002c 2C1B     		subs	r4, r5, r4
+ 214              	.LVL28:
+ 104:lvgl\src\lv_misc/lv_utils.c ****             base = (middle += size);
+ 215              		.loc 1 104 0
+ 216 002e 06EB0708 		add	r8, r6, r7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 7
+
+
+ 217              	.LVL29:
+ 218 0032 02E0     		b	.L14
+ 219              	.LVL30:
+ 220              	.L15:
+ 105:lvgl\src\lv_misc/lv_utils.c ****         }
+ 106:lvgl\src\lv_misc/lv_utils.c ****         else if(c < 0) {
+ 221              		.loc 1 106 0
+ 222 0034 0028     		cmp	r0, #0
+ 223 0036 05DA     		bge	.L19
+ 107:lvgl\src\lv_misc/lv_utils.c ****             n /= 2;
+ 224              		.loc 1 107 0
+ 225 0038 2C46     		mov	r4, r5
+ 226              	.LVL31:
+ 227              	.L14:
+ 100:lvgl\src\lv_misc/lv_utils.c ****         middle += (n / 2) * size;
+ 228              		.loc 1 100 0 discriminator 1
+ 229 003a 002C     		cmp	r4, #0
+ 230 003c E9D1     		bne	.L18
+ 108:lvgl\src\lv_misc/lv_utils.c ****             middle = base;
+ 109:lvgl\src\lv_misc/lv_utils.c ****         }
+ 110:lvgl\src\lv_misc/lv_utils.c ****         else {
+ 111:lvgl\src\lv_misc/lv_utils.c ****             return (char *)middle;
+ 112:lvgl\src\lv_misc/lv_utils.c ****         }
+ 113:lvgl\src\lv_misc/lv_utils.c ****     }
+ 114:lvgl\src\lv_misc/lv_utils.c ****     return NULL;
+ 231              		.loc 1 114 0
+ 232 003e 0020     		movs	r0, #0
+ 233 0040 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 234              	.LVL32:
+ 235              	.L19:
+ 111:lvgl\src\lv_misc/lv_utils.c ****         }
+ 236              		.loc 1 111 0
+ 237 0044 3046     		mov	r0, r6
+ 238              	.LVL33:
+ 115:lvgl\src\lv_misc/lv_utils.c **** }
+ 239              		.loc 1 115 0
+ 240 0046 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 241              		.cfi_endproc
+ 242              	.LFE6:
+ 243              		.size	_lv_utils_bsearch, .-_lv_utils_bsearch
+ 244 004a 00BF     		.text
+ 245              	.Letext0:
+ 246              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 247              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 248              		.section	.debug_info,"",%progbits
+ 249              	.Ldebug_info0:
+ 250 0000 13020000 		.4byte	0x213
+ 251 0004 0400     		.2byte	0x4
+ 252 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 253 000a 04       		.byte	0x4
+ 254 000b 01       		.uleb128 0x1
+ 255 000c 3F000000 		.4byte	.LASF27
+ 256 0010 0C       		.byte	0xc
+ 257 0011 B0010000 		.4byte	.LASF28
+ 258 0015 51010000 		.4byte	.LASF29
+ 259 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 260 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 8
+
+
+ 261 0021 00000000 		.4byte	.Ldebug_line0
+ 262 0025 02       		.uleb128 0x2
+ 263 0026 00000000 		.4byte	.LASF4
+ 264 002a 02       		.byte	0x2
+ 265 002b 1B       		.byte	0x1b
+ 266 002c 30000000 		.4byte	0x30
+ 267 0030 03       		.uleb128 0x3
+ 268 0031 01       		.byte	0x1
+ 269 0032 06       		.byte	0x6
+ 270 0033 00020000 		.4byte	.LASF0
+ 271 0037 03       		.uleb128 0x3
+ 272 0038 01       		.byte	0x1
+ 273 0039 08       		.byte	0x8
+ 274 003a EA000000 		.4byte	.LASF1
+ 275 003e 03       		.uleb128 0x3
+ 276 003f 02       		.byte	0x2
+ 277 0040 05       		.byte	0x5
+ 278 0041 D1010000 		.4byte	.LASF2
+ 279 0045 03       		.uleb128 0x3
+ 280 0046 02       		.byte	0x2
+ 281 0047 07       		.byte	0x7
+ 282 0048 D7000000 		.4byte	.LASF3
+ 283 004c 02       		.uleb128 0x2
+ 284 004d 29000000 		.4byte	.LASF5
+ 285 0051 02       		.byte	0x2
+ 286 0052 3F       		.byte	0x3f
+ 287 0053 57000000 		.4byte	0x57
+ 288 0057 03       		.uleb128 0x3
+ 289 0058 04       		.byte	0x4
+ 290 0059 05       		.byte	0x5
+ 291 005a E4010000 		.4byte	.LASF6
+ 292 005e 02       		.uleb128 0x2
+ 293 005f 0A010000 		.4byte	.LASF7
+ 294 0063 02       		.byte	0x2
+ 295 0064 41       		.byte	0x41
+ 296 0065 69000000 		.4byte	0x69
+ 297 0069 03       		.uleb128 0x3
+ 298 006a 04       		.byte	0x4
+ 299 006b 07       		.byte	0x7
+ 300 006c F8000000 		.4byte	.LASF8
+ 301 0070 03       		.uleb128 0x3
+ 302 0071 08       		.byte	0x8
+ 303 0072 05       		.byte	0x5
+ 304 0073 A2010000 		.4byte	.LASF9
+ 305 0077 03       		.uleb128 0x3
+ 306 0078 08       		.byte	0x8
+ 307 0079 07       		.byte	0x7
+ 308 007a 3A010000 		.4byte	.LASF10
+ 309 007e 04       		.uleb128 0x4
+ 310 007f 04       		.byte	0x4
+ 311 0080 05       		.byte	0x5
+ 312 0081 696E7400 		.ascii	"int\000"
+ 313 0085 03       		.uleb128 0x3
+ 314 0086 04       		.byte	0x4
+ 315 0087 07       		.byte	0x7
+ 316 0088 15010000 		.4byte	.LASF11
+ 317 008c 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 9
+
+
+ 318 008d 33000000 		.4byte	.LASF12
+ 319 0091 03       		.byte	0x3
+ 320 0092 14       		.byte	0x14
+ 321 0093 25000000 		.4byte	0x25
+ 322 0097 02       		.uleb128 0x2
+ 323 0098 91010000 		.4byte	.LASF13
+ 324 009c 03       		.byte	0x3
+ 325 009d 2C       		.byte	0x2c
+ 326 009e 4C000000 		.4byte	0x4c
+ 327 00a2 02       		.uleb128 0x2
+ 328 00a3 DB010000 		.4byte	.LASF14
+ 329 00a7 03       		.byte	0x3
+ 330 00a8 30       		.byte	0x30
+ 331 00a9 5E000000 		.4byte	0x5e
+ 332 00ad 03       		.uleb128 0x3
+ 333 00ae 08       		.byte	0x8
+ 334 00af 04       		.byte	0x4
+ 335 00b0 F4010000 		.4byte	.LASF15
+ 336 00b4 05       		.uleb128 0x5
+ 337 00b5 04       		.byte	0x4
+ 338 00b6 03       		.uleb128 0x3
+ 339 00b7 04       		.byte	0x4
+ 340 00b8 07       		.byte	0x7
+ 341 00b9 99010000 		.4byte	.LASF16
+ 342 00bd 06       		.uleb128 0x6
+ 343 00be 04       		.byte	0x4
+ 344 00bf C3000000 		.4byte	0xc3
+ 345 00c3 03       		.uleb128 0x3
+ 346 00c4 01       		.byte	0x1
+ 347 00c5 08       		.byte	0x8
+ 348 00c6 CC010000 		.4byte	.LASF17
+ 349 00ca 06       		.uleb128 0x6
+ 350 00cb 04       		.byte	0x4
+ 351 00cc D0000000 		.4byte	0xd0
+ 352 00d0 07       		.uleb128 0x7
+ 353 00d1 C3000000 		.4byte	0xc3
+ 354 00d5 03       		.uleb128 0x3
+ 355 00d6 01       		.byte	0x1
+ 356 00d7 02       		.byte	0x2
+ 357 00d8 0C020000 		.4byte	.LASF18
+ 358 00dc 08       		.uleb128 0x8
+ 359 00dd 09000000 		.4byte	.LASF22
+ 360 00e1 01       		.byte	0x1
+ 361 00e2 2E       		.byte	0x2e
+ 362 00e3 BD000000 		.4byte	0xbd
+ 363 00e7 00000000 		.4byte	.LFB5
+ 364 00eb 7C000000 		.4byte	.LFE5-.LFB5
+ 365 00ef 01       		.uleb128 0x1
+ 366 00f0 9C       		.byte	0x9c
+ 367 00f1 64010000 		.4byte	0x164
+ 368 00f5 09       		.uleb128 0x9
+ 369 00f6 6E756D00 		.ascii	"num\000"
+ 370 00fa 01       		.byte	0x1
+ 371 00fb 2E       		.byte	0x2e
+ 372 00fc 97000000 		.4byte	0x97
+ 373 0100 00000000 		.4byte	.LLST0
+ 374 0104 0A       		.uleb128 0xa
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 10
+
+
+ 375 0105 62756600 		.ascii	"buf\000"
+ 376 0109 01       		.byte	0x1
+ 377 010a 2E       		.byte	0x2e
+ 378 010b BD000000 		.4byte	0xbd
+ 379 010f 01       		.uleb128 0x1
+ 380 0110 51       		.byte	0x51
+ 381 0111 0B       		.uleb128 0xb
+ 382 0112 1E000000 		.4byte	.LASF19
+ 383 0116 01       		.byte	0x1
+ 384 0117 35       		.byte	0x35
+ 385 0118 8C000000 		.4byte	0x8c
+ 386 011c 4D000000 		.4byte	.LLST1
+ 387 0120 0C       		.uleb128 0xc
+ 388 0121 6900     		.ascii	"i\000"
+ 389 0123 01       		.byte	0x1
+ 390 0124 36       		.byte	0x36
+ 391 0125 8C000000 		.4byte	0x8c
+ 392 0129 B0000000 		.4byte	.LLST2
+ 393 012d 0D       		.uleb128 0xd
+ 394 012e 2C000000 		.4byte	.LBB2
+ 395 0132 22000000 		.4byte	.LBE2-.LBB2
+ 396 0136 4A010000 		.4byte	0x14a
+ 397 013a 0B       		.uleb128 0xb
+ 398 013b 34010000 		.4byte	.LASF20
+ 399 013f 01       		.byte	0x1
+ 400 0140 3D       		.byte	0x3d
+ 401 0141 C3000000 		.4byte	0xc3
+ 402 0145 F2000000 		.4byte	.LLST3
+ 403 0149 00       		.byte	0
+ 404 014a 0E       		.uleb128 0xe
+ 405 014b 5C000000 		.4byte	.LBB3
+ 406 014f 10000000 		.4byte	.LBE3-.LBB3
+ 407 0153 0B       		.uleb128 0xb
+ 408 0154 D2000000 		.4byte	.LASF21
+ 409 0158 01       		.byte	0x1
+ 410 0159 44       		.byte	0x44
+ 411 015a C3000000 		.4byte	0xc3
+ 412 015e 12010000 		.4byte	.LLST4
+ 413 0162 00       		.byte	0
+ 414 0163 00       		.byte	0
+ 415 0164 08       		.uleb128 0x8
+ 416 0165 22010000 		.4byte	.LASF23
+ 417 0169 01       		.byte	0x1
+ 418 016a 5E       		.byte	0x5e
+ 419 016b B4000000 		.4byte	0xb4
+ 420 016f 00000000 		.4byte	.LFB6
+ 421 0173 4A000000 		.4byte	.LFE6-.LFB6
+ 422 0177 01       		.uleb128 0x1
+ 423 0178 9C       		.byte	0x9c
+ 424 0179 F5010000 		.4byte	0x1f5
+ 425 017d 09       		.uleb128 0x9
+ 426 017e 6B657900 		.ascii	"key\000"
+ 427 0182 01       		.byte	0x1
+ 428 0183 5E       		.byte	0x5e
+ 429 0184 F5010000 		.4byte	0x1f5
+ 430 0188 25010000 		.4byte	.LLST5
+ 431 018c 0F       		.uleb128 0xf
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 11
+
+
+ 432 018d CD000000 		.4byte	.LASF24
+ 433 0191 01       		.byte	0x1
+ 434 0192 5E       		.byte	0x5e
+ 435 0193 F5010000 		.4byte	0x1f5
+ 436 0197 43010000 		.4byte	.LLST6
+ 437 019b 09       		.uleb128 0x9
+ 438 019c 6E00     		.ascii	"n\000"
+ 439 019e 01       		.byte	0x1
+ 440 019f 5E       		.byte	0x5e
+ 441 01a0 A2000000 		.4byte	0xa2
+ 442 01a4 61010000 		.4byte	.LLST7
+ 443 01a8 0F       		.uleb128 0xf
+ 444 01a9 3A000000 		.4byte	.LASF25
+ 445 01ad 01       		.byte	0x1
+ 446 01ae 5E       		.byte	0x5e
+ 447 01af A2000000 		.4byte	0xa2
+ 448 01b3 8A010000 		.4byte	.LLST8
+ 449 01b7 09       		.uleb128 0x9
+ 450 01b8 636D7000 		.ascii	"cmp\000"
+ 451 01bc 01       		.byte	0x1
+ 452 01bd 5F       		.byte	0x5f
+ 453 01be 10020000 		.4byte	0x210
+ 454 01c2 A8010000 		.4byte	.LLST9
+ 455 01c6 0B       		.uleb128 0xb
+ 456 01c7 ED010000 		.4byte	.LASF26
+ 457 01cb 01       		.byte	0x1
+ 458 01cc 61       		.byte	0x61
+ 459 01cd CA000000 		.4byte	0xca
+ 460 01d1 C8010000 		.4byte	.LLST10
+ 461 01d5 0C       		.uleb128 0xc
+ 462 01d6 6300     		.ascii	"c\000"
+ 463 01d8 01       		.byte	0x1
+ 464 01d9 62       		.byte	0x62
+ 465 01da 97000000 		.4byte	0x97
+ 466 01de 1D020000 		.4byte	.LLST11
+ 467 01e2 10       		.uleb128 0x10
+ 468 01e3 1E000000 		.4byte	.LVL26
+ 469 01e7 11       		.uleb128 0x11
+ 470 01e8 01       		.uleb128 0x1
+ 471 01e9 50       		.byte	0x50
+ 472 01ea 02       		.uleb128 0x2
+ 473 01eb 7A       		.byte	0x7a
+ 474 01ec 00       		.sleb128 0
+ 475 01ed 11       		.uleb128 0x11
+ 476 01ee 01       		.uleb128 0x1
+ 477 01ef 51       		.byte	0x51
+ 478 01f0 02       		.uleb128 0x2
+ 479 01f1 76       		.byte	0x76
+ 480 01f2 00       		.sleb128 0
+ 481 01f3 00       		.byte	0
+ 482 01f4 00       		.byte	0
+ 483 01f5 06       		.uleb128 0x6
+ 484 01f6 04       		.byte	0x4
+ 485 01f7 FB010000 		.4byte	0x1fb
+ 486 01fb 12       		.uleb128 0x12
+ 487 01fc 13       		.uleb128 0x13
+ 488 01fd 97000000 		.4byte	0x97
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 12
+
+
+ 489 0201 10020000 		.4byte	0x210
+ 490 0205 14       		.uleb128 0x14
+ 491 0206 F5010000 		.4byte	0x1f5
+ 492 020a 14       		.uleb128 0x14
+ 493 020b F5010000 		.4byte	0x1f5
+ 494 020f 00       		.byte	0
+ 495 0210 06       		.uleb128 0x6
+ 496 0211 04       		.byte	0x4
+ 497 0212 FC010000 		.4byte	0x1fc
+ 498 0216 00       		.byte	0
+ 499              		.section	.debug_abbrev,"",%progbits
+ 500              	.Ldebug_abbrev0:
+ 501 0000 01       		.uleb128 0x1
+ 502 0001 11       		.uleb128 0x11
+ 503 0002 01       		.byte	0x1
+ 504 0003 25       		.uleb128 0x25
+ 505 0004 0E       		.uleb128 0xe
+ 506 0005 13       		.uleb128 0x13
+ 507 0006 0B       		.uleb128 0xb
+ 508 0007 03       		.uleb128 0x3
+ 509 0008 0E       		.uleb128 0xe
+ 510 0009 1B       		.uleb128 0x1b
+ 511 000a 0E       		.uleb128 0xe
+ 512 000b 55       		.uleb128 0x55
+ 513 000c 17       		.uleb128 0x17
+ 514 000d 11       		.uleb128 0x11
+ 515 000e 01       		.uleb128 0x1
+ 516 000f 10       		.uleb128 0x10
+ 517 0010 17       		.uleb128 0x17
+ 518 0011 00       		.byte	0
+ 519 0012 00       		.byte	0
+ 520 0013 02       		.uleb128 0x2
+ 521 0014 16       		.uleb128 0x16
+ 522 0015 00       		.byte	0
+ 523 0016 03       		.uleb128 0x3
+ 524 0017 0E       		.uleb128 0xe
+ 525 0018 3A       		.uleb128 0x3a
+ 526 0019 0B       		.uleb128 0xb
+ 527 001a 3B       		.uleb128 0x3b
+ 528 001b 0B       		.uleb128 0xb
+ 529 001c 49       		.uleb128 0x49
+ 530 001d 13       		.uleb128 0x13
+ 531 001e 00       		.byte	0
+ 532 001f 00       		.byte	0
+ 533 0020 03       		.uleb128 0x3
+ 534 0021 24       		.uleb128 0x24
+ 535 0022 00       		.byte	0
+ 536 0023 0B       		.uleb128 0xb
+ 537 0024 0B       		.uleb128 0xb
+ 538 0025 3E       		.uleb128 0x3e
+ 539 0026 0B       		.uleb128 0xb
+ 540 0027 03       		.uleb128 0x3
+ 541 0028 0E       		.uleb128 0xe
+ 542 0029 00       		.byte	0
+ 543 002a 00       		.byte	0
+ 544 002b 04       		.uleb128 0x4
+ 545 002c 24       		.uleb128 0x24
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 13
+
+
+ 546 002d 00       		.byte	0
+ 547 002e 0B       		.uleb128 0xb
+ 548 002f 0B       		.uleb128 0xb
+ 549 0030 3E       		.uleb128 0x3e
+ 550 0031 0B       		.uleb128 0xb
+ 551 0032 03       		.uleb128 0x3
+ 552 0033 08       		.uleb128 0x8
+ 553 0034 00       		.byte	0
+ 554 0035 00       		.byte	0
+ 555 0036 05       		.uleb128 0x5
+ 556 0037 0F       		.uleb128 0xf
+ 557 0038 00       		.byte	0
+ 558 0039 0B       		.uleb128 0xb
+ 559 003a 0B       		.uleb128 0xb
+ 560 003b 00       		.byte	0
+ 561 003c 00       		.byte	0
+ 562 003d 06       		.uleb128 0x6
+ 563 003e 0F       		.uleb128 0xf
+ 564 003f 00       		.byte	0
+ 565 0040 0B       		.uleb128 0xb
+ 566 0041 0B       		.uleb128 0xb
+ 567 0042 49       		.uleb128 0x49
+ 568 0043 13       		.uleb128 0x13
+ 569 0044 00       		.byte	0
+ 570 0045 00       		.byte	0
+ 571 0046 07       		.uleb128 0x7
+ 572 0047 26       		.uleb128 0x26
+ 573 0048 00       		.byte	0
+ 574 0049 49       		.uleb128 0x49
+ 575 004a 13       		.uleb128 0x13
+ 576 004b 00       		.byte	0
+ 577 004c 00       		.byte	0
+ 578 004d 08       		.uleb128 0x8
+ 579 004e 2E       		.uleb128 0x2e
+ 580 004f 01       		.byte	0x1
+ 581 0050 3F       		.uleb128 0x3f
+ 582 0051 19       		.uleb128 0x19
+ 583 0052 03       		.uleb128 0x3
+ 584 0053 0E       		.uleb128 0xe
+ 585 0054 3A       		.uleb128 0x3a
+ 586 0055 0B       		.uleb128 0xb
+ 587 0056 3B       		.uleb128 0x3b
+ 588 0057 0B       		.uleb128 0xb
+ 589 0058 27       		.uleb128 0x27
+ 590 0059 19       		.uleb128 0x19
+ 591 005a 49       		.uleb128 0x49
+ 592 005b 13       		.uleb128 0x13
+ 593 005c 11       		.uleb128 0x11
+ 594 005d 01       		.uleb128 0x1
+ 595 005e 12       		.uleb128 0x12
+ 596 005f 06       		.uleb128 0x6
+ 597 0060 40       		.uleb128 0x40
+ 598 0061 18       		.uleb128 0x18
+ 599 0062 9742     		.uleb128 0x2117
+ 600 0064 19       		.uleb128 0x19
+ 601 0065 01       		.uleb128 0x1
+ 602 0066 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 14
+
+
+ 603 0067 00       		.byte	0
+ 604 0068 00       		.byte	0
+ 605 0069 09       		.uleb128 0x9
+ 606 006a 05       		.uleb128 0x5
+ 607 006b 00       		.byte	0
+ 608 006c 03       		.uleb128 0x3
+ 609 006d 08       		.uleb128 0x8
+ 610 006e 3A       		.uleb128 0x3a
+ 611 006f 0B       		.uleb128 0xb
+ 612 0070 3B       		.uleb128 0x3b
+ 613 0071 0B       		.uleb128 0xb
+ 614 0072 49       		.uleb128 0x49
+ 615 0073 13       		.uleb128 0x13
+ 616 0074 02       		.uleb128 0x2
+ 617 0075 17       		.uleb128 0x17
+ 618 0076 00       		.byte	0
+ 619 0077 00       		.byte	0
+ 620 0078 0A       		.uleb128 0xa
+ 621 0079 05       		.uleb128 0x5
+ 622 007a 00       		.byte	0
+ 623 007b 03       		.uleb128 0x3
+ 624 007c 08       		.uleb128 0x8
+ 625 007d 3A       		.uleb128 0x3a
+ 626 007e 0B       		.uleb128 0xb
+ 627 007f 3B       		.uleb128 0x3b
+ 628 0080 0B       		.uleb128 0xb
+ 629 0081 49       		.uleb128 0x49
+ 630 0082 13       		.uleb128 0x13
+ 631 0083 02       		.uleb128 0x2
+ 632 0084 18       		.uleb128 0x18
+ 633 0085 00       		.byte	0
+ 634 0086 00       		.byte	0
+ 635 0087 0B       		.uleb128 0xb
+ 636 0088 34       		.uleb128 0x34
+ 637 0089 00       		.byte	0
+ 638 008a 03       		.uleb128 0x3
+ 639 008b 0E       		.uleb128 0xe
+ 640 008c 3A       		.uleb128 0x3a
+ 641 008d 0B       		.uleb128 0xb
+ 642 008e 3B       		.uleb128 0x3b
+ 643 008f 0B       		.uleb128 0xb
+ 644 0090 49       		.uleb128 0x49
+ 645 0091 13       		.uleb128 0x13
+ 646 0092 02       		.uleb128 0x2
+ 647 0093 17       		.uleb128 0x17
+ 648 0094 00       		.byte	0
+ 649 0095 00       		.byte	0
+ 650 0096 0C       		.uleb128 0xc
+ 651 0097 34       		.uleb128 0x34
+ 652 0098 00       		.byte	0
+ 653 0099 03       		.uleb128 0x3
+ 654 009a 08       		.uleb128 0x8
+ 655 009b 3A       		.uleb128 0x3a
+ 656 009c 0B       		.uleb128 0xb
+ 657 009d 3B       		.uleb128 0x3b
+ 658 009e 0B       		.uleb128 0xb
+ 659 009f 49       		.uleb128 0x49
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 15
+
+
+ 660 00a0 13       		.uleb128 0x13
+ 661 00a1 02       		.uleb128 0x2
+ 662 00a2 17       		.uleb128 0x17
+ 663 00a3 00       		.byte	0
+ 664 00a4 00       		.byte	0
+ 665 00a5 0D       		.uleb128 0xd
+ 666 00a6 0B       		.uleb128 0xb
+ 667 00a7 01       		.byte	0x1
+ 668 00a8 11       		.uleb128 0x11
+ 669 00a9 01       		.uleb128 0x1
+ 670 00aa 12       		.uleb128 0x12
+ 671 00ab 06       		.uleb128 0x6
+ 672 00ac 01       		.uleb128 0x1
+ 673 00ad 13       		.uleb128 0x13
+ 674 00ae 00       		.byte	0
+ 675 00af 00       		.byte	0
+ 676 00b0 0E       		.uleb128 0xe
+ 677 00b1 0B       		.uleb128 0xb
+ 678 00b2 01       		.byte	0x1
+ 679 00b3 11       		.uleb128 0x11
+ 680 00b4 01       		.uleb128 0x1
+ 681 00b5 12       		.uleb128 0x12
+ 682 00b6 06       		.uleb128 0x6
+ 683 00b7 00       		.byte	0
+ 684 00b8 00       		.byte	0
+ 685 00b9 0F       		.uleb128 0xf
+ 686 00ba 05       		.uleb128 0x5
+ 687 00bb 00       		.byte	0
+ 688 00bc 03       		.uleb128 0x3
+ 689 00bd 0E       		.uleb128 0xe
+ 690 00be 3A       		.uleb128 0x3a
+ 691 00bf 0B       		.uleb128 0xb
+ 692 00c0 3B       		.uleb128 0x3b
+ 693 00c1 0B       		.uleb128 0xb
+ 694 00c2 49       		.uleb128 0x49
+ 695 00c3 13       		.uleb128 0x13
+ 696 00c4 02       		.uleb128 0x2
+ 697 00c5 17       		.uleb128 0x17
+ 698 00c6 00       		.byte	0
+ 699 00c7 00       		.byte	0
+ 700 00c8 10       		.uleb128 0x10
+ 701 00c9 898201   		.uleb128 0x4109
+ 702 00cc 01       		.byte	0x1
+ 703 00cd 11       		.uleb128 0x11
+ 704 00ce 01       		.uleb128 0x1
+ 705 00cf 00       		.byte	0
+ 706 00d0 00       		.byte	0
+ 707 00d1 11       		.uleb128 0x11
+ 708 00d2 8A8201   		.uleb128 0x410a
+ 709 00d5 00       		.byte	0
+ 710 00d6 02       		.uleb128 0x2
+ 711 00d7 18       		.uleb128 0x18
+ 712 00d8 9142     		.uleb128 0x2111
+ 713 00da 18       		.uleb128 0x18
+ 714 00db 00       		.byte	0
+ 715 00dc 00       		.byte	0
+ 716 00dd 12       		.uleb128 0x12
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 16
+
+
+ 717 00de 26       		.uleb128 0x26
+ 718 00df 00       		.byte	0
+ 719 00e0 00       		.byte	0
+ 720 00e1 00       		.byte	0
+ 721 00e2 13       		.uleb128 0x13
+ 722 00e3 15       		.uleb128 0x15
+ 723 00e4 01       		.byte	0x1
+ 724 00e5 27       		.uleb128 0x27
+ 725 00e6 19       		.uleb128 0x19
+ 726 00e7 49       		.uleb128 0x49
+ 727 00e8 13       		.uleb128 0x13
+ 728 00e9 01       		.uleb128 0x1
+ 729 00ea 13       		.uleb128 0x13
+ 730 00eb 00       		.byte	0
+ 731 00ec 00       		.byte	0
+ 732 00ed 14       		.uleb128 0x14
+ 733 00ee 05       		.uleb128 0x5
+ 734 00ef 00       		.byte	0
+ 735 00f0 49       		.uleb128 0x49
+ 736 00f1 13       		.uleb128 0x13
+ 737 00f2 00       		.byte	0
+ 738 00f3 00       		.byte	0
+ 739 00f4 00       		.byte	0
+ 740              		.section	.debug_loc,"",%progbits
+ 741              	.Ldebug_loc0:
+ 742              	.LLST0:
+ 743 0000 00000000 		.4byte	.LVL0
+ 744 0004 0C000000 		.4byte	.LVL1
+ 745 0008 0100     		.2byte	0x1
+ 746 000a 50       		.byte	0x50
+ 747 000b 0C000000 		.4byte	.LVL1
+ 748 000f 0E000000 		.4byte	.LVL2
+ 749 0013 0400     		.2byte	0x4
+ 750 0015 F3       		.byte	0xf3
+ 751 0016 01       		.uleb128 0x1
+ 752 0017 50       		.byte	0x50
+ 753 0018 9F       		.byte	0x9f
+ 754 0019 0E000000 		.4byte	.LVL2
+ 755 001d 20000000 		.4byte	.LVL5
+ 756 0021 0100     		.2byte	0x1
+ 757 0023 50       		.byte	0x50
+ 758 0024 20000000 		.4byte	.LVL5
+ 759 0028 26000000 		.4byte	.LVL6
+ 760 002c 0100     		.2byte	0x1
+ 761 002e 54       		.byte	0x54
+ 762 002f 26000000 		.4byte	.LVL6
+ 763 0033 28000000 		.4byte	.LVL7
+ 764 0037 0100     		.2byte	0x1
+ 765 0039 50       		.byte	0x50
+ 766 003a 28000000 		.4byte	.LVL7
+ 767 003e 5C000000 		.4byte	.LVL15
+ 768 0042 0100     		.2byte	0x1
+ 769 0044 54       		.byte	0x54
+ 770 0045 00000000 		.4byte	0
+ 771 0049 00000000 		.4byte	0
+ 772              	.LLST1:
+ 773 004d 12000000 		.4byte	.LVL3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 17
+
+
+ 774 0051 16000000 		.4byte	.LVL4
+ 775 0055 0200     		.2byte	0x2
+ 776 0057 30       		.byte	0x30
+ 777 0058 9F       		.byte	0x9f
+ 778 0059 16000000 		.4byte	.LVL4
+ 779 005d 26000000 		.4byte	.LVL6
+ 780 0061 0200     		.2byte	0x2
+ 781 0063 31       		.byte	0x31
+ 782 0064 9F       		.byte	0x9f
+ 783 0065 26000000 		.4byte	.LVL6
+ 784 0069 2C000000 		.4byte	.LVL8
+ 785 006d 0200     		.2byte	0x2
+ 786 006f 30       		.byte	0x30
+ 787 0070 9F       		.byte	0x9f
+ 788 0071 2C000000 		.4byte	.LVL8
+ 789 0075 46000000 		.4byte	.LVL10
+ 790 0079 0100     		.2byte	0x1
+ 791 007b 52       		.byte	0x52
+ 792 007c 46000000 		.4byte	.LVL10
+ 793 0080 4E000000 		.4byte	.LVL13
+ 794 0084 0100     		.2byte	0x1
+ 795 0086 55       		.byte	0x55
+ 796 0087 4E000000 		.4byte	.LVL13
+ 797 008b 5A000000 		.4byte	.LVL14
+ 798 008f 0100     		.2byte	0x1
+ 799 0091 52       		.byte	0x52
+ 800 0092 5A000000 		.4byte	.LVL14
+ 801 0096 66000000 		.4byte	.LVL17
+ 802 009a 0100     		.2byte	0x1
+ 803 009c 53       		.byte	0x53
+ 804 009d 68000000 		.4byte	.LVL18
+ 805 00a1 7C000000 		.4byte	.LFE5
+ 806 00a5 0100     		.2byte	0x1
+ 807 00a7 53       		.byte	0x53
+ 808 00a8 00000000 		.4byte	0
+ 809 00ac 00000000 		.4byte	0
+ 810              	.LLST2:
+ 811 00b0 12000000 		.4byte	.LVL3
+ 812 00b4 20000000 		.4byte	.LVL5
+ 813 00b8 0200     		.2byte	0x2
+ 814 00ba 30       		.byte	0x30
+ 815 00bb 9F       		.byte	0x9f
+ 816 00bc 20000000 		.4byte	.LVL5
+ 817 00c0 26000000 		.4byte	.LVL6
+ 818 00c4 0200     		.2byte	0x2
+ 819 00c6 31       		.byte	0x31
+ 820 00c7 9F       		.byte	0x9f
+ 821 00c8 26000000 		.4byte	.LVL6
+ 822 00cc 2C000000 		.4byte	.LVL8
+ 823 00d0 0200     		.2byte	0x2
+ 824 00d2 30       		.byte	0x30
+ 825 00d3 9F       		.byte	0x9f
+ 826 00d4 2C000000 		.4byte	.LVL8
+ 827 00d8 6A000000 		.4byte	.LVL19
+ 828 00dc 0100     		.2byte	0x1
+ 829 00de 50       		.byte	0x50
+ 830 00df 6C000000 		.4byte	.LVL20
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 18
+
+
+ 831 00e3 72000000 		.4byte	.LVL21
+ 832 00e7 0100     		.2byte	0x1
+ 833 00e9 50       		.byte	0x50
+ 834 00ea 00000000 		.4byte	0
+ 835 00ee 00000000 		.4byte	0
+ 836              	.LLST3:
+ 837 00f2 44000000 		.4byte	.LVL9
+ 838 00f6 48000000 		.4byte	.LVL11
+ 839 00fa 0100     		.2byte	0x1
+ 840 00fc 53       		.byte	0x53
+ 841 00fd 48000000 		.4byte	.LVL11
+ 842 0101 4E000000 		.4byte	.LVL13
+ 843 0105 0300     		.2byte	0x3
+ 844 0107 73       		.byte	0x73
+ 845 0108 50       		.sleb128 -48
+ 846 0109 9F       		.byte	0x9f
+ 847 010a 00000000 		.4byte	0
+ 848 010e 00000000 		.4byte	0
+ 849              	.LLST4:
+ 850 0112 5E000000 		.4byte	.LVL16
+ 851 0116 6C000000 		.4byte	.LVL20
+ 852 011a 0100     		.2byte	0x1
+ 853 011c 52       		.byte	0x52
+ 854 011d 00000000 		.4byte	0
+ 855 0121 00000000 		.4byte	0
+ 856              	.LLST5:
+ 857 0125 00000000 		.4byte	.LVL22
+ 858 0129 12000000 		.4byte	.LVL24
+ 859 012d 0100     		.2byte	0x1
+ 860 012f 50       		.byte	0x50
+ 861 0130 12000000 		.4byte	.LVL24
+ 862 0134 4A000000 		.4byte	.LFE6
+ 863 0138 0100     		.2byte	0x1
+ 864 013a 5A       		.byte	0x5a
+ 865 013b 00000000 		.4byte	0
+ 866 013f 00000000 		.4byte	0
+ 867              	.LLST6:
+ 868 0143 00000000 		.4byte	.LVL22
+ 869 0147 12000000 		.4byte	.LVL24
+ 870 014b 0100     		.2byte	0x1
+ 871 014d 51       		.byte	0x51
+ 872 014e 12000000 		.4byte	.LVL24
+ 873 0152 4A000000 		.4byte	.LFE6
+ 874 0156 0100     		.2byte	0x1
+ 875 0158 58       		.byte	0x58
+ 876 0159 00000000 		.4byte	0
+ 877 015d 00000000 		.4byte	0
+ 878              	.LLST7:
+ 879 0161 00000000 		.4byte	.LVL22
+ 880 0165 12000000 		.4byte	.LVL24
+ 881 0169 0100     		.2byte	0x1
+ 882 016b 52       		.byte	0x52
+ 883 016c 12000000 		.4byte	.LVL24
+ 884 0170 2A000000 		.4byte	.LVL27
+ 885 0174 0100     		.2byte	0x1
+ 886 0176 54       		.byte	0x54
+ 887 0177 2E000000 		.4byte	.LVL28
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 19
+
+
+ 888 017b 4A000000 		.4byte	.LFE6
+ 889 017f 0100     		.2byte	0x1
+ 890 0181 54       		.byte	0x54
+ 891 0182 00000000 		.4byte	0
+ 892 0186 00000000 		.4byte	0
+ 893              	.LLST8:
+ 894 018a 00000000 		.4byte	.LVL22
+ 895 018e 12000000 		.4byte	.LVL24
+ 896 0192 0100     		.2byte	0x1
+ 897 0194 53       		.byte	0x53
+ 898 0195 12000000 		.4byte	.LVL24
+ 899 0199 4A000000 		.4byte	.LFE6
+ 900 019d 0100     		.2byte	0x1
+ 901 019f 57       		.byte	0x57
+ 902 01a0 00000000 		.4byte	0
+ 903 01a4 00000000 		.4byte	0
+ 904              	.LLST9:
+ 905 01a8 00000000 		.4byte	.LVL22
+ 906 01ac 44000000 		.4byte	.LVL32
+ 907 01b0 0200     		.2byte	0x2
+ 908 01b2 91       		.byte	0x91
+ 909 01b3 00       		.sleb128 0
+ 910 01b4 44000000 		.4byte	.LVL32
+ 911 01b8 4A000000 		.4byte	.LFE6
+ 912 01bc 0200     		.2byte	0x2
+ 913 01be 91       		.byte	0x91
+ 914 01bf 00       		.sleb128 0
+ 915 01c0 00000000 		.4byte	0
+ 916 01c4 00000000 		.4byte	0
+ 917              	.LLST10:
+ 918 01c8 10000000 		.4byte	.LVL23
+ 919 01cc 12000000 		.4byte	.LVL24
+ 920 01d0 0100     		.2byte	0x1
+ 921 01d2 51       		.byte	0x51
+ 922 01d3 12000000 		.4byte	.LVL24
+ 923 01d7 18000000 		.4byte	.LVL25
+ 924 01db 0100     		.2byte	0x1
+ 925 01dd 58       		.byte	0x58
+ 926 01de 18000000 		.4byte	.LVL25
+ 927 01e2 32000000 		.4byte	.LVL29
+ 928 01e6 0100     		.2byte	0x1
+ 929 01e8 56       		.byte	0x56
+ 930 01e9 32000000 		.4byte	.LVL29
+ 931 01ed 34000000 		.4byte	.LVL30
+ 932 01f1 0100     		.2byte	0x1
+ 933 01f3 58       		.byte	0x58
+ 934 01f4 34000000 		.4byte	.LVL30
+ 935 01f8 3A000000 		.4byte	.LVL31
+ 936 01fc 0100     		.2byte	0x1
+ 937 01fe 56       		.byte	0x56
+ 938 01ff 3A000000 		.4byte	.LVL31
+ 939 0203 44000000 		.4byte	.LVL32
+ 940 0207 0100     		.2byte	0x1
+ 941 0209 58       		.byte	0x58
+ 942 020a 44000000 		.4byte	.LVL32
+ 943 020e 4A000000 		.4byte	.LFE6
+ 944 0212 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 20
+
+
+ 945 0214 56       		.byte	0x56
+ 946 0215 00000000 		.4byte	0
+ 947 0219 00000000 		.4byte	0
+ 948              	.LLST11:
+ 949 021d 1E000000 		.4byte	.LVL26
+ 950 0221 3A000000 		.4byte	.LVL31
+ 951 0225 0100     		.2byte	0x1
+ 952 0227 50       		.byte	0x50
+ 953 0228 44000000 		.4byte	.LVL32
+ 954 022c 46000000 		.4byte	.LVL33
+ 955 0230 0100     		.2byte	0x1
+ 956 0232 50       		.byte	0x50
+ 957 0233 00000000 		.4byte	0
+ 958 0237 00000000 		.4byte	0
+ 959              		.section	.debug_aranges,"",%progbits
+ 960 0000 24000000 		.4byte	0x24
+ 961 0004 0200     		.2byte	0x2
+ 962 0006 00000000 		.4byte	.Ldebug_info0
+ 963 000a 04       		.byte	0x4
+ 964 000b 00       		.byte	0
+ 965 000c 0000     		.2byte	0
+ 966 000e 0000     		.2byte	0
+ 967 0010 00000000 		.4byte	.LFB5
+ 968 0014 7C000000 		.4byte	.LFE5-.LFB5
+ 969 0018 00000000 		.4byte	.LFB6
+ 970 001c 4A000000 		.4byte	.LFE6-.LFB6
+ 971 0020 00000000 		.4byte	0
+ 972 0024 00000000 		.4byte	0
+ 973              		.section	.debug_ranges,"",%progbits
+ 974              	.Ldebug_ranges0:
+ 975 0000 00000000 		.4byte	.LFB5
+ 976 0004 7C000000 		.4byte	.LFE5
+ 977 0008 00000000 		.4byte	.LFB6
+ 978 000c 4A000000 		.4byte	.LFE6
+ 979 0010 00000000 		.4byte	0
+ 980 0014 00000000 		.4byte	0
+ 981              		.section	.debug_line,"",%progbits
+ 982              	.Ldebug_line0:
+ 983 0000 86010000 		.section	.debug_str,"MS",%progbits,1
+ 983      02002F01 
+ 983      00000201 
+ 983      FB0E0D00 
+ 983      01010101 
+ 984              	.LASF4:
+ 985 0000 5F5F696E 		.ascii	"__int8_t\000"
+ 985      74385F74 
+ 985      00
+ 986              	.LASF22:
+ 987 0009 5F6C765F 		.ascii	"_lv_utils_num_to_str\000"
+ 987      7574696C 
+ 987      735F6E75 
+ 987      6D5F746F 
+ 987      5F737472 
+ 988              	.LASF19:
+ 989 001e 64696769 		.ascii	"digitCount\000"
+ 989      74436F75 
+ 989      6E7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 21
+
+
+ 990              	.LASF5:
+ 991 0029 5F5F696E 		.ascii	"__int32_t\000"
+ 991      7433325F 
+ 991      7400
+ 992              	.LASF12:
+ 993 0033 696E7438 		.ascii	"int8_t\000"
+ 993      5F7400
+ 994              	.LASF25:
+ 995 003a 73697A65 		.ascii	"size\000"
+ 995      00
+ 996              	.LASF27:
+ 997 003f 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 997      43313120 
+ 997      352E342E 
+ 997      31203230 
+ 997      31363036 
+ 998 0072 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 998      20726576 
+ 998      6973696F 
+ 998      6E203233 
+ 998      37373135 
+ 999 00a5 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 999      66756E63 
+ 999      74696F6E 
+ 999      2D736563 
+ 999      74696F6E 
+ 1000              	.LASF24:
+ 1001 00cd 62617365 		.ascii	"base\000"
+ 1001      00
+ 1002              	.LASF21:
+ 1003 00d2 74656D70 		.ascii	"temp\000"
+ 1003      00
+ 1004              	.LASF3:
+ 1005 00d7 73686F72 		.ascii	"short unsigned int\000"
+ 1005      7420756E 
+ 1005      7369676E 
+ 1005      65642069 
+ 1005      6E7400
+ 1006              	.LASF1:
+ 1007 00ea 756E7369 		.ascii	"unsigned char\000"
+ 1007      676E6564 
+ 1007      20636861 
+ 1007      7200
+ 1008              	.LASF8:
+ 1009 00f8 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1009      20756E73 
+ 1009      69676E65 
+ 1009      6420696E 
+ 1009      7400
+ 1010              	.LASF7:
+ 1011 010a 5F5F7569 		.ascii	"__uint32_t\000"
+ 1011      6E743332 
+ 1011      5F7400
+ 1012              	.LASF11:
+ 1013 0115 756E7369 		.ascii	"unsigned int\000"
+ 1013      676E6564 
+ 1013      20696E74 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 22
+
+
+ 1013      00
+ 1014              	.LASF23:
+ 1015 0122 5F6C765F 		.ascii	"_lv_utils_bsearch\000"
+ 1015      7574696C 
+ 1015      735F6273 
+ 1015      65617263 
+ 1015      6800
+ 1016              	.LASF20:
+ 1017 0134 64696769 		.ascii	"digit\000"
+ 1017      7400
+ 1018              	.LASF10:
+ 1019 013a 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1019      206C6F6E 
+ 1019      6720756E 
+ 1019      7369676E 
+ 1019      65642069 
+ 1020              	.LASF29:
+ 1021 0151 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 1021      73657273 
+ 1021      5C737472 
+ 1021      61705C44 
+ 1021      6F63756D 
+ 1022 017e 69393334 		.ascii	"i9341_master.cydsn\000"
+ 1022      315F6D61 
+ 1022      73746572 
+ 1022      2E637964 
+ 1022      736E00
+ 1023              	.LASF13:
+ 1024 0191 696E7433 		.ascii	"int32_t\000"
+ 1024      325F7400 
+ 1025              	.LASF16:
+ 1026 0199 73697A65 		.ascii	"sizetype\000"
+ 1026      74797065 
+ 1026      00
+ 1027              	.LASF9:
+ 1028 01a2 6C6F6E67 		.ascii	"long long int\000"
+ 1028      206C6F6E 
+ 1028      6720696E 
+ 1028      7400
+ 1029              	.LASF28:
+ 1030 01b0 6C76676C 		.ascii	"lvgl\\src\\lv_misc\\lv_utils.c\000"
+ 1030      5C737263 
+ 1030      5C6C765F 
+ 1030      6D697363 
+ 1030      5C6C765F 
+ 1031              	.LASF17:
+ 1032 01cc 63686172 		.ascii	"char\000"
+ 1032      00
+ 1033              	.LASF2:
+ 1034 01d1 73686F72 		.ascii	"short int\000"
+ 1034      7420696E 
+ 1034      7400
+ 1035              	.LASF14:
+ 1036 01db 75696E74 		.ascii	"uint32_t\000"
+ 1036      33325F74 
+ 1036      00
+ 1037              	.LASF6:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccmc3zNC.s 			page 23
+
+
+ 1038 01e4 6C6F6E67 		.ascii	"long int\000"
+ 1038      20696E74 
+ 1038      00
+ 1039              	.LASF26:
+ 1040 01ed 6D696464 		.ascii	"middle\000"
+ 1040      6C6500
+ 1041              	.LASF15:
+ 1042 01f4 6C6F6E67 		.ascii	"long double\000"
+ 1042      20646F75 
+ 1042      626C6500 
+ 1043              	.LASF0:
+ 1044 0200 7369676E 		.ascii	"signed char\000"
+ 1044      65642063 
+ 1044      68617200 
+ 1045              	.LASF18:
+ 1046 020c 5F426F6F 		.ascii	"_Bool\000"
+ 1046      6C00
+ 1047              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

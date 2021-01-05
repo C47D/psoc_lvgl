@@ -1,0 +1,4135 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"disp_spi.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.display_tl_poll_is_busy,"ax",%progbits
+  20              		.align	2
+  21              		.global	display_tl_poll_is_busy
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	display_tl_poll_is_busy, %function
+  25              	display_tl_poll_is_busy:
+  26              	.LFB378:
+  27              		.file 1 "ili9341\\disp_spi.c"
+   1:ili9341/disp_spi.c **** /**
+   2:ili9341/disp_spi.c ****  * @file disp_spi.c
+   3:ili9341/disp_spi.c ****  *
+   4:ili9341/disp_spi.c ****  */
+   5:ili9341/disp_spi.c **** 
+   6:ili9341/disp_spi.c **** /*********************
+   7:ili9341/disp_spi.c ****  *      INCLUDES
+   8:ili9341/disp_spi.c ****  *********************/
+   9:ili9341/disp_spi.c **** #include <string.h>
+  10:ili9341/disp_spi.c **** 
+  11:ili9341/disp_spi.c **** #include "lvgl/lvgl.h"
+  12:ili9341/disp_spi.c **** 
+  13:ili9341/disp_spi.c **** #include "disp_spi.h"
+  14:ili9341/disp_spi.c **** #include "spi_dma.h"
+  15:ili9341/disp_spi.c **** 
+  16:ili9341/disp_spi.c **** /*********************
+  17:ili9341/disp_spi.c ****  *      DEFINES
+  18:ili9341/disp_spi.c ****  *********************/
+  19:ili9341/disp_spi.c **** #define TAG "DISPLAY_TL"
+  20:ili9341/disp_spi.c **** 
+  21:ili9341/disp_spi.c **** /**********************
+  22:ili9341/disp_spi.c ****  *      TYPEDEFS
+  23:ili9341/disp_spi.c ****  **********************/
+  24:ili9341/disp_spi.c **** 
+  25:ili9341/disp_spi.c **** /**********************
+  26:ili9341/disp_spi.c ****  *  STATIC PROTOTYPES
+  27:ili9341/disp_spi.c ****  **********************/
+  28:ili9341/disp_spi.c **** 
+  29:ili9341/disp_spi.c **** /**********************
+  30:ili9341/disp_spi.c ****  *  STATIC VARIABLES
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 2
+
+
+  31:ili9341/disp_spi.c ****  **********************/
+  32:ili9341/disp_spi.c **** 
+  33:ili9341/disp_spi.c **** static volatile disp_spi_send_flag_t spi_flags = 0;
+  34:ili9341/disp_spi.c **** 
+  35:ili9341/disp_spi.c **** /**********************
+  36:ili9341/disp_spi.c ****  *      MACROS
+  37:ili9341/disp_spi.c ****  **********************/
+  38:ili9341/disp_spi.c **** 
+  39:ili9341/disp_spi.c **** /**********************
+  40:ili9341/disp_spi.c ****  *   GLOBAL FUNCTIONS
+  41:ili9341/disp_spi.c ****  **********************/
+  42:ili9341/disp_spi.c **** void display_spi_transaction(const uint8_t *data, uint16_t length,
+  43:ili9341/disp_spi.c ****     disp_spi_send_flag_t flags, disp_spi_read_data *out,
+  44:ili9341/disp_spi.c ****     uint64_t addr)
+  45:ili9341/disp_spi.c **** {
+  46:ili9341/disp_spi.c ****     (void) addr;
+  47:ili9341/disp_spi.c ****     (void) out;
+  48:ili9341/disp_spi.c ****     
+  49:ili9341/disp_spi.c ****     if (0 == length) {
+  50:ili9341/disp_spi.c ****         return;
+  51:ili9341/disp_spi.c ****     }
+  52:ili9341/disp_spi.c **** 
+  53:ili9341/disp_spi.c ****     spi_flags = flags;
+  54:ili9341/disp_spi.c **** 
+  55:ili9341/disp_spi.c ****     /* Wait for previous pending transaction results */
+  56:ili9341/disp_spi.c ****     display_tl_poll_is_busy();
+  57:ili9341/disp_spi.c **** 
+  58:ili9341/disp_spi.c ****     if (flags & DISP_SPI_RECEIVE) {
+  59:ili9341/disp_spi.c **** 
+  60:ili9341/disp_spi.c ****     }
+  61:ili9341/disp_spi.c **** 
+  62:ili9341/disp_spi.c ****     if (flags & DISP_SPI_ADDRESS_24) {
+  63:ili9341/disp_spi.c **** 
+  64:ili9341/disp_spi.c ****     }
+  65:ili9341/disp_spi.c **** 
+  66:ili9341/disp_spi.c ****     /* Poll/Complete/Queue transaction */
+  67:ili9341/disp_spi.c ****     if (flags & DISP_SPI_SEND_POLLING) {
+  68:ili9341/disp_spi.c ****         // NOTE: Platform dependent
+  69:ili9341/disp_spi.c ****         send_spi(data, (size_t) length);
+  70:ili9341/disp_spi.c ****     } else if (flags & DISP_SPI_SEND_SYNCHRONOUS) {
+  71:ili9341/disp_spi.c **** 
+  72:ili9341/disp_spi.c ****     } else {
+  73:ili9341/disp_spi.c ****         // NOTE: Platform dependent
+  74:ili9341/disp_spi.c ****         send_spi_dma(data, NULL, (size_t) length);
+  75:ili9341/disp_spi.c ****     }
+  76:ili9341/disp_spi.c **** }
+  77:ili9341/disp_spi.c **** 
+  78:ili9341/disp_spi.c **** void display_tl_poll_is_busy(void)
+  79:ili9341/disp_spi.c **** {
+  28              		.loc 1 79 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+  35              		.cfi_offset 14, -4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 3
+
+
+  36              	.L2:
+  80:ili9341/disp_spi.c ****     while (spi_xfer_is_ongoing()) {
+  37              		.loc 1 80 0 discriminator 1
+  38 0002 FFF7FEFF 		bl	spi_xfer_is_ongoing
+  39              	.LVL0:
+  40 0006 0028     		cmp	r0, #0
+  41 0008 FBD1     		bne	.L2
+  81:ili9341/disp_spi.c ****         
+  82:ili9341/disp_spi.c ****     }
+  83:ili9341/disp_spi.c **** }
+  42              		.loc 1 83 0
+  43 000a 08BD     		pop	{r3, pc}
+  44              		.cfi_endproc
+  45              	.LFE378:
+  46              		.size	display_tl_poll_is_busy, .-display_tl_poll_is_busy
+  47              		.section	.text.display_spi_transaction,"ax",%progbits
+  48              		.align	2
+  49              		.global	display_spi_transaction
+  50              		.thumb
+  51              		.thumb_func
+  52              		.type	display_spi_transaction, %function
+  53              	display_spi_transaction:
+  54              	.LFB377:
+  45:ili9341/disp_spi.c ****     (void) addr;
+  55              		.loc 1 45 0
+  56              		.cfi_startproc
+  57              		@ args = 8, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59              	.LVL1:
+  49:ili9341/disp_spi.c ****         return;
+  60              		.loc 1 49 0
+  61 0000 C9B1     		cbz	r1, .L8
+  45:ili9341/disp_spi.c ****     (void) addr;
+  62              		.loc 1 45 0
+  63 0002 70B5     		push	{r4, r5, r6, lr}
+  64              		.cfi_def_cfa_offset 16
+  65              		.cfi_offset 4, -16
+  66              		.cfi_offset 5, -12
+  67              		.cfi_offset 6, -8
+  68              		.cfi_offset 14, -4
+  69 0004 0E46     		mov	r6, r1
+  70 0006 1446     		mov	r4, r2
+  71 0008 0546     		mov	r5, r0
+  53:ili9341/disp_spi.c **** 
+  72              		.loc 1 53 0
+  73 000a 0B4B     		ldr	r3, .L9
+  74              	.LVL2:
+  75 000c 1A80     		strh	r2, [r3]	@ movhi
+  56:ili9341/disp_spi.c **** 
+  76              		.loc 1 56 0
+  77 000e FFF7FEFF 		bl	display_tl_poll_is_busy
+  78              	.LVL3:
+  67:ili9341/disp_spi.c ****         // NOTE: Platform dependent
+  79              		.loc 1 67 0
+  80 0012 14F0010F 		tst	r4, #1
+  81 0016 04D0     		beq	.L6
+  69:ili9341/disp_spi.c ****     } else if (flags & DISP_SPI_SEND_SYNCHRONOUS) {
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 4
+
+
+  82              		.loc 1 69 0
+  83 0018 3146     		mov	r1, r6
+  84 001a 2846     		mov	r0, r5
+  85 001c FFF7FEFF 		bl	send_spi
+  86              	.LVL4:
+  87 0020 70BD     		pop	{r4, r5, r6, pc}
+  88              	.LVL5:
+  89              	.L6:
+  70:ili9341/disp_spi.c **** 
+  90              		.loc 1 70 0
+  91 0022 04F00204 		and	r4, r4, #2
+  92 0026 A4B2     		uxth	r4, r4
+  93 0028 24B9     		cbnz	r4, .L4
+  74:ili9341/disp_spi.c ****     }
+  94              		.loc 1 74 0
+  95 002a 3246     		mov	r2, r6
+  96 002c 0021     		movs	r1, #0
+  97 002e 2846     		mov	r0, r5
+  98 0030 FFF7FEFF 		bl	send_spi_dma
+  99              	.LVL6:
+ 100              	.L4:
+ 101 0034 70BD     		pop	{r4, r5, r6, pc}
+ 102              	.LVL7:
+ 103              	.L8:
+ 104              		.cfi_def_cfa_offset 0
+ 105              		.cfi_restore 4
+ 106              		.cfi_restore 5
+ 107              		.cfi_restore 6
+ 108              		.cfi_restore 14
+ 109 0036 7047     		bx	lr
+ 110              	.L10:
+ 111              		.align	2
+ 112              	.L9:
+ 113 0038 00000000 		.word	.LANCHOR0
+ 114              		.cfi_endproc
+ 115              	.LFE377:
+ 116              		.size	display_spi_transaction, .-display_spi_transaction
+ 117              		.section	.text.display_spi_acquire,"ax",%progbits
+ 118              		.align	2
+ 119              		.global	display_spi_acquire
+ 120              		.thumb
+ 121              		.thumb_func
+ 122              		.type	display_spi_acquire, %function
+ 123              	display_spi_acquire:
+ 124              	.LFB379:
+  84:ili9341/disp_spi.c **** 
+  85:ili9341/disp_spi.c **** void display_spi_acquire(void)
+  86:ili9341/disp_spi.c **** {
+ 125              		.loc 1 86 0
+ 126              		.cfi_startproc
+ 127              		@ args = 0, pretend = 0, frame = 0
+ 128              		@ frame_needed = 0, uses_anonymous_args = 0
+ 129              		@ link register save eliminated.
+ 130 0000 7047     		bx	lr
+ 131              		.cfi_endproc
+ 132              	.LFE379:
+ 133              		.size	display_spi_acquire, .-display_spi_acquire
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 5
+
+
+ 134 0002 00BF     		.section	.text.display_spi_release,"ax",%progbits
+ 135              		.align	2
+ 136              		.global	display_spi_release
+ 137              		.thumb
+ 138              		.thumb_func
+ 139              		.type	display_spi_release, %function
+ 140              	display_spi_release:
+ 141              	.LFB380:
+  87:ili9341/disp_spi.c **** 
+  88:ili9341/disp_spi.c **** }
+  89:ili9341/disp_spi.c **** 
+  90:ili9341/disp_spi.c **** void display_spi_release(void)
+  91:ili9341/disp_spi.c **** {
+ 142              		.loc 1 91 0
+ 143              		.cfi_startproc
+ 144              		@ args = 0, pretend = 0, frame = 0
+ 145              		@ frame_needed = 0, uses_anonymous_args = 0
+ 146              		@ link register save eliminated.
+ 147 0000 7047     		bx	lr
+ 148              		.cfi_endproc
+ 149              	.LFE380:
+ 150              		.size	display_spi_release, .-display_spi_release
+ 151 0002 00BF     		.section	.text.display_colors_sent_notification,"ax",%progbits
+ 152              		.align	2
+ 153              		.global	display_colors_sent_notification
+ 154              		.thumb
+ 155              		.thumb_func
+ 156              		.type	display_colors_sent_notification, %function
+ 157              	display_colors_sent_notification:
+ 158              	.LFB381:
+  92:ili9341/disp_spi.c **** 
+  93:ili9341/disp_spi.c **** }
+  94:ili9341/disp_spi.c **** 
+  95:ili9341/disp_spi.c **** /**********************
+  96:ili9341/disp_spi.c ****  *   STATIC FUNCTIONS
+  97:ili9341/disp_spi.c ****  **********************/
+  98:ili9341/disp_spi.c **** 
+  99:ili9341/disp_spi.c **** /* Called on the spi complete callback */
+ 100:ili9341/disp_spi.c **** void display_colors_sent_notification(void)
+ 101:ili9341/disp_spi.c **** {
+ 159              		.loc 1 101 0
+ 160              		.cfi_startproc
+ 161              		@ args = 0, pretend = 0, frame = 0
+ 162              		@ frame_needed = 0, uses_anonymous_args = 0
+ 163              		.loc 1 101 0
+ 164 0000 08B5     		push	{r3, lr}
+ 165              		.cfi_def_cfa_offset 8
+ 166              		.cfi_offset 3, -8
+ 167              		.cfi_offset 14, -4
+ 102:ili9341/disp_spi.c ****     if (spi_flags & DISP_SPI_SIGNAL_FLUSH) {
+ 168              		.loc 1 102 0
+ 169 0002 054B     		ldr	r3, .L16
+ 170 0004 1B88     		ldrh	r3, [r3]
+ 171 0006 03F00403 		and	r3, r3, #4
+ 172 000a 9BB2     		uxth	r3, r3
+ 173 000c 1BB1     		cbz	r3, .L13
+ 174              	.LVL8:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 6
+
+
+ 175              	.LBB2:
+ 103:ili9341/disp_spi.c ****         lv_disp_t * disp = NULL;
+ 104:ili9341/disp_spi.c **** 
+ 105:ili9341/disp_spi.c **** #if (LVGL_VERSION_MAJOR >= 7)
+ 106:ili9341/disp_spi.c ****         disp = _lv_refr_get_disp_refreshing();
+ 176              		.loc 1 106 0
+ 177 000e FFF7FEFF 		bl	_lv_refr_get_disp_refreshing
+ 178              	.LVL9:
+ 107:ili9341/disp_spi.c **** #else /* Before v7 */
+ 108:ili9341/disp_spi.c ****         disp = lv_refr_get_disp_refreshing();
+ 109:ili9341/disp_spi.c **** #endif
+ 110:ili9341/disp_spi.c **** 
+ 111:ili9341/disp_spi.c ****         lv_disp_flush_ready(&disp->driver);
+ 179              		.loc 1 111 0
+ 180 0012 FFF7FEFF 		bl	lv_disp_flush_ready
+ 181              	.LVL10:
+ 182              	.L13:
+ 183 0016 08BD     		pop	{r3, pc}
+ 184              	.L17:
+ 185              		.align	2
+ 186              	.L16:
+ 187 0018 00000000 		.word	.LANCHOR0
+ 188              	.LBE2:
+ 189              		.cfi_endproc
+ 190              	.LFE381:
+ 191              		.size	display_colors_sent_notification, .-display_colors_sent_notification
+ 192              		.bss
+ 193              		.align	1
+ 194              		.set	.LANCHOR0,. + 0
+ 195              		.type	spi_flags, %object
+ 196              		.size	spi_flags, 2
+ 197              	spi_flags:
+ 198 0000 0000     		.space	2
+ 199              		.text
+ 200              	.Letext0:
+ 201              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 202              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 203              		.file 4 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 204              		.file 5 "./lvgl/src/lv_misc/../../../lv_conf.h"
+ 205              		.file 6 "./lvgl/src/lv_misc/lv_types.h"
+ 206              		.file 7 "./lvgl/src/lv_misc/lv_ll.h"
+ 207              		.file 8 "./lvgl/src/lv_misc/lv_task.h"
+ 208              		.file 9 "./lvgl/src/lv_hal/../lv_misc/lv_color.h"
+ 209              		.file 10 "./lvgl/src/lv_hal/../lv_misc/lv_area.h"
+ 210              		.file 11 "./lvgl/src/lv_hal/lv_hal_disp.h"
+ 211              		.file 12 "./lvgl/src/lv_core/lv_obj.h"
+ 212              		.file 13 "./lvgl/src/lv_hal/lv_hal_indev.h"
+ 213              		.file 14 "./lvgl/src/lv_core/lv_style.h"
+ 214              		.file 15 "./lvgl/src/lv_core/../lv_draw/../lv_misc/lv_bidi.h"
+ 215              		.file 16 "./lvgl/src/lv_widgets/lv_cont.h"
+ 216              		.file 17 "./lvgl/src/lv_widgets/lv_btn.h"
+ 217              		.file 18 "./lvgl/src/lv_widgets/lv_page.h"
+ 218              		.file 19 "./lvgl/src/lv_widgets/lv_textarea.h"
+ 219              		.file 20 "ili9341\\disp_spi.h"
+ 220              		.file 21 "./spi_dma.h"
+ 221              		.file 22 "./lvgl/src/lv_core/lv_refr.h"
+ 222              		.section	.debug_info,"",%progbits
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 7
+
+
+ 223              	.Ldebug_info0:
+ 224 0000 B10D0000 		.4byte	0xdb1
+ 225 0004 0400     		.2byte	0x4
+ 226 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 227 000a 04       		.byte	0x4
+ 228 000b 01       		.uleb128 0x1
+ 229 000c 52090000 		.4byte	.LASF228
+ 230 0010 0C       		.byte	0xc
+ 231 0011 C6040000 		.4byte	.LASF229
+ 232 0015 4B070000 		.4byte	.LASF230
+ 233 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 234 001d 00000000 		.4byte	0
+ 235 0021 00000000 		.4byte	.Ldebug_line0
+ 236 0025 02       		.uleb128 0x2
+ 237 0026 04       		.byte	0x4
+ 238 0027 05       		.byte	0x5
+ 239 0028 696E7400 		.ascii	"int\000"
+ 240 002c 03       		.uleb128 0x3
+ 241 002d 5A000000 		.4byte	.LASF4
+ 242 0031 02       		.byte	0x2
+ 243 0032 D8       		.byte	0xd8
+ 244 0033 37000000 		.4byte	0x37
+ 245 0037 04       		.uleb128 0x4
+ 246 0038 04       		.byte	0x4
+ 247 0039 07       		.byte	0x7
+ 248 003a 03040000 		.4byte	.LASF0
+ 249 003e 04       		.uleb128 0x4
+ 250 003f 08       		.byte	0x8
+ 251 0040 05       		.byte	0x5
+ 252 0041 F4020000 		.4byte	.LASF1
+ 253 0045 04       		.uleb128 0x4
+ 254 0046 08       		.byte	0x8
+ 255 0047 04       		.byte	0x4
+ 256 0048 98060000 		.4byte	.LASF2
+ 257 004c 04       		.uleb128 0x4
+ 258 004d 01       		.byte	0x1
+ 259 004e 06       		.byte	0x6
+ 260 004f D0000000 		.4byte	.LASF3
+ 261 0053 03       		.uleb128 0x3
+ 262 0054 DC000000 		.4byte	.LASF5
+ 263 0058 03       		.byte	0x3
+ 264 0059 1D       		.byte	0x1d
+ 265 005a 5E000000 		.4byte	0x5e
+ 266 005e 04       		.uleb128 0x4
+ 267 005f 01       		.byte	0x1
+ 268 0060 08       		.byte	0x8
+ 269 0061 70080000 		.4byte	.LASF6
+ 270 0065 03       		.uleb128 0x3
+ 271 0066 90030000 		.4byte	.LASF7
+ 272 006a 03       		.byte	0x3
+ 273 006b 29       		.byte	0x29
+ 274 006c 70000000 		.4byte	0x70
+ 275 0070 04       		.uleb128 0x4
+ 276 0071 02       		.byte	0x2
+ 277 0072 05       		.byte	0x5
+ 278 0073 AD0A0000 		.4byte	.LASF8
+ 279 0077 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 8
+
+
+ 280 0078 9A0A0000 		.4byte	.LASF9
+ 281 007c 03       		.byte	0x3
+ 282 007d 2B       		.byte	0x2b
+ 283 007e 82000000 		.4byte	0x82
+ 284 0082 04       		.uleb128 0x4
+ 285 0083 02       		.byte	0x2
+ 286 0084 07       		.byte	0x7
+ 287 0085 B3040000 		.4byte	.LASF10
+ 288 0089 03       		.uleb128 0x3
+ 289 008a F1050000 		.4byte	.LASF11
+ 290 008e 03       		.byte	0x3
+ 291 008f 3F       		.byte	0x3f
+ 292 0090 94000000 		.4byte	0x94
+ 293 0094 04       		.uleb128 0x4
+ 294 0095 04       		.byte	0x4
+ 295 0096 05       		.byte	0x5
+ 296 0097 A6020000 		.4byte	.LASF12
+ 297 009b 03       		.uleb128 0x3
+ 298 009c 67030000 		.4byte	.LASF13
+ 299 00a0 03       		.byte	0x3
+ 300 00a1 41       		.byte	0x41
+ 301 00a2 A6000000 		.4byte	0xa6
+ 302 00a6 04       		.uleb128 0x4
+ 303 00a7 04       		.byte	0x4
+ 304 00a8 07       		.byte	0x7
+ 305 00a9 5D040000 		.4byte	.LASF14
+ 306 00ad 03       		.uleb128 0x3
+ 307 00ae EC070000 		.4byte	.LASF15
+ 308 00b2 03       		.byte	0x3
+ 309 00b3 5B       		.byte	0x5b
+ 310 00b4 B8000000 		.4byte	0xb8
+ 311 00b8 04       		.uleb128 0x4
+ 312 00b9 08       		.byte	0x8
+ 313 00ba 07       		.byte	0x7
+ 314 00bb 41010000 		.4byte	.LASF16
+ 315 00bf 04       		.uleb128 0x4
+ 316 00c0 04       		.byte	0x4
+ 317 00c1 07       		.byte	0x7
+ 318 00c2 66060000 		.4byte	.LASF17
+ 319 00c6 05       		.uleb128 0x5
+ 320 00c7 04       		.byte	0x4
+ 321 00c8 04       		.uleb128 0x4
+ 322 00c9 01       		.byte	0x1
+ 323 00ca 08       		.byte	0x8
+ 324 00cb 6B0A0000 		.4byte	.LASF18
+ 325 00cf 03       		.uleb128 0x3
+ 326 00d0 3E090000 		.4byte	.LASF19
+ 327 00d4 04       		.byte	0x4
+ 328 00d5 18       		.byte	0x18
+ 329 00d6 53000000 		.4byte	0x53
+ 330 00da 03       		.uleb128 0x3
+ 331 00db EA010000 		.4byte	.LASF20
+ 332 00df 04       		.byte	0x4
+ 333 00e0 20       		.byte	0x20
+ 334 00e1 65000000 		.4byte	0x65
+ 335 00e5 03       		.uleb128 0x3
+ 336 00e6 10040000 		.4byte	.LASF21
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 9
+
+
+ 337 00ea 04       		.byte	0x4
+ 338 00eb 24       		.byte	0x24
+ 339 00ec 77000000 		.4byte	0x77
+ 340 00f0 03       		.uleb128 0x3
+ 341 00f1 68080000 		.4byte	.LASF22
+ 342 00f5 04       		.byte	0x4
+ 343 00f6 2C       		.byte	0x2c
+ 344 00f7 89000000 		.4byte	0x89
+ 345 00fb 03       		.uleb128 0x3
+ 346 00fc 880B0000 		.4byte	.LASF23
+ 347 0100 04       		.byte	0x4
+ 348 0101 30       		.byte	0x30
+ 349 0102 9B000000 		.4byte	0x9b
+ 350 0106 03       		.uleb128 0x3
+ 351 0107 A6000000 		.4byte	.LASF24
+ 352 010b 04       		.byte	0x4
+ 353 010c 3C       		.byte	0x3c
+ 354 010d AD000000 		.4byte	0xad
+ 355 0111 03       		.uleb128 0x3
+ 356 0112 C20C0000 		.4byte	.LASF25
+ 357 0116 05       		.byte	0x5
+ 358 0117 46       		.byte	0x46
+ 359 0118 DA000000 		.4byte	0xda
+ 360 011c 06       		.uleb128 0x6
+ 361 011d 1B0B0000 		.4byte	.LASF26
+ 362 0121 05       		.byte	0x5
+ 363 0122 2101     		.2byte	0x121
+ 364 0124 C6000000 		.4byte	0xc6
+ 365 0128 06       		.uleb128 0x6
+ 366 0129 F0030000 		.4byte	.LASF27
+ 367 012d 05       		.byte	0x5
+ 368 012e 1202     		.2byte	0x212
+ 369 0130 C6000000 		.4byte	0xc6
+ 370 0134 03       		.uleb128 0x3
+ 371 0135 D1030000 		.4byte	.LASF28
+ 372 0139 06       		.byte	0x6
+ 373 013a 34       		.byte	0x34
+ 374 013b CF000000 		.4byte	0xcf
+ 375 013f 03       		.uleb128 0x3
+ 376 0140 5E0A0000 		.4byte	.LASF29
+ 377 0144 07       		.byte	0x7
+ 378 0145 1E       		.byte	0x1e
+ 379 0146 CF000000 		.4byte	0xcf
+ 380 014a 07       		.uleb128 0x7
+ 381 014b 0C       		.byte	0xc
+ 382 014c 07       		.byte	0x7
+ 383 014d 21       		.byte	0x21
+ 384 014e 77010000 		.4byte	0x177
+ 385 0152 08       		.uleb128 0x8
+ 386 0153 6E010000 		.4byte	.LASF30
+ 387 0157 07       		.byte	0x7
+ 388 0158 22       		.byte	0x22
+ 389 0159 FB000000 		.4byte	0xfb
+ 390 015d 00       		.byte	0
+ 391 015e 08       		.uleb128 0x8
+ 392 015f F8090000 		.4byte	.LASF31
+ 393 0163 07       		.byte	0x7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 10
+
+
+ 394 0164 23       		.byte	0x23
+ 395 0165 77010000 		.4byte	0x177
+ 396 0169 04       		.byte	0x4
+ 397 016a 08       		.uleb128 0x8
+ 398 016b 55060000 		.4byte	.LASF32
+ 399 016f 07       		.byte	0x7
+ 400 0170 24       		.byte	0x24
+ 401 0171 77010000 		.4byte	0x177
+ 402 0175 08       		.byte	0x8
+ 403 0176 00       		.byte	0
+ 404 0177 09       		.uleb128 0x9
+ 405 0178 04       		.byte	0x4
+ 406 0179 3F010000 		.4byte	0x13f
+ 407 017d 03       		.uleb128 0x3
+ 408 017e A2010000 		.4byte	.LASF33
+ 409 0182 07       		.byte	0x7
+ 410 0183 25       		.byte	0x25
+ 411 0184 4A010000 		.4byte	0x14a
+ 412 0188 03       		.uleb128 0x3
+ 413 0189 B70A0000 		.4byte	.LASF34
+ 414 018d 08       		.byte	0x8
+ 415 018e 29       		.byte	0x29
+ 416 018f 93010000 		.4byte	0x193
+ 417 0193 09       		.uleb128 0x9
+ 418 0194 04       		.byte	0x4
+ 419 0195 99010000 		.4byte	0x199
+ 420 0199 0A       		.uleb128 0xa
+ 421 019a A4010000 		.4byte	0x1a4
+ 422 019e 0B       		.uleb128 0xb
+ 423 019f A4010000 		.4byte	0x1a4
+ 424 01a3 00       		.byte	0
+ 425 01a4 09       		.uleb128 0x9
+ 426 01a5 04       		.byte	0x4
+ 427 01a6 AA010000 		.4byte	0x1aa
+ 428 01aa 0C       		.uleb128 0xc
+ 429 01ab CF020000 		.4byte	.LASF61
+ 430 01af 18       		.byte	0x18
+ 431 01b0 08       		.byte	0x8
+ 432 01b1 3C       		.byte	0x3c
+ 433 01b2 02020000 		.4byte	0x202
+ 434 01b6 08       		.uleb128 0x8
+ 435 01b7 F20A0000 		.4byte	.LASF35
+ 436 01bb 08       		.byte	0x8
+ 437 01bc 3D       		.byte	0x3d
+ 438 01bd FB000000 		.4byte	0xfb
+ 439 01c1 00       		.byte	0
+ 440 01c2 08       		.uleb128 0x8
+ 441 01c3 460A0000 		.4byte	.LASF36
+ 442 01c7 08       		.byte	0x8
+ 443 01c8 3E       		.byte	0x3e
+ 444 01c9 FB000000 		.4byte	0xfb
+ 445 01cd 04       		.byte	0x4
+ 446 01ce 08       		.uleb128 0x8
+ 447 01cf 8A040000 		.4byte	.LASF37
+ 448 01d3 08       		.byte	0x8
+ 449 01d4 3F       		.byte	0x3f
+ 450 01d5 88010000 		.4byte	0x188
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 11
+
+
+ 451 01d9 08       		.byte	0x8
+ 452 01da 08       		.uleb128 0x8
+ 453 01db 10000000 		.4byte	.LASF38
+ 454 01df 08       		.byte	0x8
+ 455 01e0 41       		.byte	0x41
+ 456 01e1 C6000000 		.4byte	0xc6
+ 457 01e5 0C       		.byte	0xc
+ 458 01e6 08       		.uleb128 0x8
+ 459 01e7 F9000000 		.4byte	.LASF39
+ 460 01eb 08       		.byte	0x8
+ 461 01ec 43       		.byte	0x43
+ 462 01ed F0000000 		.4byte	0xf0
+ 463 01f1 10       		.byte	0x10
+ 464 01f2 0D       		.uleb128 0xd
+ 465 01f3 B8070000 		.4byte	.LASF41
+ 466 01f7 08       		.byte	0x8
+ 467 01f8 44       		.byte	0x44
+ 468 01f9 CF000000 		.4byte	0xcf
+ 469 01fd 01       		.byte	0x1
+ 470 01fe 03       		.byte	0x3
+ 471 01ff 05       		.byte	0x5
+ 472 0200 14       		.byte	0x14
+ 473 0201 00       		.byte	0
+ 474 0202 03       		.uleb128 0x3
+ 475 0203 72030000 		.4byte	.LASF40
+ 476 0207 08       		.byte	0x8
+ 477 0208 45       		.byte	0x45
+ 478 0209 AA010000 		.4byte	0x1aa
+ 479 020d 07       		.uleb128 0x7
+ 480 020e 02       		.byte	0x2
+ 481 020f 09       		.byte	0x9
+ 482 0210 EA       		.byte	0xea
+ 483 0211 52020000 		.4byte	0x252
+ 484 0215 0D       		.uleb128 0xd
+ 485 0216 00080000 		.4byte	.LASF42
+ 486 021a 09       		.byte	0x9
+ 487 021b F0       		.byte	0xf0
+ 488 021c E5000000 		.4byte	0xe5
+ 489 0220 02       		.byte	0x2
+ 490 0221 03       		.byte	0x3
+ 491 0222 0D       		.byte	0xd
+ 492 0223 00       		.byte	0
+ 493 0224 0E       		.uleb128 0xe
+ 494 0225 72656400 		.ascii	"red\000"
+ 495 0229 09       		.byte	0x9
+ 496 022a F1       		.byte	0xf1
+ 497 022b E5000000 		.4byte	0xe5
+ 498 022f 02       		.byte	0x2
+ 499 0230 05       		.byte	0x5
+ 500 0231 08       		.byte	0x8
+ 501 0232 00       		.byte	0
+ 502 0233 0D       		.uleb128 0xd
+ 503 0234 A2070000 		.4byte	.LASF43
+ 504 0238 09       		.byte	0x9
+ 505 0239 F2       		.byte	0xf2
+ 506 023a E5000000 		.4byte	0xe5
+ 507 023e 02       		.byte	0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 12
+
+
+ 508 023f 05       		.byte	0x5
+ 509 0240 03       		.byte	0x3
+ 510 0241 00       		.byte	0
+ 511 0242 0D       		.uleb128 0xd
+ 512 0243 08080000 		.4byte	.LASF44
+ 513 0247 09       		.byte	0x9
+ 514 0248 F3       		.byte	0xf3
+ 515 0249 E5000000 		.4byte	0xe5
+ 516 024d 02       		.byte	0x2
+ 517 024e 03       		.byte	0x3
+ 518 024f 00       		.byte	0
+ 519 0250 00       		.byte	0
+ 520 0251 00       		.byte	0
+ 521 0252 0F       		.uleb128 0xf
+ 522 0253 02       		.byte	0x2
+ 523 0254 09       		.byte	0x9
+ 524 0255 E9       		.byte	0xe9
+ 525 0256 70020000 		.4byte	0x270
+ 526 025a 10       		.uleb128 0x10
+ 527 025b 636800   		.ascii	"ch\000"
+ 528 025e 09       		.byte	0x9
+ 529 025f F5       		.byte	0xf5
+ 530 0260 0D020000 		.4byte	0x20d
+ 531 0264 11       		.uleb128 0x11
+ 532 0265 B4060000 		.4byte	.LASF45
+ 533 0269 09       		.byte	0x9
+ 534 026a F6       		.byte	0xf6
+ 535 026b E5000000 		.4byte	0xe5
+ 536 026f 00       		.byte	0
+ 537 0270 03       		.uleb128 0x3
+ 538 0271 10080000 		.4byte	.LASF46
+ 539 0275 09       		.byte	0x9
+ 540 0276 F7       		.byte	0xf7
+ 541 0277 52020000 		.4byte	0x252
+ 542 027b 06       		.uleb128 0x6
+ 543 027c E70A0000 		.4byte	.LASF47
+ 544 0280 09       		.byte	0x9
+ 545 0281 0D01     		.2byte	0x10d
+ 546 0283 70020000 		.4byte	0x270
+ 547 0287 06       		.uleb128 0x6
+ 548 0288 03060000 		.4byte	.LASF48
+ 549 028c 09       		.byte	0x9
+ 550 028d 2001     		.2byte	0x120
+ 551 028f CF000000 		.4byte	0xcf
+ 552 0293 07       		.uleb128 0x7
+ 553 0294 08       		.byte	0x8
+ 554 0295 0A       		.byte	0xa
+ 555 0296 2D       		.byte	0x2d
+ 556 0297 C8020000 		.4byte	0x2c8
+ 557 029b 12       		.uleb128 0x12
+ 558 029c 783100   		.ascii	"x1\000"
+ 559 029f 0A       		.byte	0xa
+ 560 02a0 2E       		.byte	0x2e
+ 561 02a1 11010000 		.4byte	0x111
+ 562 02a5 00       		.byte	0
+ 563 02a6 12       		.uleb128 0x12
+ 564 02a7 793100   		.ascii	"y1\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 13
+
+
+ 565 02aa 0A       		.byte	0xa
+ 566 02ab 2F       		.byte	0x2f
+ 567 02ac 11010000 		.4byte	0x111
+ 568 02b0 02       		.byte	0x2
+ 569 02b1 12       		.uleb128 0x12
+ 570 02b2 783200   		.ascii	"x2\000"
+ 571 02b5 0A       		.byte	0xa
+ 572 02b6 30       		.byte	0x30
+ 573 02b7 11010000 		.4byte	0x111
+ 574 02bb 04       		.byte	0x4
+ 575 02bc 12       		.uleb128 0x12
+ 576 02bd 793200   		.ascii	"y2\000"
+ 577 02c0 0A       		.byte	0xa
+ 578 02c1 31       		.byte	0x31
+ 579 02c2 11010000 		.4byte	0x111
+ 580 02c6 06       		.byte	0x6
+ 581 02c7 00       		.byte	0
+ 582 02c8 03       		.uleb128 0x3
+ 583 02c9 96020000 		.4byte	.LASF49
+ 584 02cd 0A       		.byte	0xa
+ 585 02ce 32       		.byte	0x32
+ 586 02cf 93020000 		.4byte	0x293
+ 587 02d3 03       		.uleb128 0x3
+ 588 02d4 06010000 		.4byte	.LASF50
+ 589 02d8 0A       		.byte	0xa
+ 590 02d9 4E       		.byte	0x4e
+ 591 02da CF000000 		.4byte	0xcf
+ 592 02de 07       		.uleb128 0x7
+ 593 02df 24       		.byte	0x24
+ 594 02e0 0B       		.byte	0xb
+ 595 02e1 2F       		.byte	0x2f
+ 596 02e2 59030000 		.4byte	0x359
+ 597 02e6 08       		.uleb128 0x8
+ 598 02e7 0C060000 		.4byte	.LASF51
+ 599 02eb 0B       		.byte	0xb
+ 600 02ec 30       		.byte	0x30
+ 601 02ed C6000000 		.4byte	0xc6
+ 602 02f1 00       		.byte	0
+ 603 02f2 08       		.uleb128 0x8
+ 604 02f3 A90B0000 		.4byte	.LASF52
+ 605 02f7 0B       		.byte	0xb
+ 606 02f8 31       		.byte	0x31
+ 607 02f9 C6000000 		.4byte	0xc6
+ 608 02fd 04       		.byte	0x4
+ 609 02fe 08       		.uleb128 0x8
+ 610 02ff B90B0000 		.4byte	.LASF53
+ 611 0303 0B       		.byte	0xb
+ 612 0304 34       		.byte	0x34
+ 613 0305 C6000000 		.4byte	0xc6
+ 614 0309 08       		.byte	0x8
+ 615 030a 08       		.uleb128 0x8
+ 616 030b ED090000 		.4byte	.LASF54
+ 617 030f 0B       		.byte	0xb
+ 618 0310 35       		.byte	0x35
+ 619 0311 FB000000 		.4byte	0xfb
+ 620 0315 0C       		.byte	0xc
+ 621 0316 08       		.uleb128 0x8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 14
+
+
+ 622 0317 0A090000 		.4byte	.LASF55
+ 623 031b 0B       		.byte	0xb
+ 624 031c 36       		.byte	0x36
+ 625 031d C8020000 		.4byte	0x2c8
+ 626 0321 10       		.byte	0x10
+ 627 0322 08       		.uleb128 0x8
+ 628 0323 EB020000 		.4byte	.LASF56
+ 629 0327 0B       		.byte	0xb
+ 630 0328 38       		.byte	0x38
+ 631 0329 59030000 		.4byte	0x359
+ 632 032d 18       		.byte	0x18
+ 633 032e 08       		.uleb128 0x8
+ 634 032f 420B0000 		.4byte	.LASF57
+ 635 0333 0B       		.byte	0xb
+ 636 0334 3A       		.byte	0x3a
+ 637 0335 59030000 		.4byte	0x359
+ 638 0339 1C       		.byte	0x1c
+ 639 033a 0D       		.uleb128 0xd
+ 640 033b 380B0000 		.4byte	.LASF58
+ 641 033f 0B       		.byte	0xb
+ 642 0340 3B       		.byte	0x3b
+ 643 0341 5E030000 		.4byte	0x35e
+ 644 0345 04       		.byte	0x4
+ 645 0346 01       		.byte	0x1
+ 646 0347 1F       		.byte	0x1f
+ 647 0348 20       		.byte	0x20
+ 648 0349 0D       		.uleb128 0xd
+ 649 034a 2C000000 		.4byte	.LASF59
+ 650 034e 0B       		.byte	0xb
+ 651 034f 3C       		.byte	0x3c
+ 652 0350 5E030000 		.4byte	0x35e
+ 653 0354 04       		.byte	0x4
+ 654 0355 01       		.byte	0x1
+ 655 0356 1E       		.byte	0x1e
+ 656 0357 20       		.byte	0x20
+ 657 0358 00       		.byte	0
+ 658 0359 13       		.uleb128 0x13
+ 659 035a 25000000 		.4byte	0x25
+ 660 035e 13       		.uleb128 0x13
+ 661 035f FB000000 		.4byte	0xfb
+ 662 0363 03       		.uleb128 0x3
+ 663 0364 C40A0000 		.4byte	.LASF60
+ 664 0368 0B       		.byte	0xb
+ 665 0369 3D       		.byte	0x3d
+ 666 036a DE020000 		.4byte	0x2de
+ 667 036e 0C       		.uleb128 0xc
+ 668 036f 5A060000 		.4byte	.LASF62
+ 669 0373 30       		.byte	0x30
+ 670 0374 0B       		.byte	0xb
+ 671 0375 42       		.byte	0x42
+ 672 0376 38040000 		.4byte	0x438
+ 673 037a 08       		.uleb128 0x8
+ 674 037b 6F040000 		.4byte	.LASF63
+ 675 037f 0B       		.byte	0xb
+ 676 0380 44       		.byte	0x44
+ 677 0381 11010000 		.4byte	0x111
+ 678 0385 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 15
+
+
+ 679 0386 08       		.uleb128 0x8
+ 680 0387 4F0A0000 		.4byte	.LASF64
+ 681 038b 0B       		.byte	0xb
+ 682 038c 45       		.byte	0x45
+ 683 038d 11010000 		.4byte	0x111
+ 684 0391 02       		.byte	0x2
+ 685 0392 08       		.uleb128 0x8
+ 686 0393 3C030000 		.4byte	.LASF65
+ 687 0397 0B       		.byte	0xb
+ 688 0398 49       		.byte	0x49
+ 689 0399 38040000 		.4byte	0x438
+ 690 039d 04       		.byte	0x4
+ 691 039e 0D       		.uleb128 0xd
+ 692 039f 830A0000 		.4byte	.LASF66
+ 693 03a3 0B       		.byte	0xb
+ 694 03a4 4C       		.byte	0x4c
+ 695 03a5 FB000000 		.4byte	0xfb
+ 696 03a9 04       		.byte	0x4
+ 697 03aa 01       		.byte	0x1
+ 698 03ab 1F       		.byte	0x1f
+ 699 03ac 08       		.byte	0x8
+ 700 03ad 0D       		.uleb128 0xd
+ 701 03ae 11060000 		.4byte	.LASF67
+ 702 03b2 0B       		.byte	0xb
+ 703 03b3 4E       		.byte	0x4e
+ 704 03b4 FB000000 		.4byte	0xfb
+ 705 03b8 04       		.byte	0x4
+ 706 03b9 01       		.byte	0x1
+ 707 03ba 1E       		.byte	0x1e
+ 708 03bb 08       		.byte	0x8
+ 709 03bc 0E       		.uleb128 0xe
+ 710 03bd 64706900 		.ascii	"dpi\000"
+ 711 03c1 0B       		.byte	0xb
+ 712 03c2 59       		.byte	0x59
+ 713 03c3 FB000000 		.4byte	0xfb
+ 714 03c7 04       		.byte	0x4
+ 715 03c8 0A       		.byte	0xa
+ 716 03c9 14       		.byte	0x14
+ 717 03ca 08       		.byte	0x8
+ 718 03cb 08       		.uleb128 0x8
+ 719 03cc C6020000 		.4byte	.LASF68
+ 720 03d0 0B       		.byte	0xb
+ 721 03d1 5D       		.byte	0x5d
+ 722 03d2 6A040000 		.4byte	0x46a
+ 723 03d6 0C       		.byte	0xc
+ 724 03d7 08       		.uleb128 0x8
+ 725 03d8 AE0B0000 		.4byte	.LASF69
+ 726 03dc 0B       		.byte	0xb
+ 727 03dd 61       		.byte	0x61
+ 728 03de 86040000 		.4byte	0x486
+ 729 03e2 10       		.byte	0x10
+ 730 03e3 08       		.uleb128 0x8
+ 731 03e4 19020000 		.4byte	.LASF70
+ 732 03e8 0B       		.byte	0xb
+ 733 03e9 66       		.byte	0x66
+ 734 03ea BB040000 		.4byte	0x4bb
+ 735 03ee 14       		.byte	0x14
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 16
+
+
+ 736 03ef 08       		.uleb128 0x8
+ 737 03f0 7D0B0000 		.4byte	.LASF71
+ 738 03f4 0B       		.byte	0xb
+ 739 03f5 6B       		.byte	0x6b
+ 740 03f6 D6040000 		.4byte	0x4d6
+ 741 03fa 18       		.byte	0x18
+ 742 03fb 08       		.uleb128 0x8
+ 743 03fc 83080000 		.4byte	.LASF72
+ 744 0400 0B       		.byte	0xb
+ 745 0401 70       		.byte	0x70
+ 746 0402 E7040000 		.4byte	0x4e7
+ 747 0406 1C       		.byte	0x1c
+ 748 0407 08       		.uleb128 0x8
+ 749 0408 96000000 		.4byte	.LASF73
+ 750 040c 0B       		.byte	0xb
+ 751 040d 73       		.byte	0x73
+ 752 040e E7040000 		.4byte	0x4e7
+ 753 0412 20       		.byte	0x20
+ 754 0413 08       		.uleb128 0x8
+ 755 0414 46090000 		.4byte	.LASF74
+ 756 0418 0B       		.byte	0xb
+ 757 0419 76       		.byte	0x76
+ 758 041a E7040000 		.4byte	0x4e7
+ 759 041e 24       		.byte	0x24
+ 760 041f 08       		.uleb128 0x8
+ 761 0420 51030000 		.4byte	.LASF75
+ 762 0424 0B       		.byte	0xb
+ 763 0425 85       		.byte	0x85
+ 764 0426 7B020000 		.4byte	0x27b
+ 765 042a 28       		.byte	0x28
+ 766 042b 08       		.uleb128 0x8
+ 767 042c 10000000 		.4byte	.LASF38
+ 768 0430 0B       		.byte	0xb
+ 769 0431 88       		.byte	0x88
+ 770 0432 1C010000 		.4byte	0x11c
+ 771 0436 2C       		.byte	0x2c
+ 772 0437 00       		.byte	0
+ 773 0438 09       		.uleb128 0x9
+ 774 0439 04       		.byte	0x4
+ 775 043a 63030000 		.4byte	0x363
+ 776 043e 0A       		.uleb128 0xa
+ 777 043f 53040000 		.4byte	0x453
+ 778 0443 0B       		.uleb128 0xb
+ 779 0444 53040000 		.4byte	0x453
+ 780 0448 0B       		.uleb128 0xb
+ 781 0449 59040000 		.4byte	0x459
+ 782 044d 0B       		.uleb128 0xb
+ 783 044e 64040000 		.4byte	0x464
+ 784 0452 00       		.byte	0
+ 785 0453 09       		.uleb128 0x9
+ 786 0454 04       		.byte	0x4
+ 787 0455 6E030000 		.4byte	0x36e
+ 788 0459 09       		.uleb128 0x9
+ 789 045a 04       		.byte	0x4
+ 790 045b 5F040000 		.4byte	0x45f
+ 791 045f 14       		.uleb128 0x14
+ 792 0460 C8020000 		.4byte	0x2c8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 17
+
+
+ 793 0464 09       		.uleb128 0x9
+ 794 0465 04       		.byte	0x4
+ 795 0466 7B020000 		.4byte	0x27b
+ 796 046a 09       		.uleb128 0x9
+ 797 046b 04       		.byte	0x4
+ 798 046c 3E040000 		.4byte	0x43e
+ 799 0470 0A       		.uleb128 0xa
+ 800 0471 80040000 		.4byte	0x480
+ 801 0475 0B       		.uleb128 0xb
+ 802 0476 53040000 		.4byte	0x453
+ 803 047a 0B       		.uleb128 0xb
+ 804 047b 80040000 		.4byte	0x480
+ 805 047f 00       		.byte	0
+ 806 0480 09       		.uleb128 0x9
+ 807 0481 04       		.byte	0x4
+ 808 0482 C8020000 		.4byte	0x2c8
+ 809 0486 09       		.uleb128 0x9
+ 810 0487 04       		.byte	0x4
+ 811 0488 70040000 		.4byte	0x470
+ 812 048c 0A       		.uleb128 0xa
+ 813 048d B5040000 		.4byte	0x4b5
+ 814 0491 0B       		.uleb128 0xb
+ 815 0492 53040000 		.4byte	0x453
+ 816 0496 0B       		.uleb128 0xb
+ 817 0497 B5040000 		.4byte	0x4b5
+ 818 049b 0B       		.uleb128 0xb
+ 819 049c 11010000 		.4byte	0x111
+ 820 04a0 0B       		.uleb128 0xb
+ 821 04a1 11010000 		.4byte	0x111
+ 822 04a5 0B       		.uleb128 0xb
+ 823 04a6 11010000 		.4byte	0x111
+ 824 04aa 0B       		.uleb128 0xb
+ 825 04ab 7B020000 		.4byte	0x27b
+ 826 04af 0B       		.uleb128 0xb
+ 827 04b0 87020000 		.4byte	0x287
+ 828 04b4 00       		.byte	0
+ 829 04b5 09       		.uleb128 0x9
+ 830 04b6 04       		.byte	0x4
+ 831 04b7 CF000000 		.4byte	0xcf
+ 832 04bb 09       		.uleb128 0x9
+ 833 04bc 04       		.byte	0x4
+ 834 04bd 8C040000 		.4byte	0x48c
+ 835 04c1 0A       		.uleb128 0xa
+ 836 04c2 D6040000 		.4byte	0x4d6
+ 837 04c6 0B       		.uleb128 0xb
+ 838 04c7 53040000 		.4byte	0x453
+ 839 04cb 0B       		.uleb128 0xb
+ 840 04cc FB000000 		.4byte	0xfb
+ 841 04d0 0B       		.uleb128 0xb
+ 842 04d1 FB000000 		.4byte	0xfb
+ 843 04d5 00       		.byte	0
+ 844 04d6 09       		.uleb128 0x9
+ 845 04d7 04       		.byte	0x4
+ 846 04d8 C1040000 		.4byte	0x4c1
+ 847 04dc 0A       		.uleb128 0xa
+ 848 04dd E7040000 		.4byte	0x4e7
+ 849 04e1 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 18
+
+
+ 850 04e2 53040000 		.4byte	0x453
+ 851 04e6 00       		.byte	0
+ 852 04e7 09       		.uleb128 0x9
+ 853 04e8 04       		.byte	0x4
+ 854 04e9 DC040000 		.4byte	0x4dc
+ 855 04ed 03       		.uleb128 0x3
+ 856 04ee B6050000 		.4byte	.LASF76
+ 857 04f2 0B       		.byte	0xb
+ 858 04f3 8B       		.byte	0x8b
+ 859 04f4 6E030000 		.4byte	0x36e
+ 860 04f8 15       		.uleb128 0x15
+ 861 04f9 D10B0000 		.4byte	.LASF77
+ 862 04fd 8001     		.2byte	0x180
+ 863 04ff 0B       		.byte	0xb
+ 864 0500 93       		.byte	0x93
+ 865 0501 C3050000 		.4byte	0x5c3
+ 866 0505 08       		.uleb128 0x8
+ 867 0506 380C0000 		.4byte	.LASF78
+ 868 050a 0B       		.byte	0xb
+ 869 050b 95       		.byte	0x95
+ 870 050c ED040000 		.4byte	0x4ed
+ 871 0510 00       		.byte	0
+ 872 0511 08       		.uleb128 0x8
+ 873 0512 C2010000 		.4byte	.LASF79
+ 874 0516 0B       		.byte	0xb
+ 875 0517 98       		.byte	0x98
+ 876 0518 C3050000 		.4byte	0x5c3
+ 877 051c 30       		.byte	0x30
+ 878 051d 08       		.uleb128 0x8
+ 879 051e 0D0C0000 		.4byte	.LASF80
+ 880 0522 0B       		.byte	0xb
+ 881 0523 9B       		.byte	0x9b
+ 882 0524 7D010000 		.4byte	0x17d
+ 883 0528 34       		.byte	0x34
+ 884 0529 08       		.uleb128 0x8
+ 885 052a D90B0000 		.4byte	.LASF81
+ 886 052e 0B       		.byte	0xb
+ 887 052f 9C       		.byte	0x9c
+ 888 0530 4A070000 		.4byte	0x74a
+ 889 0534 40       		.byte	0x40
+ 890 0535 08       		.uleb128 0x8
+ 891 0536 11010000 		.4byte	.LASF82
+ 892 053a 0B       		.byte	0xb
+ 893 053b 9D       		.byte	0x9d
+ 894 053c 4A070000 		.4byte	0x74a
+ 895 0540 44       		.byte	0x44
+ 896 0541 08       		.uleb128 0x8
+ 897 0542 B8010000 		.4byte	.LASF83
+ 898 0546 0B       		.byte	0xb
+ 899 0547 9E       		.byte	0x9e
+ 900 0548 4A070000 		.4byte	0x74a
+ 901 054c 48       		.byte	0x48
+ 902 054d 08       		.uleb128 0x8
+ 903 054e DA030000 		.4byte	.LASF84
+ 904 0552 0B       		.byte	0xb
+ 905 0553 9F       		.byte	0x9f
+ 906 0554 4A070000 		.4byte	0x74a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 19
+
+
+ 907 0558 4C       		.byte	0x4c
+ 908 0559 0D       		.uleb128 0xd
+ 909 055a 820C0000 		.4byte	.LASF85
+ 910 055e 0B       		.byte	0xb
+ 911 055f A1       		.byte	0xa1
+ 912 0560 CF000000 		.4byte	0xcf
+ 913 0564 01       		.byte	0x1
+ 914 0565 01       		.byte	0x1
+ 915 0566 07       		.byte	0x7
+ 916 0567 50       		.byte	0x50
+ 917 0568 08       		.uleb128 0x8
+ 918 0569 EE060000 		.4byte	.LASF86
+ 919 056d 0B       		.byte	0xb
+ 920 056e A4       		.byte	0xa4
+ 921 056f 7B020000 		.4byte	0x27b
+ 922 0573 52       		.byte	0x52
+ 923 0574 08       		.uleb128 0x8
+ 924 0575 43030000 		.4byte	.LASF87
+ 925 0579 0B       		.byte	0xb
+ 926 057a A5       		.byte	0xa5
+ 927 057b 50070000 		.4byte	0x750
+ 928 057f 54       		.byte	0x54
+ 929 0580 08       		.uleb128 0x8
+ 930 0581 44070000 		.4byte	.LASF88
+ 931 0585 0B       		.byte	0xb
+ 932 0586 A6       		.byte	0xa6
+ 933 0587 87020000 		.4byte	0x287
+ 934 058b 58       		.byte	0x58
+ 935 058c 08       		.uleb128 0x8
+ 936 058d 80040000 		.4byte	.LASF89
+ 937 0591 0B       		.byte	0xb
+ 938 0592 A9       		.byte	0xa9
+ 939 0593 57070000 		.4byte	0x757
+ 940 0597 5A       		.byte	0x5a
+ 941 0598 16       		.uleb128 0x16
+ 942 0599 75010000 		.4byte	.LASF90
+ 943 059d 0B       		.byte	0xb
+ 944 059e AA       		.byte	0xaa
+ 945 059f 67070000 		.4byte	0x767
+ 946 05a3 5A01     		.2byte	0x15a
+ 947 05a5 17       		.uleb128 0x17
+ 948 05a6 F2090000 		.4byte	.LASF91
+ 949 05aa 0B       		.byte	0xb
+ 950 05ab AB       		.byte	0xab
+ 951 05ac FB000000 		.4byte	0xfb
+ 952 05b0 04       		.byte	0x4
+ 953 05b1 0A       		.byte	0xa
+ 954 05b2 06       		.byte	0x6
+ 955 05b3 7801     		.2byte	0x178
+ 956 05b5 16       		.uleb128 0x16
+ 957 05b6 700A0000 		.4byte	.LASF92
+ 958 05ba 0B       		.byte	0xb
+ 959 05bb AE       		.byte	0xae
+ 960 05bc FB000000 		.4byte	0xfb
+ 961 05c0 7C01     		.2byte	0x17c
+ 962 05c2 00       		.byte	0
+ 963 05c3 09       		.uleb128 0x9
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 20
+
+
+ 964 05c4 04       		.byte	0x4
+ 965 05c5 02020000 		.4byte	0x202
+ 966 05c9 0C       		.uleb128 0xc
+ 967 05ca 1A090000 		.4byte	.LASF93
+ 968 05ce 50       		.byte	0x50
+ 969 05cf 0C       		.byte	0xc
+ 970 05d0 C5       		.byte	0xc5
+ 971 05d1 4A070000 		.4byte	0x74a
+ 972 05d5 08       		.uleb128 0x8
+ 973 05d6 8F020000 		.4byte	.LASF94
+ 974 05da 0C       		.byte	0xc
+ 975 05db C6       		.byte	0xc6
+ 976 05dc 4A070000 		.4byte	0x74a
+ 977 05e0 00       		.byte	0
+ 978 05e1 08       		.uleb128 0x8
+ 979 05e2 A30C0000 		.4byte	.LASF95
+ 980 05e6 0C       		.byte	0xc
+ 981 05e7 C7       		.byte	0xc7
+ 982 05e8 7D010000 		.4byte	0x17d
+ 983 05ec 04       		.byte	0x4
+ 984 05ed 08       		.uleb128 0x8
+ 985 05ee 4A030000 		.4byte	.LASF96
+ 986 05f2 0C       		.byte	0xc
+ 987 05f3 C9       		.byte	0xc9
+ 988 05f4 C8020000 		.4byte	0x2c8
+ 989 05f8 10       		.byte	0x10
+ 990 05f9 08       		.uleb128 0x8
+ 991 05fa E9040000 		.4byte	.LASF97
+ 992 05fe 0C       		.byte	0xc
+ 993 05ff CB       		.byte	0xcb
+ 994 0600 D7090000 		.4byte	0x9d7
+ 995 0604 18       		.byte	0x18
+ 996 0605 08       		.uleb128 0x8
+ 997 0606 50020000 		.4byte	.LASF98
+ 998 060a 0C       		.byte	0xc
+ 999 060b CC       		.byte	0xcc
+ 1000 060c 030A0000 		.4byte	0xa03
+ 1001 0610 1C       		.byte	0x1c
+ 1002 0611 08       		.uleb128 0x8
+ 1003 0612 6C0C0000 		.4byte	.LASF99
+ 1004 0616 0C       		.byte	0xc
+ 1005 0617 CD       		.byte	0xcd
+ 1006 0618 A2090000 		.4byte	0x9a2
+ 1007 061c 20       		.byte	0x20
+ 1008 061d 08       		.uleb128 0x8
+ 1009 061e F7070000 		.4byte	.LASF100
+ 1010 0622 0C       		.byte	0xc
+ 1011 0623 CF       		.byte	0xcf
+ 1012 0624 C6000000 		.4byte	0xc6
+ 1013 0628 24       		.byte	0x24
+ 1014 0629 08       		.uleb128 0x8
+ 1015 062a 190A0000 		.4byte	.LASF101
+ 1016 062e 0C       		.byte	0xc
+ 1017 062f D0       		.byte	0xd0
+ 1018 0630 75090000 		.4byte	0x975
+ 1019 0634 28       		.byte	0x28
+ 1020 0635 08       		.uleb128 0x8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 21
+
+
+ 1021 0636 02030000 		.4byte	.LASF102
+ 1022 063a 0C       		.byte	0xc
+ 1023 063b D3       		.byte	0xd3
+ 1024 063c CF000000 		.4byte	0xcf
+ 1025 0640 30       		.byte	0x30
+ 1026 0641 08       		.uleb128 0x8
+ 1027 0642 97040000 		.4byte	.LASF103
+ 1028 0646 0C       		.byte	0xc
+ 1029 0647 D4       		.byte	0xd4
+ 1030 0648 CF000000 		.4byte	0xcf
+ 1031 064c 31       		.byte	0x31
+ 1032 064d 08       		.uleb128 0x8
+ 1033 064e 5A020000 		.4byte	.LASF104
+ 1034 0652 0C       		.byte	0xc
+ 1035 0653 D9       		.byte	0xd9
+ 1036 0654 11010000 		.4byte	0x111
+ 1037 0658 32       		.byte	0x32
+ 1038 0659 0D       		.uleb128 0xd
+ 1039 065a 90000000 		.4byte	.LASF105
+ 1040 065e 0C       		.byte	0xc
+ 1041 065f DC       		.byte	0xdc
+ 1042 0660 CF000000 		.4byte	0xcf
+ 1043 0664 01       		.byte	0x1
+ 1044 0665 01       		.byte	0x1
+ 1045 0666 07       		.byte	0x7
+ 1046 0667 34       		.byte	0x34
+ 1047 0668 0D       		.uleb128 0xd
+ 1048 0669 160B0000 		.4byte	.LASF106
+ 1049 066d 0C       		.byte	0xc
+ 1050 066e DD       		.byte	0xdd
+ 1051 066f CF000000 		.4byte	0xcf
+ 1052 0673 01       		.byte	0x1
+ 1053 0674 01       		.byte	0x1
+ 1054 0675 06       		.byte	0x6
+ 1055 0676 34       		.byte	0x34
+ 1056 0677 0D       		.uleb128 0xd
+ 1057 0678 2B080000 		.4byte	.LASF107
+ 1058 067c 0C       		.byte	0xc
+ 1059 067d DE       		.byte	0xde
+ 1060 067e CF000000 		.4byte	0xcf
+ 1061 0682 01       		.byte	0x1
+ 1062 0683 01       		.byte	0x1
+ 1063 0684 05       		.byte	0x5
+ 1064 0685 34       		.byte	0x34
+ 1065 0686 0D       		.uleb128 0xd
+ 1066 0687 140C0000 		.4byte	.LASF108
+ 1067 068b 0C       		.byte	0xc
+ 1068 068c DF       		.byte	0xdf
+ 1069 068d CF000000 		.4byte	0xcf
+ 1070 0691 01       		.byte	0x1
+ 1071 0692 01       		.byte	0x1
+ 1072 0693 04       		.byte	0x4
+ 1073 0694 34       		.byte	0x34
+ 1074 0695 0D       		.uleb128 0xd
+ 1075 0696 28020000 		.4byte	.LASF109
+ 1076 069a 0C       		.byte	0xc
+ 1077 069b E0       		.byte	0xe0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 22
+
+
+ 1078 069c CF000000 		.4byte	0xcf
+ 1079 06a0 01       		.byte	0x1
+ 1080 06a1 01       		.byte	0x1
+ 1081 06a2 03       		.byte	0x3
+ 1082 06a3 34       		.byte	0x34
+ 1083 06a4 0E       		.uleb128 0xe
+ 1084 06a5 746F7000 		.ascii	"top\000"
+ 1085 06a9 0C       		.byte	0xc
+ 1086 06aa E1       		.byte	0xe1
+ 1087 06ab CF000000 		.4byte	0xcf
+ 1088 06af 01       		.byte	0x1
+ 1089 06b0 01       		.byte	0x1
+ 1090 06b1 02       		.byte	0x2
+ 1091 06b2 34       		.byte	0x34
+ 1092 06b3 0D       		.uleb128 0xd
+ 1093 06b4 8B0C0000 		.4byte	.LASF110
+ 1094 06b8 0C       		.byte	0xc
+ 1095 06b9 E2       		.byte	0xe2
+ 1096 06ba CF000000 		.4byte	0xcf
+ 1097 06be 01       		.byte	0x1
+ 1098 06bf 01       		.byte	0x1
+ 1099 06c0 01       		.byte	0x1
+ 1100 06c1 34       		.byte	0x34
+ 1101 06c2 0D       		.uleb128 0xd
+ 1102 06c3 28040000 		.4byte	.LASF111
+ 1103 06c7 0C       		.byte	0xc
+ 1104 06c8 E3       		.byte	0xe3
+ 1105 06c9 CF000000 		.4byte	0xcf
+ 1106 06cd 01       		.byte	0x1
+ 1107 06ce 01       		.byte	0x1
+ 1108 06cf 00       		.byte	0
+ 1109 06d0 34       		.byte	0x34
+ 1110 06d1 0D       		.uleb128 0xd
+ 1111 06d2 0A020000 		.4byte	.LASF112
+ 1112 06d6 0C       		.byte	0xc
+ 1113 06d7 E4       		.byte	0xe4
+ 1114 06d8 CF000000 		.4byte	0xcf
+ 1115 06dc 01       		.byte	0x1
+ 1116 06dd 01       		.byte	0x1
+ 1117 06de 07       		.byte	0x7
+ 1118 06df 35       		.byte	0x35
+ 1119 06e0 0D       		.uleb128 0xd
+ 1120 06e1 2E070000 		.4byte	.LASF113
+ 1121 06e5 0C       		.byte	0xc
+ 1122 06e6 E5       		.byte	0xe5
+ 1123 06e7 CF000000 		.4byte	0xcf
+ 1124 06eb 01       		.byte	0x1
+ 1125 06ec 01       		.byte	0x1
+ 1126 06ed 06       		.byte	0x6
+ 1127 06ee 35       		.byte	0x35
+ 1128 06ef 0D       		.uleb128 0xd
+ 1129 06f0 77040000 		.4byte	.LASF114
+ 1130 06f4 0C       		.byte	0xc
+ 1131 06f5 E7       		.byte	0xe7
+ 1132 06f6 82070000 		.4byte	0x782
+ 1133 06fa 01       		.byte	0x1
+ 1134 06fb 03       		.byte	0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 23
+
+
+ 1135 06fc 03       		.byte	0x3
+ 1136 06fd 35       		.byte	0x35
+ 1137 06fe 0D       		.uleb128 0xd
+ 1138 06ff 3B070000 		.4byte	.LASF115
+ 1139 0703 0C       		.byte	0xc
+ 1140 0704 E8       		.byte	0xe8
+ 1141 0705 81090000 		.4byte	0x981
+ 1142 0709 01       		.byte	0x1
+ 1143 070a 02       		.byte	0x2
+ 1144 070b 01       		.byte	0x1
+ 1145 070c 35       		.byte	0x35
+ 1146 070d 08       		.uleb128 0x8
+ 1147 070e A50A0000 		.4byte	.LASF116
+ 1148 0712 0C       		.byte	0xc
+ 1149 0713 EB       		.byte	0xeb
+ 1150 0714 C6000000 		.4byte	0xc6
+ 1151 0718 38       		.byte	0x38
+ 1152 0719 08       		.uleb128 0x8
+ 1153 071a 19060000 		.4byte	.LASF117
+ 1154 071e 0C       		.byte	0xc
+ 1155 071f EE       		.byte	0xee
+ 1156 0720 CF000000 		.4byte	0xcf
+ 1157 0724 3C       		.byte	0x3c
+ 1158 0725 08       		.uleb128 0x8
+ 1159 0726 A0020000 		.4byte	.LASF118
+ 1160 072a 0C       		.byte	0xc
+ 1161 072b F0       		.byte	0xf0
+ 1162 072c 9A0A0000 		.4byte	0xa9a
+ 1163 0730 3D       		.byte	0x3d
+ 1164 0731 08       		.uleb128 0x8
+ 1165 0732 FB050000 		.4byte	.LASF119
+ 1166 0736 0C       		.byte	0xc
+ 1167 0737 F3       		.byte	0xf3
+ 1168 0738 8F0A0000 		.4byte	0xa8f
+ 1169 073c 40       		.byte	0x40
+ 1170 073d 08       		.uleb128 0x8
+ 1171 073e 10000000 		.4byte	.LASF38
+ 1172 0742 0C       		.byte	0xc
+ 1173 0743 F7       		.byte	0xf7
+ 1174 0744 28010000 		.4byte	0x128
+ 1175 0748 4C       		.byte	0x4c
+ 1176 0749 00       		.byte	0
+ 1177 074a 09       		.uleb128 0x9
+ 1178 074b 04       		.byte	0x4
+ 1179 074c C9050000 		.4byte	0x5c9
+ 1180 0750 09       		.uleb128 0x9
+ 1181 0751 04       		.byte	0x4
+ 1182 0752 56070000 		.4byte	0x756
+ 1183 0756 18       		.uleb128 0x18
+ 1184 0757 19       		.uleb128 0x19
+ 1185 0758 C8020000 		.4byte	0x2c8
+ 1186 075c 67070000 		.4byte	0x767
+ 1187 0760 1A       		.uleb128 0x1a
+ 1188 0761 BF000000 		.4byte	0xbf
+ 1189 0765 1F       		.byte	0x1f
+ 1190 0766 00       		.byte	0
+ 1191 0767 19       		.uleb128 0x19
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 24
+
+
+ 1192 0768 CF000000 		.4byte	0xcf
+ 1193 076c 77070000 		.4byte	0x777
+ 1194 0770 1A       		.uleb128 0x1a
+ 1195 0771 BF000000 		.4byte	0xbf
+ 1196 0775 1F       		.byte	0x1f
+ 1197 0776 00       		.byte	0
+ 1198 0777 03       		.uleb128 0x3
+ 1199 0778 550C0000 		.4byte	.LASF120
+ 1200 077c 0B       		.byte	0xb
+ 1201 077d AF       		.byte	0xaf
+ 1202 077e F8040000 		.4byte	0x4f8
+ 1203 0782 03       		.uleb128 0x3
+ 1204 0783 D4050000 		.4byte	.LASF121
+ 1205 0787 0D       		.byte	0xd
+ 1206 0788 3D       		.byte	0x3d
+ 1207 0789 CF000000 		.4byte	0xcf
+ 1208 078d 04       		.uleb128 0x4
+ 1209 078e 01       		.byte	0x1
+ 1210 078f 02       		.byte	0x2
+ 1211 0790 62080000 		.4byte	.LASF122
+ 1212 0794 09       		.uleb128 0x9
+ 1213 0795 04       		.byte	0x4
+ 1214 0796 9A070000 		.4byte	0x79a
+ 1215 079a 14       		.uleb128 0x14
+ 1216 079b CF000000 		.4byte	0xcf
+ 1217 079f 07       		.uleb128 0x7
+ 1218 07a0 04       		.byte	0x4
+ 1219 07a1 0E       		.byte	0xe
+ 1220 07a2 D3       		.byte	0xd3
+ 1221 07a3 B4070000 		.4byte	0x7b4
+ 1222 07a7 12       		.uleb128 0x12
+ 1223 07a8 6D617000 		.ascii	"map\000"
+ 1224 07ac 0E       		.byte	0xe
+ 1225 07ad D4       		.byte	0xd4
+ 1226 07ae B5040000 		.4byte	0x4b5
+ 1227 07b2 00       		.byte	0
+ 1228 07b3 00       		.byte	0
+ 1229 07b4 03       		.uleb128 0x3
+ 1230 07b5 8B080000 		.4byte	.LASF123
+ 1231 07b9 0E       		.byte	0xe
+ 1232 07ba D8       		.byte	0xd8
+ 1233 07bb 9F070000 		.4byte	0x79f
+ 1234 07bf 07       		.uleb128 0x7
+ 1235 07c0 08       		.byte	0x8
+ 1236 07c1 0E       		.byte	0xe
+ 1237 07c2 DC       		.byte	0xdc
+ 1238 07c3 69090000 		.4byte	0x969
+ 1239 07c7 08       		.uleb128 0x8
+ 1240 07c8 190A0000 		.4byte	.LASF101
+ 1241 07cc 0E       		.byte	0xe
+ 1242 07cd DD       		.byte	0xdd
+ 1243 07ce 69090000 		.4byte	0x969
+ 1244 07d2 00       		.byte	0
+ 1245 07d3 0D       		.uleb128 0xd
+ 1246 07d4 67020000 		.4byte	.LASF124
+ 1247 07d8 0E       		.byte	0xe
+ 1248 07d9 E1       		.byte	0xe1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 25
+
+
+ 1249 07da FB000000 		.4byte	0xfb
+ 1250 07de 04       		.byte	0x4
+ 1251 07df 06       		.byte	0x6
+ 1252 07e0 1A       		.byte	0x1a
+ 1253 07e1 04       		.byte	0x4
+ 1254 07e2 0D       		.uleb128 0xd
+ 1255 07e3 27050000 		.4byte	.LASF125
+ 1256 07e7 0E       		.byte	0xe
+ 1257 07e8 E2       		.byte	0xe2
+ 1258 07e9 FB000000 		.4byte	0xfb
+ 1259 07ed 04       		.byte	0x4
+ 1260 07ee 01       		.byte	0x1
+ 1261 07ef 19       		.byte	0x19
+ 1262 07f0 04       		.byte	0x4
+ 1263 07f1 0D       		.uleb128 0xd
+ 1264 07f2 900A0000 		.4byte	.LASF126
+ 1265 07f6 0E       		.byte	0xe
+ 1266 07f7 E3       		.byte	0xe3
+ 1267 07f8 FB000000 		.4byte	0xfb
+ 1268 07fc 04       		.byte	0x4
+ 1269 07fd 01       		.byte	0x1
+ 1270 07fe 18       		.byte	0x18
+ 1271 07ff 04       		.byte	0x4
+ 1272 0800 0D       		.uleb128 0xd
+ 1273 0801 980C0000 		.4byte	.LASF127
+ 1274 0805 0E       		.byte	0xe
+ 1275 0806 E4       		.byte	0xe4
+ 1276 0807 FB000000 		.4byte	0xfb
+ 1277 080b 04       		.byte	0x4
+ 1278 080c 01       		.byte	0x1
+ 1279 080d 17       		.byte	0x17
+ 1280 080e 04       		.byte	0x4
+ 1281 080f 0D       		.uleb128 0xd
+ 1282 0810 E6080000 		.4byte	.LASF128
+ 1283 0814 0E       		.byte	0xe
+ 1284 0815 E5       		.byte	0xe5
+ 1285 0816 FB000000 		.4byte	0xfb
+ 1286 081a 04       		.byte	0x4
+ 1287 081b 01       		.byte	0x1
+ 1288 081c 16       		.byte	0x16
+ 1289 081d 04       		.byte	0x4
+ 1290 081e 0D       		.uleb128 0xd
+ 1291 081f 0D0A0000 		.4byte	.LASF129
+ 1292 0823 0E       		.byte	0xe
+ 1293 0824 E6       		.byte	0xe6
+ 1294 0825 FB000000 		.4byte	0xfb
+ 1295 0829 04       		.byte	0x4
+ 1296 082a 01       		.byte	0x1
+ 1297 082b 15       		.byte	0x15
+ 1298 082c 04       		.byte	0x4
+ 1299 082d 0D       		.uleb128 0xd
+ 1300 082e 21060000 		.4byte	.LASF130
+ 1301 0832 0E       		.byte	0xe
+ 1302 0833 E7       		.byte	0xe7
+ 1303 0834 FB000000 		.4byte	0xfb
+ 1304 0838 04       		.byte	0x4
+ 1305 0839 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 26
+
+
+ 1306 083a 14       		.byte	0x14
+ 1307 083b 04       		.byte	0x4
+ 1308 083c 0D       		.uleb128 0xd
+ 1309 083d E4030000 		.4byte	.LASF131
+ 1310 0841 0E       		.byte	0xe
+ 1311 0842 E9       		.byte	0xe9
+ 1312 0843 FB000000 		.4byte	0xfb
+ 1313 0847 04       		.byte	0x4
+ 1314 0848 01       		.byte	0x1
+ 1315 0849 13       		.byte	0x13
+ 1316 084a 04       		.byte	0x4
+ 1317 084b 0D       		.uleb128 0xd
+ 1318 084c FD090000 		.4byte	.LASF132
+ 1319 0850 0E       		.byte	0xe
+ 1320 0851 EA       		.byte	0xea
+ 1321 0852 FB000000 		.4byte	0xfb
+ 1322 0856 04       		.byte	0x4
+ 1323 0857 01       		.byte	0x1
+ 1324 0858 12       		.byte	0x12
+ 1325 0859 04       		.byte	0x4
+ 1326 085a 0D       		.uleb128 0xd
+ 1327 085b F2040000 		.4byte	.LASF133
+ 1328 085f 0E       		.byte	0xe
+ 1329 0860 EB       		.byte	0xeb
+ 1330 0861 FB000000 		.4byte	0xfb
+ 1331 0865 04       		.byte	0x4
+ 1332 0866 01       		.byte	0x1
+ 1333 0867 11       		.byte	0x11
+ 1334 0868 04       		.byte	0x4
+ 1335 0869 0D       		.uleb128 0xd
+ 1336 086a 85060000 		.4byte	.LASF134
+ 1337 086e 0E       		.byte	0xe
+ 1338 086f EC       		.byte	0xec
+ 1339 0870 FB000000 		.4byte	0xfb
+ 1340 0874 04       		.byte	0x4
+ 1341 0875 01       		.byte	0x1
+ 1342 0876 10       		.byte	0x10
+ 1343 0877 04       		.byte	0x4
+ 1344 0878 0D       		.uleb128 0xd
+ 1345 0879 5F0C0000 		.4byte	.LASF135
+ 1346 087d 0E       		.byte	0xe
+ 1347 087e ED       		.byte	0xed
+ 1348 087f FB000000 		.4byte	0xfb
+ 1349 0883 04       		.byte	0x4
+ 1350 0884 01       		.byte	0x1
+ 1351 0885 0F       		.byte	0xf
+ 1352 0886 04       		.byte	0x4
+ 1353 0887 0D       		.uleb128 0xd
+ 1354 0888 A4060000 		.4byte	.LASF136
+ 1355 088c 0E       		.byte	0xe
+ 1356 088d EE       		.byte	0xee
+ 1357 088e FB000000 		.4byte	0xfb
+ 1358 0892 04       		.byte	0x4
+ 1359 0893 01       		.byte	0x1
+ 1360 0894 0E       		.byte	0xe
+ 1361 0895 04       		.byte	0x4
+ 1362 0896 0D       		.uleb128 0xd
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 27
+
+
+ 1363 0897 6F060000 		.4byte	.LASF137
+ 1364 089b 0E       		.byte	0xe
+ 1365 089c EF       		.byte	0xef
+ 1366 089d FB000000 		.4byte	0xfb
+ 1367 08a1 04       		.byte	0x4
+ 1368 08a2 01       		.byte	0x1
+ 1369 08a3 0D       		.byte	0xd
+ 1370 08a4 04       		.byte	0x4
+ 1371 08a5 0D       		.uleb128 0xd
+ 1372 08a6 1D080000 		.4byte	.LASF138
+ 1373 08aa 0E       		.byte	0xe
+ 1374 08ab F0       		.byte	0xf0
+ 1375 08ac FB000000 		.4byte	0xfb
+ 1376 08b0 04       		.byte	0x4
+ 1377 08b1 01       		.byte	0x1
+ 1378 08b2 0C       		.byte	0xc
+ 1379 08b3 04       		.byte	0x4
+ 1380 08b4 0D       		.uleb128 0xd
+ 1381 08b5 1A010000 		.4byte	.LASF139
+ 1382 08b9 0E       		.byte	0xe
+ 1383 08ba F1       		.byte	0xf1
+ 1384 08bb FB000000 		.4byte	0xfb
+ 1385 08bf 04       		.byte	0x4
+ 1386 08c0 01       		.byte	0x1
+ 1387 08c1 0B       		.byte	0xb
+ 1388 08c2 04       		.byte	0x4
+ 1389 08c3 0D       		.uleb128 0xd
+ 1390 08c4 15050000 		.4byte	.LASF140
+ 1391 08c8 0E       		.byte	0xe
+ 1392 08c9 F3       		.byte	0xf3
+ 1393 08ca FB000000 		.4byte	0xfb
+ 1394 08ce 04       		.byte	0x4
+ 1395 08cf 01       		.byte	0x1
+ 1396 08d0 0A       		.byte	0xa
+ 1397 08d1 04       		.byte	0x4
+ 1398 08d2 0D       		.uleb128 0xd
+ 1399 08d3 58010000 		.4byte	.LASF141
+ 1400 08d7 0E       		.byte	0xe
+ 1401 08d8 F4       		.byte	0xf4
+ 1402 08d9 FB000000 		.4byte	0xfb
+ 1403 08dd 04       		.byte	0x4
+ 1404 08de 01       		.byte	0x1
+ 1405 08df 09       		.byte	0x9
+ 1406 08e0 04       		.byte	0x4
+ 1407 08e1 0D       		.uleb128 0xd
+ 1408 08e2 C4050000 		.4byte	.LASF142
+ 1409 08e6 0E       		.byte	0xe
+ 1410 08e7 F5       		.byte	0xf5
+ 1411 08e8 FB000000 		.4byte	0xfb
+ 1412 08ec 04       		.byte	0x4
+ 1413 08ed 01       		.byte	0x1
+ 1414 08ee 08       		.byte	0x8
+ 1415 08ef 04       		.byte	0x4
+ 1416 08f0 0D       		.uleb128 0xd
+ 1417 08f1 02050000 		.4byte	.LASF143
+ 1418 08f5 0E       		.byte	0xe
+ 1419 08f6 F7       		.byte	0xf7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 28
+
+
+ 1420 08f7 FB000000 		.4byte	0xfb
+ 1421 08fb 04       		.byte	0x4
+ 1422 08fc 01       		.byte	0x1
+ 1423 08fd 07       		.byte	0x7
+ 1424 08fe 04       		.byte	0x4
+ 1425 08ff 0D       		.uleb128 0xd
+ 1426 0900 A7070000 		.4byte	.LASF144
+ 1427 0904 0E       		.byte	0xe
+ 1428 0905 F8       		.byte	0xf8
+ 1429 0906 FB000000 		.4byte	0xfb
+ 1430 090a 04       		.byte	0x4
+ 1431 090b 01       		.byte	0x1
+ 1432 090c 06       		.byte	0x6
+ 1433 090d 04       		.byte	0x4
+ 1434 090e 0D       		.uleb128 0xd
+ 1435 090f FB0B0000 		.4byte	.LASF145
+ 1436 0913 0E       		.byte	0xe
+ 1437 0914 F9       		.byte	0xf9
+ 1438 0915 FB000000 		.4byte	0xfb
+ 1439 0919 04       		.byte	0x4
+ 1440 091a 01       		.byte	0x1
+ 1441 091b 05       		.byte	0x5
+ 1442 091c 04       		.byte	0x4
+ 1443 091d 0D       		.uleb128 0xd
+ 1444 091e 4C000000 		.4byte	.LASF146
+ 1445 0922 0E       		.byte	0xe
+ 1446 0923 FA       		.byte	0xfa
+ 1447 0924 FB000000 		.4byte	0xfb
+ 1448 0928 04       		.byte	0x4
+ 1449 0929 01       		.byte	0x1
+ 1450 092a 04       		.byte	0x4
+ 1451 092b 04       		.byte	0x4
+ 1452 092c 0D       		.uleb128 0xd
+ 1453 092d 8B070000 		.4byte	.LASF147
+ 1454 0931 0E       		.byte	0xe
+ 1455 0932 FB       		.byte	0xfb
+ 1456 0933 FB000000 		.4byte	0xfb
+ 1457 0937 04       		.byte	0x4
+ 1458 0938 01       		.byte	0x1
+ 1459 0939 03       		.byte	0x3
+ 1460 093a 04       		.byte	0x4
+ 1461 093b 0D       		.uleb128 0xd
+ 1462 093c 00000000 		.4byte	.LASF148
+ 1463 0940 0E       		.byte	0xe
+ 1464 0941 FD       		.byte	0xfd
+ 1465 0942 FB000000 		.4byte	0xfb
+ 1466 0946 04       		.byte	0x4
+ 1467 0947 01       		.byte	0x1
+ 1468 0948 02       		.byte	0x2
+ 1469 0949 04       		.byte	0x4
+ 1470 094a 0D       		.uleb128 0xd
+ 1471 094b 2C030000 		.4byte	.LASF149
+ 1472 094f 0E       		.byte	0xe
+ 1473 0950 FE       		.byte	0xfe
+ 1474 0951 FB000000 		.4byte	0xfb
+ 1475 0955 04       		.byte	0x4
+ 1476 0956 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 29
+
+
+ 1477 0957 01       		.byte	0x1
+ 1478 0958 04       		.byte	0x4
+ 1479 0959 0D       		.uleb128 0xd
+ 1480 095a AF000000 		.4byte	.LASF150
+ 1481 095e 0E       		.byte	0xe
+ 1482 095f FF       		.byte	0xff
+ 1483 0960 FB000000 		.4byte	0xfb
+ 1484 0964 04       		.byte	0x4
+ 1485 0965 01       		.byte	0x1
+ 1486 0966 00       		.byte	0
+ 1487 0967 04       		.byte	0x4
+ 1488 0968 00       		.byte	0
+ 1489 0969 09       		.uleb128 0x9
+ 1490 096a 04       		.byte	0x4
+ 1491 096b 6F090000 		.4byte	0x96f
+ 1492 096f 09       		.uleb128 0x9
+ 1493 0970 04       		.byte	0x4
+ 1494 0971 B4070000 		.4byte	0x7b4
+ 1495 0975 06       		.uleb128 0x6
+ 1496 0976 D9040000 		.4byte	.LASF151
+ 1497 097a 0E       		.byte	0xe
+ 1498 097b 0001     		.2byte	0x100
+ 1499 097d BF070000 		.4byte	0x7bf
+ 1500 0981 03       		.uleb128 0x3
+ 1501 0982 B9060000 		.4byte	.LASF152
+ 1502 0986 0F       		.byte	0xf
+ 1503 0987 2B       		.byte	0x2b
+ 1504 0988 CF000000 		.4byte	0xcf
+ 1505 098c 03       		.uleb128 0x3
+ 1506 098d 33060000 		.4byte	.LASF153
+ 1507 0991 0C       		.byte	0xc
+ 1508 0992 42       		.byte	0x42
+ 1509 0993 CF000000 		.4byte	0xcf
+ 1510 0997 03       		.uleb128 0x3
+ 1511 0998 C0000000 		.4byte	.LASF154
+ 1512 099c 0C       		.byte	0xc
+ 1513 099d 4C       		.byte	0x4c
+ 1514 099e CF000000 		.4byte	0xcf
+ 1515 09a2 03       		.uleb128 0x3
+ 1516 09a3 19040000 		.4byte	.LASF155
+ 1517 09a7 0C       		.byte	0xc
+ 1518 09a8 52       		.byte	0x52
+ 1519 09a9 AD090000 		.4byte	0x9ad
+ 1520 09ad 09       		.uleb128 0x9
+ 1521 09ae 04       		.byte	0x4
+ 1522 09af B3090000 		.4byte	0x9b3
+ 1523 09b3 1B       		.uleb128 0x1b
+ 1524 09b4 97090000 		.4byte	0x997
+ 1525 09b8 CC090000 		.4byte	0x9cc
+ 1526 09bc 0B       		.uleb128 0xb
+ 1527 09bd 4A070000 		.4byte	0x74a
+ 1528 09c1 0B       		.uleb128 0xb
+ 1529 09c2 59040000 		.4byte	0x459
+ 1530 09c6 0B       		.uleb128 0xb
+ 1531 09c7 8C090000 		.4byte	0x98c
+ 1532 09cb 00       		.byte	0
+ 1533 09cc 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 30
+
+
+ 1534 09cd 84020000 		.4byte	.LASF156
+ 1535 09d1 0C       		.byte	0xc
+ 1536 09d2 6E       		.byte	0x6e
+ 1537 09d3 CF000000 		.4byte	0xcf
+ 1538 09d7 03       		.uleb128 0x3
+ 1539 09d8 AA010000 		.4byte	.LASF157
+ 1540 09dc 0C       		.byte	0xc
+ 1541 09dd 75       		.byte	0x75
+ 1542 09de E2090000 		.4byte	0x9e2
+ 1543 09e2 09       		.uleb128 0x9
+ 1544 09e3 04       		.byte	0x4
+ 1545 09e4 E8090000 		.4byte	0x9e8
+ 1546 09e8 0A       		.uleb128 0xa
+ 1547 09e9 F8090000 		.4byte	0x9f8
+ 1548 09ed 0B       		.uleb128 0xb
+ 1549 09ee 4A070000 		.4byte	0x74a
+ 1550 09f2 0B       		.uleb128 0xb
+ 1551 09f3 CC090000 		.4byte	0x9cc
+ 1552 09f7 00       		.byte	0
+ 1553 09f8 03       		.uleb128 0x3
+ 1554 09f9 3A0A0000 		.4byte	.LASF158
+ 1555 09fd 0C       		.byte	0xc
+ 1556 09fe 9B       		.byte	0x9b
+ 1557 09ff CF000000 		.4byte	0xcf
+ 1558 0a03 03       		.uleb128 0x3
+ 1559 0a04 E2050000 		.4byte	.LASF159
+ 1560 0a08 0C       		.byte	0xc
+ 1561 0a09 9D       		.byte	0x9d
+ 1562 0a0a 0E0A0000 		.4byte	0xa0e
+ 1563 0a0e 09       		.uleb128 0x9
+ 1564 0a0f 04       		.byte	0x4
+ 1565 0a10 140A0000 		.4byte	0xa14
+ 1566 0a14 1B       		.uleb128 0x1b
+ 1567 0a15 34010000 		.4byte	0x134
+ 1568 0a19 2D0A0000 		.4byte	0xa2d
+ 1569 0a1d 0B       		.uleb128 0xb
+ 1570 0a1e 4A070000 		.4byte	0x74a
+ 1571 0a22 0B       		.uleb128 0xb
+ 1572 0a23 F8090000 		.4byte	0x9f8
+ 1573 0a27 0B       		.uleb128 0xb
+ 1574 0a28 C6000000 		.4byte	0xc6
+ 1575 0a2c 00       		.byte	0
+ 1576 0a2d 07       		.uleb128 0x7
+ 1577 0a2e 0C       		.byte	0xc
+ 1578 0a2f 0C       		.byte	0xc
+ 1579 0a30 A0       		.byte	0xa0
+ 1580 0a31 840A0000 		.4byte	0xa84
+ 1581 0a35 08       		.uleb128 0x8
+ 1582 0a36 2E060000 		.4byte	.LASF160
+ 1583 0a3a 0C       		.byte	0xc
+ 1584 0a3b A1       		.byte	0xa1
+ 1585 0a3c 840A0000 		.4byte	0xa84
+ 1586 0a40 00       		.byte	0
+ 1587 0a41 08       		.uleb128 0x8
+ 1588 0a42 23020000 		.4byte	.LASF161
+ 1589 0a46 0C       		.byte	0xc
+ 1590 0a47 A2       		.byte	0xa2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 31
+
+
+ 1591 0a48 11010000 		.4byte	0x111
+ 1592 0a4c 04       		.byte	0x4
+ 1593 0a4d 08       		.uleb128 0x8
+ 1594 0a4e 7E080000 		.4byte	.LASF162
+ 1595 0a52 0C       		.byte	0xc
+ 1596 0a53 A3       		.byte	0xa3
+ 1597 0a54 11010000 		.4byte	0x111
+ 1598 0a58 06       		.byte	0x6
+ 1599 0a59 08       		.uleb128 0x8
+ 1600 0a5a 3F0C0000 		.4byte	.LASF163
+ 1601 0a5e 0C       		.byte	0xc
+ 1602 0a5f A4       		.byte	0xa4
+ 1603 0a60 D3020000 		.4byte	0x2d3
+ 1604 0a64 08       		.byte	0x8
+ 1605 0a65 0D       		.uleb128 0xd
+ 1606 0a66 43020000 		.4byte	.LASF164
+ 1607 0a6a 0C       		.byte	0xc
+ 1608 0a6b A5       		.byte	0xa5
+ 1609 0a6c CF000000 		.4byte	0xcf
+ 1610 0a70 01       		.byte	0x1
+ 1611 0a71 01       		.byte	0x1
+ 1612 0a72 07       		.byte	0x7
+ 1613 0a73 09       		.byte	0x9
+ 1614 0a74 0D       		.uleb128 0xd
+ 1615 0a75 CC010000 		.4byte	.LASF165
+ 1616 0a79 0C       		.byte	0xc
+ 1617 0a7a A6       		.byte	0xa6
+ 1618 0a7b CF000000 		.4byte	0xcf
+ 1619 0a7f 01       		.byte	0x1
+ 1620 0a80 01       		.byte	0x1
+ 1621 0a81 06       		.byte	0x6
+ 1622 0a82 09       		.byte	0x9
+ 1623 0a83 00       		.byte	0
+ 1624 0a84 09       		.uleb128 0x9
+ 1625 0a85 04       		.byte	0x4
+ 1626 0a86 8A0A0000 		.4byte	0xa8a
+ 1627 0a8a 14       		.uleb128 0x14
+ 1628 0a8b C9050000 		.4byte	0x5c9
+ 1629 0a8f 03       		.uleb128 0x3
+ 1630 0a90 C7060000 		.4byte	.LASF166
+ 1631 0a94 0C       		.byte	0xc
+ 1632 0a95 A8       		.byte	0xa8
+ 1633 0a96 2D0A0000 		.4byte	0xa2d
+ 1634 0a9a 03       		.uleb128 0x3
+ 1635 0a9b 0F090000 		.4byte	.LASF167
+ 1636 0a9f 0C       		.byte	0xc
+ 1637 0aa0 C3       		.byte	0xc3
+ 1638 0aa1 CF000000 		.4byte	0xcf
+ 1639 0aa5 1C       		.uleb128 0x1c
+ 1640 0aa6 01       		.byte	0x1
+ 1641 0aa7 5E000000 		.4byte	0x5e
+ 1642 0aab 0C       		.byte	0xc
+ 1643 0aac FC       		.byte	0xfc
+ 1644 0aad CA0A0000 		.4byte	0xaca
+ 1645 0ab1 1D       		.uleb128 0x1d
+ 1646 0ab2 DA020000 		.4byte	.LASF168
+ 1647 0ab6 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 32
+
+
+ 1648 0ab7 1D       		.uleb128 0x1d
+ 1649 0ab8 D4060000 		.4byte	.LASF169
+ 1650 0abc 01       		.byte	0x1
+ 1651 0abd 1D       		.uleb128 0x1d
+ 1652 0abe AF020000 		.4byte	.LASF170
+ 1653 0ac2 40       		.byte	0x40
+ 1654 0ac3 1D       		.uleb128 0x1d
+ 1655 0ac4 2A0A0000 		.4byte	.LASF171
+ 1656 0ac8 FF       		.byte	0xff
+ 1657 0ac9 00       		.byte	0
+ 1658 0aca 1C       		.uleb128 0x1c
+ 1659 0acb 01       		.byte	0x1
+ 1660 0acc 5E000000 		.4byte	0x5e
+ 1661 0ad0 10       		.byte	0x10
+ 1662 0ad1 6F       		.byte	0x6f
+ 1663 0ad2 E90A0000 		.4byte	0xae9
+ 1664 0ad6 1D       		.uleb128 0x1d
+ 1665 0ad7 5A050000 		.4byte	.LASF172
+ 1666 0adb 00       		.byte	0
+ 1667 0adc 1D       		.uleb128 0x1d
+ 1668 0add BD070000 		.4byte	.LASF173
+ 1669 0ae1 01       		.byte	0x1
+ 1670 0ae2 1D       		.uleb128 0x1d
+ 1671 0ae3 14030000 		.4byte	.LASF174
+ 1672 0ae7 40       		.byte	0x40
+ 1673 0ae8 00       		.byte	0
+ 1674 0ae9 1C       		.uleb128 0x1c
+ 1675 0aea 01       		.byte	0x1
+ 1676 0aeb 5E000000 		.4byte	0x5e
+ 1677 0aef 11       		.byte	0x11
+ 1678 0af0 3B       		.byte	0x3b
+ 1679 0af1 080B0000 		.4byte	0xb08
+ 1680 0af5 1D       		.uleb128 0x1d
+ 1681 0af6 34040000 		.4byte	.LASF175
+ 1682 0afa 00       		.byte	0
+ 1683 0afb 1D       		.uleb128 0x1d
+ 1684 0afc 27010000 		.4byte	.LASF176
+ 1685 0b00 01       		.byte	0x1
+ 1686 0b01 1D       		.uleb128 0x1d
+ 1687 0b02 660B0000 		.4byte	.LASF177
+ 1688 0b06 40       		.byte	0x40
+ 1689 0b07 00       		.byte	0
+ 1690 0b08 1C       		.uleb128 0x1c
+ 1691 0b09 01       		.byte	0x1
+ 1692 0b0a 5E000000 		.4byte	0x5e
+ 1693 0b0e 12       		.byte	0x12
+ 1694 0b0f 56       		.byte	0x56
+ 1695 0b10 390B0000 		.4byte	0xb39
+ 1696 0b14 1D       		.uleb128 0x1d
+ 1697 0b15 C10B0000 		.4byte	.LASF178
+ 1698 0b19 00       		.byte	0
+ 1699 0b1a 1D       		.uleb128 0x1d
+ 1700 0b1b F3080000 		.4byte	.LASF179
+ 1701 0b1f 01       		.byte	0x1
+ 1702 0b20 1D       		.uleb128 0x1d
+ 1703 0b21 45040000 		.4byte	.LASF180
+ 1704 0b25 02       		.byte	0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 33
+
+
+ 1705 0b26 1D       		.uleb128 0x1d
+ 1706 0b27 9A030000 		.4byte	.LASF181
+ 1707 0b2b 03       		.byte	0x3
+ 1708 0b2c 1D       		.uleb128 0x1d
+ 1709 0b2d FE0A0000 		.4byte	.LASF182
+ 1710 0b31 40       		.byte	0x40
+ 1711 0b32 1D       		.uleb128 0x1d
+ 1712 0b33 F2010000 		.4byte	.LASF183
+ 1713 0b37 41       		.byte	0x41
+ 1714 0b38 00       		.byte	0
+ 1715 0b39 1C       		.uleb128 0x1c
+ 1716 0b3a 01       		.byte	0x1
+ 1717 0b3b 5E000000 		.4byte	0x5e
+ 1718 0b3f 13       		.byte	0x13
+ 1719 0b40 4F       		.byte	0x4f
+ 1720 0b41 700B0000 		.4byte	0xb70
+ 1721 0b45 1D       		.uleb128 0x1d
+ 1722 0b46 A2050000 		.4byte	.LASF184
+ 1723 0b4a 00       		.byte	0
+ 1724 0b4b 1D       		.uleb128 0x1d
+ 1725 0b4c 75000000 		.4byte	.LASF185
+ 1726 0b50 01       		.byte	0x1
+ 1727 0b51 1D       		.uleb128 0x1d
+ 1728 0b52 6C050000 		.4byte	.LASF186
+ 1729 0b56 02       		.byte	0x2
+ 1730 0b57 1D       		.uleb128 0x1d
+ 1731 0b58 4A080000 		.4byte	.LASF187
+ 1732 0b5c 03       		.byte	0x3
+ 1733 0b5d 1D       		.uleb128 0x1d
+ 1734 0b5e C9080000 		.4byte	.LASF188
+ 1735 0b62 04       		.byte	0x4
+ 1736 0b63 1D       		.uleb128 0x1d
+ 1737 0b64 F7060000 		.4byte	.LASF189
+ 1738 0b68 05       		.byte	0x5
+ 1739 0b69 1D       		.uleb128 0x1d
+ 1740 0b6a B5030000 		.4byte	.LASF190
+ 1741 0b6e 41       		.byte	0x41
+ 1742 0b6f 00       		.byte	0
+ 1743 0b70 1E       		.uleb128 0x1e
+ 1744 0b71 36000000 		.4byte	.LASF231
+ 1745 0b75 02       		.byte	0x2
+ 1746 0b76 82000000 		.4byte	0x82
+ 1747 0b7a 14       		.byte	0x14
+ 1748 0b7b 1B       		.byte	0x1b
+ 1749 0b7c DA0B0000 		.4byte	0xbda
+ 1750 0b80 1D       		.uleb128 0x1d
+ 1751 0b81 31050000 		.4byte	.LASF191
+ 1752 0b85 00       		.byte	0
+ 1753 0b86 1D       		.uleb128 0x1d
+ 1754 0b87 AC0C0000 		.4byte	.LASF192
+ 1755 0b8b 01       		.byte	0x1
+ 1756 0b8c 1D       		.uleb128 0x1d
+ 1757 0b8d 24090000 		.4byte	.LASF193
+ 1758 0b91 02       		.byte	0x2
+ 1759 0b92 1D       		.uleb128 0x1d
+ 1760 0b93 500B0000 		.4byte	.LASF194
+ 1761 0b97 04       		.byte	0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 34
+
+
+ 1762 0b98 1D       		.uleb128 0x1d
+ 1763 0b99 44060000 		.4byte	.LASF195
+ 1764 0b9d 08       		.byte	0x8
+ 1765 0b9e 1D       		.uleb128 0x1d
+ 1766 0b9f 16070000 		.4byte	.LASF196
+ 1767 0ba3 10       		.byte	0x10
+ 1768 0ba4 1D       		.uleb128 0x1d
+ 1769 0ba5 450C0000 		.4byte	.LASF197
+ 1770 0ba9 20       		.byte	0x20
+ 1771 0baa 1D       		.uleb128 0x1d
+ 1772 0bab 71020000 		.4byte	.LASF198
+ 1773 0baf 40       		.byte	0x40
+ 1774 0bb0 1D       		.uleb128 0x1d
+ 1775 0bb1 2F020000 		.4byte	.LASF199
+ 1776 0bb5 80       		.byte	0x80
+ 1777 0bb6 1F       		.uleb128 0x1f
+ 1778 0bb7 7C030000 		.4byte	.LASF200
+ 1779 0bbb 0001     		.2byte	0x100
+ 1780 0bbd 1F       		.uleb128 0x1f
+ 1781 0bbe 46050000 		.4byte	.LASF201
+ 1782 0bc2 0002     		.2byte	0x200
+ 1783 0bc4 1F       		.uleb128 0x1f
+ 1784 0bc5 1A000000 		.4byte	.LASF202
+ 1785 0bc9 0004     		.2byte	0x400
+ 1786 0bcb 1F       		.uleb128 0x1f
+ 1787 0bcc B7080000 		.4byte	.LASF203
+ 1788 0bd0 0008     		.2byte	0x800
+ 1789 0bd2 1F       		.uleb128 0x1f
+ 1790 0bd3 88050000 		.4byte	.LASF204
+ 1791 0bd7 0010     		.2byte	0x1000
+ 1792 0bd9 00       		.byte	0
+ 1793 0bda 03       		.uleb128 0x3
+ 1794 0bdb D20A0000 		.4byte	.LASF205
+ 1795 0bdf 14       		.byte	0x14
+ 1796 0be0 2A       		.byte	0x2a
+ 1797 0be1 700B0000 		.4byte	0xb70
+ 1798 0be5 0F       		.uleb128 0xf
+ 1799 0be6 04       		.byte	0x4
+ 1800 0be7 14       		.byte	0x14
+ 1801 0be8 2E       		.byte	0x2e
+ 1802 0be9 0F0C0000 		.4byte	0xc0f
+ 1803 0bed 11       		.uleb128 0x11
+ 1804 0bee 62030000 		.4byte	.LASF206
+ 1805 0bf2 14       		.byte	0x14
+ 1806 0bf3 2F       		.byte	0x2f
+ 1807 0bf4 CF000000 		.4byte	0xcf
+ 1808 0bf8 11       		.uleb128 0x11
+ 1809 0bf9 F90A0000 		.4byte	.LASF207
+ 1810 0bfd 14       		.byte	0x14
+ 1811 0bfe 30       		.byte	0x30
+ 1812 0bff E5000000 		.4byte	0xe5
+ 1813 0c03 11       		.uleb128 0x11
+ 1814 0c04 240A0000 		.4byte	.LASF208
+ 1815 0c08 14       		.byte	0x14
+ 1816 0c09 31       		.byte	0x31
+ 1817 0c0a FB000000 		.4byte	0xfb
+ 1818 0c0e 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 35
+
+
+ 1819 0c0f 0C       		.uleb128 0xc
+ 1820 0c10 D6010000 		.4byte	.LASF209
+ 1821 0c14 05       		.byte	0x5
+ 1822 0c15 14       		.byte	0x14
+ 1823 0c16 2C       		.byte	0x2c
+ 1824 0c17 2E0C0000 		.4byte	0xc2e
+ 1825 0c1b 08       		.uleb128 0x8
+ 1826 0c1c 760C0000 		.4byte	.LASF210
+ 1827 0c20 14       		.byte	0x14
+ 1828 0c21 2D       		.byte	0x2d
+ 1829 0c22 CF000000 		.4byte	0xcf
+ 1830 0c26 00       		.byte	0
+ 1831 0c27 20       		.uleb128 0x20
+ 1832 0c28 E50B0000 		.4byte	0xbe5
+ 1833 0c2c 01       		.byte	0x1
+ 1834 0c2d 00       		.byte	0
+ 1835 0c2e 03       		.uleb128 0x3
+ 1836 0c2f E6000000 		.4byte	.LASF211
+ 1837 0c33 14       		.byte	0x14
+ 1838 0c34 33       		.byte	0x33
+ 1839 0c35 0F0C0000 		.4byte	0xc0f
+ 1840 0c39 21       		.uleb128 0x21
+ 1841 0c3a 910B0000 		.4byte	.LASF212
+ 1842 0c3e 01       		.byte	0x1
+ 1843 0c3f 4E       		.byte	0x4e
+ 1844 0c40 00000000 		.4byte	.LFB378
+ 1845 0c44 0C000000 		.4byte	.LFE378-.LFB378
+ 1846 0c48 01       		.uleb128 0x1
+ 1847 0c49 9C       		.byte	0x9c
+ 1848 0c4a 580C0000 		.4byte	0xc58
+ 1849 0c4e 22       		.uleb128 0x22
+ 1850 0c4f 06000000 		.4byte	.LVL0
+ 1851 0c53 7C0D0000 		.4byte	0xd7c
+ 1852 0c57 00       		.byte	0
+ 1853 0c58 21       		.uleb128 0x21
+ 1854 0c59 200C0000 		.4byte	.LASF213
+ 1855 0c5d 01       		.byte	0x1
+ 1856 0c5e 2A       		.byte	0x2a
+ 1857 0c5f 00000000 		.4byte	.LFB377
+ 1858 0c63 3C000000 		.4byte	.LFE377-.LFB377
+ 1859 0c67 01       		.uleb128 0x1
+ 1860 0c68 9C       		.byte	0x9c
+ 1861 0c69 F70C0000 		.4byte	0xcf7
+ 1862 0c6d 23       		.uleb128 0x23
+ 1863 0c6e 92040000 		.4byte	.LASF214
+ 1864 0c72 01       		.byte	0x1
+ 1865 0c73 2A       		.byte	0x2a
+ 1866 0c74 94070000 		.4byte	0x794
+ 1867 0c78 00000000 		.4byte	.LLST0
+ 1868 0c7c 23       		.uleb128 0x23
+ 1869 0c7d 570A0000 		.4byte	.LASF215
+ 1870 0c81 01       		.byte	0x1
+ 1871 0c82 2A       		.byte	0x2a
+ 1872 0c83 E5000000 		.4byte	0xe5
+ 1873 0c87 29000000 		.4byte	.LLST1
+ 1874 0c8b 23       		.uleb128 0x23
+ 1875 0c8c E10B0000 		.4byte	.LASF216
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 36
+
+
+ 1876 0c90 01       		.byte	0x1
+ 1877 0c91 2B       		.byte	0x2b
+ 1878 0c92 DA0B0000 		.4byte	0xbda
+ 1879 0c96 55000000 		.4byte	.LLST2
+ 1880 0c9a 24       		.uleb128 0x24
+ 1881 0c9b 6F757400 		.ascii	"out\000"
+ 1882 0c9f 01       		.byte	0x1
+ 1883 0ca0 2B       		.byte	0x2b
+ 1884 0ca1 F70C0000 		.4byte	0xcf7
+ 1885 0ca5 81000000 		.4byte	.LLST3
+ 1886 0ca9 23       		.uleb128 0x23
+ 1887 0caa 69010000 		.4byte	.LASF217
+ 1888 0cae 01       		.byte	0x1
+ 1889 0caf 2C       		.byte	0x2c
+ 1890 0cb0 06010000 		.4byte	0x106
+ 1891 0cb4 AD000000 		.4byte	.LLST4
+ 1892 0cb8 22       		.uleb128 0x22
+ 1893 0cb9 12000000 		.4byte	.LVL3
+ 1894 0cbd 390C0000 		.4byte	0xc39
+ 1895 0cc1 25       		.uleb128 0x25
+ 1896 0cc2 20000000 		.4byte	.LVL4
+ 1897 0cc6 870D0000 		.4byte	0xd87
+ 1898 0cca DB0C0000 		.4byte	0xcdb
+ 1899 0cce 26       		.uleb128 0x26
+ 1900 0ccf 01       		.uleb128 0x1
+ 1901 0cd0 50       		.byte	0x50
+ 1902 0cd1 02       		.uleb128 0x2
+ 1903 0cd2 75       		.byte	0x75
+ 1904 0cd3 00       		.sleb128 0
+ 1905 0cd4 26       		.uleb128 0x26
+ 1906 0cd5 01       		.uleb128 0x1
+ 1907 0cd6 51       		.byte	0x51
+ 1908 0cd7 02       		.uleb128 0x2
+ 1909 0cd8 76       		.byte	0x76
+ 1910 0cd9 00       		.sleb128 0
+ 1911 0cda 00       		.byte	0
+ 1912 0cdb 27       		.uleb128 0x27
+ 1913 0cdc 34000000 		.4byte	.LVL6
+ 1914 0ce0 920D0000 		.4byte	0xd92
+ 1915 0ce4 26       		.uleb128 0x26
+ 1916 0ce5 01       		.uleb128 0x1
+ 1917 0ce6 50       		.byte	0x50
+ 1918 0ce7 02       		.uleb128 0x2
+ 1919 0ce8 75       		.byte	0x75
+ 1920 0ce9 00       		.sleb128 0
+ 1921 0cea 26       		.uleb128 0x26
+ 1922 0ceb 01       		.uleb128 0x1
+ 1923 0cec 51       		.byte	0x51
+ 1924 0ced 01       		.uleb128 0x1
+ 1925 0cee 30       		.byte	0x30
+ 1926 0cef 26       		.uleb128 0x26
+ 1927 0cf0 01       		.uleb128 0x1
+ 1928 0cf1 52       		.byte	0x52
+ 1929 0cf2 02       		.uleb128 0x2
+ 1930 0cf3 76       		.byte	0x76
+ 1931 0cf4 00       		.sleb128 0
+ 1932 0cf5 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 37
+
+
+ 1933 0cf6 00       		.byte	0
+ 1934 0cf7 09       		.uleb128 0x9
+ 1935 0cf8 04       		.byte	0x4
+ 1936 0cf9 2E0C0000 		.4byte	0xc2e
+ 1937 0cfd 28       		.uleb128 0x28
+ 1938 0cfe E70B0000 		.4byte	.LASF218
+ 1939 0d02 01       		.byte	0x1
+ 1940 0d03 55       		.byte	0x55
+ 1941 0d04 00000000 		.4byte	.LFB379
+ 1942 0d08 02000000 		.4byte	.LFE379-.LFB379
+ 1943 0d0c 01       		.uleb128 0x1
+ 1944 0d0d 9C       		.byte	0x9c
+ 1945 0d0e 28       		.uleb128 0x28
+ 1946 0d0f 61000000 		.4byte	.LASF219
+ 1947 0d13 01       		.byte	0x1
+ 1948 0d14 5A       		.byte	0x5a
+ 1949 0d15 00000000 		.4byte	.LFB380
+ 1950 0d19 02000000 		.4byte	.LFE380-.LFB380
+ 1951 0d1d 01       		.uleb128 0x1
+ 1952 0d1e 9C       		.byte	0x9c
+ 1953 0d1f 21       		.uleb128 0x21
+ 1954 0d20 96080000 		.4byte	.LASF220
+ 1955 0d24 01       		.byte	0x1
+ 1956 0d25 64       		.byte	0x64
+ 1957 0d26 00000000 		.4byte	.LFB381
+ 1958 0d2a 1C000000 		.4byte	.LFE381-.LFB381
+ 1959 0d2e 01       		.uleb128 0x1
+ 1960 0d2f 9C       		.byte	0x9c
+ 1961 0d30 600D0000 		.4byte	0xd60
+ 1962 0d34 29       		.uleb128 0x29
+ 1963 0d35 0E000000 		.4byte	.LBB2
+ 1964 0d39 0E000000 		.4byte	.LBE2-.LBB2
+ 1965 0d3d 2A       		.uleb128 0x2a
+ 1966 0d3e 330B0000 		.4byte	.LASF221
+ 1967 0d42 01       		.byte	0x1
+ 1968 0d43 67       		.byte	0x67
+ 1969 0d44 600D0000 		.4byte	0xd60
+ 1970 0d48 CD000000 		.4byte	.LLST5
+ 1971 0d4c 22       		.uleb128 0x22
+ 1972 0d4d 12000000 		.4byte	.LVL9
+ 1973 0d51 9D0D0000 		.4byte	0xd9d
+ 1974 0d55 22       		.uleb128 0x22
+ 1975 0d56 16000000 		.4byte	.LVL10
+ 1976 0d5a A80D0000 		.4byte	0xda8
+ 1977 0d5e 00       		.byte	0
+ 1978 0d5f 00       		.byte	0
+ 1979 0d60 09       		.uleb128 0x9
+ 1980 0d61 04       		.byte	0x4
+ 1981 0d62 77070000 		.4byte	0x777
+ 1982 0d66 2B       		.uleb128 0x2b
+ 1983 0d67 A9040000 		.4byte	.LASF222
+ 1984 0d6b 01       		.byte	0x1
+ 1985 0d6c 21       		.byte	0x21
+ 1986 0d6d 770D0000 		.4byte	0xd77
+ 1987 0d71 05       		.uleb128 0x5
+ 1988 0d72 03       		.byte	0x3
+ 1989 0d73 00000000 		.4byte	spi_flags
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 38
+
+
+ 1990 0d77 13       		.uleb128 0x13
+ 1991 0d78 DA0B0000 		.4byte	0xbda
+ 1992 0d7c 2C       		.uleb128 0x2c
+ 1993 0d7d 36080000 		.4byte	.LASF223
+ 1994 0d81 36080000 		.4byte	.LASF223
+ 1995 0d85 15       		.byte	0x15
+ 1996 0d86 12       		.byte	0x12
+ 1997 0d87 2C       		.uleb128 0x2c
+ 1998 0d88 25070000 		.4byte	.LASF224
+ 1999 0d8c 25070000 		.4byte	.LASF224
+ 2000 0d90 15       		.byte	0x15
+ 2001 0d91 17       		.byte	0x17
+ 2002 0d92 2C       		.uleb128 0x2c
+ 2003 0d93 E0090000 		.4byte	.LASF225
+ 2004 0d97 E0090000 		.4byte	.LASF225
+ 2005 0d9b 15       		.byte	0x15
+ 2006 0d9c 16       		.byte	0x16
+ 2007 0d9d 2C       		.uleb128 0x2c
+ 2008 0d9e 85010000 		.4byte	.LASF226
+ 2009 0da2 85010000 		.4byte	.LASF226
+ 2010 0da6 16       		.byte	0x16
+ 2011 0da7 47       		.byte	0x47
+ 2012 0da8 2D       		.uleb128 0x2d
+ 2013 0da9 D8070000 		.4byte	.LASF227
+ 2014 0dad D8070000 		.4byte	.LASF227
+ 2015 0db1 0B       		.byte	0xb
+ 2016 0db2 2001     		.2byte	0x120
+ 2017 0db4 00       		.byte	0
+ 2018              		.section	.debug_abbrev,"",%progbits
+ 2019              	.Ldebug_abbrev0:
+ 2020 0000 01       		.uleb128 0x1
+ 2021 0001 11       		.uleb128 0x11
+ 2022 0002 01       		.byte	0x1
+ 2023 0003 25       		.uleb128 0x25
+ 2024 0004 0E       		.uleb128 0xe
+ 2025 0005 13       		.uleb128 0x13
+ 2026 0006 0B       		.uleb128 0xb
+ 2027 0007 03       		.uleb128 0x3
+ 2028 0008 0E       		.uleb128 0xe
+ 2029 0009 1B       		.uleb128 0x1b
+ 2030 000a 0E       		.uleb128 0xe
+ 2031 000b 55       		.uleb128 0x55
+ 2032 000c 17       		.uleb128 0x17
+ 2033 000d 11       		.uleb128 0x11
+ 2034 000e 01       		.uleb128 0x1
+ 2035 000f 10       		.uleb128 0x10
+ 2036 0010 17       		.uleb128 0x17
+ 2037 0011 00       		.byte	0
+ 2038 0012 00       		.byte	0
+ 2039 0013 02       		.uleb128 0x2
+ 2040 0014 24       		.uleb128 0x24
+ 2041 0015 00       		.byte	0
+ 2042 0016 0B       		.uleb128 0xb
+ 2043 0017 0B       		.uleb128 0xb
+ 2044 0018 3E       		.uleb128 0x3e
+ 2045 0019 0B       		.uleb128 0xb
+ 2046 001a 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 39
+
+
+ 2047 001b 08       		.uleb128 0x8
+ 2048 001c 00       		.byte	0
+ 2049 001d 00       		.byte	0
+ 2050 001e 03       		.uleb128 0x3
+ 2051 001f 16       		.uleb128 0x16
+ 2052 0020 00       		.byte	0
+ 2053 0021 03       		.uleb128 0x3
+ 2054 0022 0E       		.uleb128 0xe
+ 2055 0023 3A       		.uleb128 0x3a
+ 2056 0024 0B       		.uleb128 0xb
+ 2057 0025 3B       		.uleb128 0x3b
+ 2058 0026 0B       		.uleb128 0xb
+ 2059 0027 49       		.uleb128 0x49
+ 2060 0028 13       		.uleb128 0x13
+ 2061 0029 00       		.byte	0
+ 2062 002a 00       		.byte	0
+ 2063 002b 04       		.uleb128 0x4
+ 2064 002c 24       		.uleb128 0x24
+ 2065 002d 00       		.byte	0
+ 2066 002e 0B       		.uleb128 0xb
+ 2067 002f 0B       		.uleb128 0xb
+ 2068 0030 3E       		.uleb128 0x3e
+ 2069 0031 0B       		.uleb128 0xb
+ 2070 0032 03       		.uleb128 0x3
+ 2071 0033 0E       		.uleb128 0xe
+ 2072 0034 00       		.byte	0
+ 2073 0035 00       		.byte	0
+ 2074 0036 05       		.uleb128 0x5
+ 2075 0037 0F       		.uleb128 0xf
+ 2076 0038 00       		.byte	0
+ 2077 0039 0B       		.uleb128 0xb
+ 2078 003a 0B       		.uleb128 0xb
+ 2079 003b 00       		.byte	0
+ 2080 003c 00       		.byte	0
+ 2081 003d 06       		.uleb128 0x6
+ 2082 003e 16       		.uleb128 0x16
+ 2083 003f 00       		.byte	0
+ 2084 0040 03       		.uleb128 0x3
+ 2085 0041 0E       		.uleb128 0xe
+ 2086 0042 3A       		.uleb128 0x3a
+ 2087 0043 0B       		.uleb128 0xb
+ 2088 0044 3B       		.uleb128 0x3b
+ 2089 0045 05       		.uleb128 0x5
+ 2090 0046 49       		.uleb128 0x49
+ 2091 0047 13       		.uleb128 0x13
+ 2092 0048 00       		.byte	0
+ 2093 0049 00       		.byte	0
+ 2094 004a 07       		.uleb128 0x7
+ 2095 004b 13       		.uleb128 0x13
+ 2096 004c 01       		.byte	0x1
+ 2097 004d 0B       		.uleb128 0xb
+ 2098 004e 0B       		.uleb128 0xb
+ 2099 004f 3A       		.uleb128 0x3a
+ 2100 0050 0B       		.uleb128 0xb
+ 2101 0051 3B       		.uleb128 0x3b
+ 2102 0052 0B       		.uleb128 0xb
+ 2103 0053 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 40
+
+
+ 2104 0054 13       		.uleb128 0x13
+ 2105 0055 00       		.byte	0
+ 2106 0056 00       		.byte	0
+ 2107 0057 08       		.uleb128 0x8
+ 2108 0058 0D       		.uleb128 0xd
+ 2109 0059 00       		.byte	0
+ 2110 005a 03       		.uleb128 0x3
+ 2111 005b 0E       		.uleb128 0xe
+ 2112 005c 3A       		.uleb128 0x3a
+ 2113 005d 0B       		.uleb128 0xb
+ 2114 005e 3B       		.uleb128 0x3b
+ 2115 005f 0B       		.uleb128 0xb
+ 2116 0060 49       		.uleb128 0x49
+ 2117 0061 13       		.uleb128 0x13
+ 2118 0062 38       		.uleb128 0x38
+ 2119 0063 0B       		.uleb128 0xb
+ 2120 0064 00       		.byte	0
+ 2121 0065 00       		.byte	0
+ 2122 0066 09       		.uleb128 0x9
+ 2123 0067 0F       		.uleb128 0xf
+ 2124 0068 00       		.byte	0
+ 2125 0069 0B       		.uleb128 0xb
+ 2126 006a 0B       		.uleb128 0xb
+ 2127 006b 49       		.uleb128 0x49
+ 2128 006c 13       		.uleb128 0x13
+ 2129 006d 00       		.byte	0
+ 2130 006e 00       		.byte	0
+ 2131 006f 0A       		.uleb128 0xa
+ 2132 0070 15       		.uleb128 0x15
+ 2133 0071 01       		.byte	0x1
+ 2134 0072 27       		.uleb128 0x27
+ 2135 0073 19       		.uleb128 0x19
+ 2136 0074 01       		.uleb128 0x1
+ 2137 0075 13       		.uleb128 0x13
+ 2138 0076 00       		.byte	0
+ 2139 0077 00       		.byte	0
+ 2140 0078 0B       		.uleb128 0xb
+ 2141 0079 05       		.uleb128 0x5
+ 2142 007a 00       		.byte	0
+ 2143 007b 49       		.uleb128 0x49
+ 2144 007c 13       		.uleb128 0x13
+ 2145 007d 00       		.byte	0
+ 2146 007e 00       		.byte	0
+ 2147 007f 0C       		.uleb128 0xc
+ 2148 0080 13       		.uleb128 0x13
+ 2149 0081 01       		.byte	0x1
+ 2150 0082 03       		.uleb128 0x3
+ 2151 0083 0E       		.uleb128 0xe
+ 2152 0084 0B       		.uleb128 0xb
+ 2153 0085 0B       		.uleb128 0xb
+ 2154 0086 3A       		.uleb128 0x3a
+ 2155 0087 0B       		.uleb128 0xb
+ 2156 0088 3B       		.uleb128 0x3b
+ 2157 0089 0B       		.uleb128 0xb
+ 2158 008a 01       		.uleb128 0x1
+ 2159 008b 13       		.uleb128 0x13
+ 2160 008c 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 41
+
+
+ 2161 008d 00       		.byte	0
+ 2162 008e 0D       		.uleb128 0xd
+ 2163 008f 0D       		.uleb128 0xd
+ 2164 0090 00       		.byte	0
+ 2165 0091 03       		.uleb128 0x3
+ 2166 0092 0E       		.uleb128 0xe
+ 2167 0093 3A       		.uleb128 0x3a
+ 2168 0094 0B       		.uleb128 0xb
+ 2169 0095 3B       		.uleb128 0x3b
+ 2170 0096 0B       		.uleb128 0xb
+ 2171 0097 49       		.uleb128 0x49
+ 2172 0098 13       		.uleb128 0x13
+ 2173 0099 0B       		.uleb128 0xb
+ 2174 009a 0B       		.uleb128 0xb
+ 2175 009b 0D       		.uleb128 0xd
+ 2176 009c 0B       		.uleb128 0xb
+ 2177 009d 0C       		.uleb128 0xc
+ 2178 009e 0B       		.uleb128 0xb
+ 2179 009f 38       		.uleb128 0x38
+ 2180 00a0 0B       		.uleb128 0xb
+ 2181 00a1 00       		.byte	0
+ 2182 00a2 00       		.byte	0
+ 2183 00a3 0E       		.uleb128 0xe
+ 2184 00a4 0D       		.uleb128 0xd
+ 2185 00a5 00       		.byte	0
+ 2186 00a6 03       		.uleb128 0x3
+ 2187 00a7 08       		.uleb128 0x8
+ 2188 00a8 3A       		.uleb128 0x3a
+ 2189 00a9 0B       		.uleb128 0xb
+ 2190 00aa 3B       		.uleb128 0x3b
+ 2191 00ab 0B       		.uleb128 0xb
+ 2192 00ac 49       		.uleb128 0x49
+ 2193 00ad 13       		.uleb128 0x13
+ 2194 00ae 0B       		.uleb128 0xb
+ 2195 00af 0B       		.uleb128 0xb
+ 2196 00b0 0D       		.uleb128 0xd
+ 2197 00b1 0B       		.uleb128 0xb
+ 2198 00b2 0C       		.uleb128 0xc
+ 2199 00b3 0B       		.uleb128 0xb
+ 2200 00b4 38       		.uleb128 0x38
+ 2201 00b5 0B       		.uleb128 0xb
+ 2202 00b6 00       		.byte	0
+ 2203 00b7 00       		.byte	0
+ 2204 00b8 0F       		.uleb128 0xf
+ 2205 00b9 17       		.uleb128 0x17
+ 2206 00ba 01       		.byte	0x1
+ 2207 00bb 0B       		.uleb128 0xb
+ 2208 00bc 0B       		.uleb128 0xb
+ 2209 00bd 3A       		.uleb128 0x3a
+ 2210 00be 0B       		.uleb128 0xb
+ 2211 00bf 3B       		.uleb128 0x3b
+ 2212 00c0 0B       		.uleb128 0xb
+ 2213 00c1 01       		.uleb128 0x1
+ 2214 00c2 13       		.uleb128 0x13
+ 2215 00c3 00       		.byte	0
+ 2216 00c4 00       		.byte	0
+ 2217 00c5 10       		.uleb128 0x10
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 42
+
+
+ 2218 00c6 0D       		.uleb128 0xd
+ 2219 00c7 00       		.byte	0
+ 2220 00c8 03       		.uleb128 0x3
+ 2221 00c9 08       		.uleb128 0x8
+ 2222 00ca 3A       		.uleb128 0x3a
+ 2223 00cb 0B       		.uleb128 0xb
+ 2224 00cc 3B       		.uleb128 0x3b
+ 2225 00cd 0B       		.uleb128 0xb
+ 2226 00ce 49       		.uleb128 0x49
+ 2227 00cf 13       		.uleb128 0x13
+ 2228 00d0 00       		.byte	0
+ 2229 00d1 00       		.byte	0
+ 2230 00d2 11       		.uleb128 0x11
+ 2231 00d3 0D       		.uleb128 0xd
+ 2232 00d4 00       		.byte	0
+ 2233 00d5 03       		.uleb128 0x3
+ 2234 00d6 0E       		.uleb128 0xe
+ 2235 00d7 3A       		.uleb128 0x3a
+ 2236 00d8 0B       		.uleb128 0xb
+ 2237 00d9 3B       		.uleb128 0x3b
+ 2238 00da 0B       		.uleb128 0xb
+ 2239 00db 49       		.uleb128 0x49
+ 2240 00dc 13       		.uleb128 0x13
+ 2241 00dd 00       		.byte	0
+ 2242 00de 00       		.byte	0
+ 2243 00df 12       		.uleb128 0x12
+ 2244 00e0 0D       		.uleb128 0xd
+ 2245 00e1 00       		.byte	0
+ 2246 00e2 03       		.uleb128 0x3
+ 2247 00e3 08       		.uleb128 0x8
+ 2248 00e4 3A       		.uleb128 0x3a
+ 2249 00e5 0B       		.uleb128 0xb
+ 2250 00e6 3B       		.uleb128 0x3b
+ 2251 00e7 0B       		.uleb128 0xb
+ 2252 00e8 49       		.uleb128 0x49
+ 2253 00e9 13       		.uleb128 0x13
+ 2254 00ea 38       		.uleb128 0x38
+ 2255 00eb 0B       		.uleb128 0xb
+ 2256 00ec 00       		.byte	0
+ 2257 00ed 00       		.byte	0
+ 2258 00ee 13       		.uleb128 0x13
+ 2259 00ef 35       		.uleb128 0x35
+ 2260 00f0 00       		.byte	0
+ 2261 00f1 49       		.uleb128 0x49
+ 2262 00f2 13       		.uleb128 0x13
+ 2263 00f3 00       		.byte	0
+ 2264 00f4 00       		.byte	0
+ 2265 00f5 14       		.uleb128 0x14
+ 2266 00f6 26       		.uleb128 0x26
+ 2267 00f7 00       		.byte	0
+ 2268 00f8 49       		.uleb128 0x49
+ 2269 00f9 13       		.uleb128 0x13
+ 2270 00fa 00       		.byte	0
+ 2271 00fb 00       		.byte	0
+ 2272 00fc 15       		.uleb128 0x15
+ 2273 00fd 13       		.uleb128 0x13
+ 2274 00fe 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 43
+
+
+ 2275 00ff 03       		.uleb128 0x3
+ 2276 0100 0E       		.uleb128 0xe
+ 2277 0101 0B       		.uleb128 0xb
+ 2278 0102 05       		.uleb128 0x5
+ 2279 0103 3A       		.uleb128 0x3a
+ 2280 0104 0B       		.uleb128 0xb
+ 2281 0105 3B       		.uleb128 0x3b
+ 2282 0106 0B       		.uleb128 0xb
+ 2283 0107 01       		.uleb128 0x1
+ 2284 0108 13       		.uleb128 0x13
+ 2285 0109 00       		.byte	0
+ 2286 010a 00       		.byte	0
+ 2287 010b 16       		.uleb128 0x16
+ 2288 010c 0D       		.uleb128 0xd
+ 2289 010d 00       		.byte	0
+ 2290 010e 03       		.uleb128 0x3
+ 2291 010f 0E       		.uleb128 0xe
+ 2292 0110 3A       		.uleb128 0x3a
+ 2293 0111 0B       		.uleb128 0xb
+ 2294 0112 3B       		.uleb128 0x3b
+ 2295 0113 0B       		.uleb128 0xb
+ 2296 0114 49       		.uleb128 0x49
+ 2297 0115 13       		.uleb128 0x13
+ 2298 0116 38       		.uleb128 0x38
+ 2299 0117 05       		.uleb128 0x5
+ 2300 0118 00       		.byte	0
+ 2301 0119 00       		.byte	0
+ 2302 011a 17       		.uleb128 0x17
+ 2303 011b 0D       		.uleb128 0xd
+ 2304 011c 00       		.byte	0
+ 2305 011d 03       		.uleb128 0x3
+ 2306 011e 0E       		.uleb128 0xe
+ 2307 011f 3A       		.uleb128 0x3a
+ 2308 0120 0B       		.uleb128 0xb
+ 2309 0121 3B       		.uleb128 0x3b
+ 2310 0122 0B       		.uleb128 0xb
+ 2311 0123 49       		.uleb128 0x49
+ 2312 0124 13       		.uleb128 0x13
+ 2313 0125 0B       		.uleb128 0xb
+ 2314 0126 0B       		.uleb128 0xb
+ 2315 0127 0D       		.uleb128 0xd
+ 2316 0128 0B       		.uleb128 0xb
+ 2317 0129 0C       		.uleb128 0xc
+ 2318 012a 0B       		.uleb128 0xb
+ 2319 012b 38       		.uleb128 0x38
+ 2320 012c 05       		.uleb128 0x5
+ 2321 012d 00       		.byte	0
+ 2322 012e 00       		.byte	0
+ 2323 012f 18       		.uleb128 0x18
+ 2324 0130 26       		.uleb128 0x26
+ 2325 0131 00       		.byte	0
+ 2326 0132 00       		.byte	0
+ 2327 0133 00       		.byte	0
+ 2328 0134 19       		.uleb128 0x19
+ 2329 0135 01       		.uleb128 0x1
+ 2330 0136 01       		.byte	0x1
+ 2331 0137 49       		.uleb128 0x49
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 44
+
+
+ 2332 0138 13       		.uleb128 0x13
+ 2333 0139 01       		.uleb128 0x1
+ 2334 013a 13       		.uleb128 0x13
+ 2335 013b 00       		.byte	0
+ 2336 013c 00       		.byte	0
+ 2337 013d 1A       		.uleb128 0x1a
+ 2338 013e 21       		.uleb128 0x21
+ 2339 013f 00       		.byte	0
+ 2340 0140 49       		.uleb128 0x49
+ 2341 0141 13       		.uleb128 0x13
+ 2342 0142 2F       		.uleb128 0x2f
+ 2343 0143 0B       		.uleb128 0xb
+ 2344 0144 00       		.byte	0
+ 2345 0145 00       		.byte	0
+ 2346 0146 1B       		.uleb128 0x1b
+ 2347 0147 15       		.uleb128 0x15
+ 2348 0148 01       		.byte	0x1
+ 2349 0149 27       		.uleb128 0x27
+ 2350 014a 19       		.uleb128 0x19
+ 2351 014b 49       		.uleb128 0x49
+ 2352 014c 13       		.uleb128 0x13
+ 2353 014d 01       		.uleb128 0x1
+ 2354 014e 13       		.uleb128 0x13
+ 2355 014f 00       		.byte	0
+ 2356 0150 00       		.byte	0
+ 2357 0151 1C       		.uleb128 0x1c
+ 2358 0152 04       		.uleb128 0x4
+ 2359 0153 01       		.byte	0x1
+ 2360 0154 0B       		.uleb128 0xb
+ 2361 0155 0B       		.uleb128 0xb
+ 2362 0156 49       		.uleb128 0x49
+ 2363 0157 13       		.uleb128 0x13
+ 2364 0158 3A       		.uleb128 0x3a
+ 2365 0159 0B       		.uleb128 0xb
+ 2366 015a 3B       		.uleb128 0x3b
+ 2367 015b 0B       		.uleb128 0xb
+ 2368 015c 01       		.uleb128 0x1
+ 2369 015d 13       		.uleb128 0x13
+ 2370 015e 00       		.byte	0
+ 2371 015f 00       		.byte	0
+ 2372 0160 1D       		.uleb128 0x1d
+ 2373 0161 28       		.uleb128 0x28
+ 2374 0162 00       		.byte	0
+ 2375 0163 03       		.uleb128 0x3
+ 2376 0164 0E       		.uleb128 0xe
+ 2377 0165 1C       		.uleb128 0x1c
+ 2378 0166 0B       		.uleb128 0xb
+ 2379 0167 00       		.byte	0
+ 2380 0168 00       		.byte	0
+ 2381 0169 1E       		.uleb128 0x1e
+ 2382 016a 04       		.uleb128 0x4
+ 2383 016b 01       		.byte	0x1
+ 2384 016c 03       		.uleb128 0x3
+ 2385 016d 0E       		.uleb128 0xe
+ 2386 016e 0B       		.uleb128 0xb
+ 2387 016f 0B       		.uleb128 0xb
+ 2388 0170 49       		.uleb128 0x49
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 45
+
+
+ 2389 0171 13       		.uleb128 0x13
+ 2390 0172 3A       		.uleb128 0x3a
+ 2391 0173 0B       		.uleb128 0xb
+ 2392 0174 3B       		.uleb128 0x3b
+ 2393 0175 0B       		.uleb128 0xb
+ 2394 0176 01       		.uleb128 0x1
+ 2395 0177 13       		.uleb128 0x13
+ 2396 0178 00       		.byte	0
+ 2397 0179 00       		.byte	0
+ 2398 017a 1F       		.uleb128 0x1f
+ 2399 017b 28       		.uleb128 0x28
+ 2400 017c 00       		.byte	0
+ 2401 017d 03       		.uleb128 0x3
+ 2402 017e 0E       		.uleb128 0xe
+ 2403 017f 1C       		.uleb128 0x1c
+ 2404 0180 05       		.uleb128 0x5
+ 2405 0181 00       		.byte	0
+ 2406 0182 00       		.byte	0
+ 2407 0183 20       		.uleb128 0x20
+ 2408 0184 0D       		.uleb128 0xd
+ 2409 0185 00       		.byte	0
+ 2410 0186 49       		.uleb128 0x49
+ 2411 0187 13       		.uleb128 0x13
+ 2412 0188 38       		.uleb128 0x38
+ 2413 0189 0B       		.uleb128 0xb
+ 2414 018a 00       		.byte	0
+ 2415 018b 00       		.byte	0
+ 2416 018c 21       		.uleb128 0x21
+ 2417 018d 2E       		.uleb128 0x2e
+ 2418 018e 01       		.byte	0x1
+ 2419 018f 3F       		.uleb128 0x3f
+ 2420 0190 19       		.uleb128 0x19
+ 2421 0191 03       		.uleb128 0x3
+ 2422 0192 0E       		.uleb128 0xe
+ 2423 0193 3A       		.uleb128 0x3a
+ 2424 0194 0B       		.uleb128 0xb
+ 2425 0195 3B       		.uleb128 0x3b
+ 2426 0196 0B       		.uleb128 0xb
+ 2427 0197 27       		.uleb128 0x27
+ 2428 0198 19       		.uleb128 0x19
+ 2429 0199 11       		.uleb128 0x11
+ 2430 019a 01       		.uleb128 0x1
+ 2431 019b 12       		.uleb128 0x12
+ 2432 019c 06       		.uleb128 0x6
+ 2433 019d 40       		.uleb128 0x40
+ 2434 019e 18       		.uleb128 0x18
+ 2435 019f 9742     		.uleb128 0x2117
+ 2436 01a1 19       		.uleb128 0x19
+ 2437 01a2 01       		.uleb128 0x1
+ 2438 01a3 13       		.uleb128 0x13
+ 2439 01a4 00       		.byte	0
+ 2440 01a5 00       		.byte	0
+ 2441 01a6 22       		.uleb128 0x22
+ 2442 01a7 898201   		.uleb128 0x4109
+ 2443 01aa 00       		.byte	0
+ 2444 01ab 11       		.uleb128 0x11
+ 2445 01ac 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 46
+
+
+ 2446 01ad 31       		.uleb128 0x31
+ 2447 01ae 13       		.uleb128 0x13
+ 2448 01af 00       		.byte	0
+ 2449 01b0 00       		.byte	0
+ 2450 01b1 23       		.uleb128 0x23
+ 2451 01b2 05       		.uleb128 0x5
+ 2452 01b3 00       		.byte	0
+ 2453 01b4 03       		.uleb128 0x3
+ 2454 01b5 0E       		.uleb128 0xe
+ 2455 01b6 3A       		.uleb128 0x3a
+ 2456 01b7 0B       		.uleb128 0xb
+ 2457 01b8 3B       		.uleb128 0x3b
+ 2458 01b9 0B       		.uleb128 0xb
+ 2459 01ba 49       		.uleb128 0x49
+ 2460 01bb 13       		.uleb128 0x13
+ 2461 01bc 02       		.uleb128 0x2
+ 2462 01bd 17       		.uleb128 0x17
+ 2463 01be 00       		.byte	0
+ 2464 01bf 00       		.byte	0
+ 2465 01c0 24       		.uleb128 0x24
+ 2466 01c1 05       		.uleb128 0x5
+ 2467 01c2 00       		.byte	0
+ 2468 01c3 03       		.uleb128 0x3
+ 2469 01c4 08       		.uleb128 0x8
+ 2470 01c5 3A       		.uleb128 0x3a
+ 2471 01c6 0B       		.uleb128 0xb
+ 2472 01c7 3B       		.uleb128 0x3b
+ 2473 01c8 0B       		.uleb128 0xb
+ 2474 01c9 49       		.uleb128 0x49
+ 2475 01ca 13       		.uleb128 0x13
+ 2476 01cb 02       		.uleb128 0x2
+ 2477 01cc 17       		.uleb128 0x17
+ 2478 01cd 00       		.byte	0
+ 2479 01ce 00       		.byte	0
+ 2480 01cf 25       		.uleb128 0x25
+ 2481 01d0 898201   		.uleb128 0x4109
+ 2482 01d3 01       		.byte	0x1
+ 2483 01d4 11       		.uleb128 0x11
+ 2484 01d5 01       		.uleb128 0x1
+ 2485 01d6 31       		.uleb128 0x31
+ 2486 01d7 13       		.uleb128 0x13
+ 2487 01d8 01       		.uleb128 0x1
+ 2488 01d9 13       		.uleb128 0x13
+ 2489 01da 00       		.byte	0
+ 2490 01db 00       		.byte	0
+ 2491 01dc 26       		.uleb128 0x26
+ 2492 01dd 8A8201   		.uleb128 0x410a
+ 2493 01e0 00       		.byte	0
+ 2494 01e1 02       		.uleb128 0x2
+ 2495 01e2 18       		.uleb128 0x18
+ 2496 01e3 9142     		.uleb128 0x2111
+ 2497 01e5 18       		.uleb128 0x18
+ 2498 01e6 00       		.byte	0
+ 2499 01e7 00       		.byte	0
+ 2500 01e8 27       		.uleb128 0x27
+ 2501 01e9 898201   		.uleb128 0x4109
+ 2502 01ec 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 47
+
+
+ 2503 01ed 11       		.uleb128 0x11
+ 2504 01ee 01       		.uleb128 0x1
+ 2505 01ef 31       		.uleb128 0x31
+ 2506 01f0 13       		.uleb128 0x13
+ 2507 01f1 00       		.byte	0
+ 2508 01f2 00       		.byte	0
+ 2509 01f3 28       		.uleb128 0x28
+ 2510 01f4 2E       		.uleb128 0x2e
+ 2511 01f5 00       		.byte	0
+ 2512 01f6 3F       		.uleb128 0x3f
+ 2513 01f7 19       		.uleb128 0x19
+ 2514 01f8 03       		.uleb128 0x3
+ 2515 01f9 0E       		.uleb128 0xe
+ 2516 01fa 3A       		.uleb128 0x3a
+ 2517 01fb 0B       		.uleb128 0xb
+ 2518 01fc 3B       		.uleb128 0x3b
+ 2519 01fd 0B       		.uleb128 0xb
+ 2520 01fe 27       		.uleb128 0x27
+ 2521 01ff 19       		.uleb128 0x19
+ 2522 0200 11       		.uleb128 0x11
+ 2523 0201 01       		.uleb128 0x1
+ 2524 0202 12       		.uleb128 0x12
+ 2525 0203 06       		.uleb128 0x6
+ 2526 0204 40       		.uleb128 0x40
+ 2527 0205 18       		.uleb128 0x18
+ 2528 0206 9742     		.uleb128 0x2117
+ 2529 0208 19       		.uleb128 0x19
+ 2530 0209 00       		.byte	0
+ 2531 020a 00       		.byte	0
+ 2532 020b 29       		.uleb128 0x29
+ 2533 020c 0B       		.uleb128 0xb
+ 2534 020d 01       		.byte	0x1
+ 2535 020e 11       		.uleb128 0x11
+ 2536 020f 01       		.uleb128 0x1
+ 2537 0210 12       		.uleb128 0x12
+ 2538 0211 06       		.uleb128 0x6
+ 2539 0212 00       		.byte	0
+ 2540 0213 00       		.byte	0
+ 2541 0214 2A       		.uleb128 0x2a
+ 2542 0215 34       		.uleb128 0x34
+ 2543 0216 00       		.byte	0
+ 2544 0217 03       		.uleb128 0x3
+ 2545 0218 0E       		.uleb128 0xe
+ 2546 0219 3A       		.uleb128 0x3a
+ 2547 021a 0B       		.uleb128 0xb
+ 2548 021b 3B       		.uleb128 0x3b
+ 2549 021c 0B       		.uleb128 0xb
+ 2550 021d 49       		.uleb128 0x49
+ 2551 021e 13       		.uleb128 0x13
+ 2552 021f 02       		.uleb128 0x2
+ 2553 0220 17       		.uleb128 0x17
+ 2554 0221 00       		.byte	0
+ 2555 0222 00       		.byte	0
+ 2556 0223 2B       		.uleb128 0x2b
+ 2557 0224 34       		.uleb128 0x34
+ 2558 0225 00       		.byte	0
+ 2559 0226 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 48
+
+
+ 2560 0227 0E       		.uleb128 0xe
+ 2561 0228 3A       		.uleb128 0x3a
+ 2562 0229 0B       		.uleb128 0xb
+ 2563 022a 3B       		.uleb128 0x3b
+ 2564 022b 0B       		.uleb128 0xb
+ 2565 022c 49       		.uleb128 0x49
+ 2566 022d 13       		.uleb128 0x13
+ 2567 022e 02       		.uleb128 0x2
+ 2568 022f 18       		.uleb128 0x18
+ 2569 0230 00       		.byte	0
+ 2570 0231 00       		.byte	0
+ 2571 0232 2C       		.uleb128 0x2c
+ 2572 0233 2E       		.uleb128 0x2e
+ 2573 0234 00       		.byte	0
+ 2574 0235 3F       		.uleb128 0x3f
+ 2575 0236 19       		.uleb128 0x19
+ 2576 0237 3C       		.uleb128 0x3c
+ 2577 0238 19       		.uleb128 0x19
+ 2578 0239 6E       		.uleb128 0x6e
+ 2579 023a 0E       		.uleb128 0xe
+ 2580 023b 03       		.uleb128 0x3
+ 2581 023c 0E       		.uleb128 0xe
+ 2582 023d 3A       		.uleb128 0x3a
+ 2583 023e 0B       		.uleb128 0xb
+ 2584 023f 3B       		.uleb128 0x3b
+ 2585 0240 0B       		.uleb128 0xb
+ 2586 0241 00       		.byte	0
+ 2587 0242 00       		.byte	0
+ 2588 0243 2D       		.uleb128 0x2d
+ 2589 0244 2E       		.uleb128 0x2e
+ 2590 0245 00       		.byte	0
+ 2591 0246 3F       		.uleb128 0x3f
+ 2592 0247 19       		.uleb128 0x19
+ 2593 0248 3C       		.uleb128 0x3c
+ 2594 0249 19       		.uleb128 0x19
+ 2595 024a 6E       		.uleb128 0x6e
+ 2596 024b 0E       		.uleb128 0xe
+ 2597 024c 03       		.uleb128 0x3
+ 2598 024d 0E       		.uleb128 0xe
+ 2599 024e 3A       		.uleb128 0x3a
+ 2600 024f 0B       		.uleb128 0xb
+ 2601 0250 3B       		.uleb128 0x3b
+ 2602 0251 05       		.uleb128 0x5
+ 2603 0252 00       		.byte	0
+ 2604 0253 00       		.byte	0
+ 2605 0254 00       		.byte	0
+ 2606              		.section	.debug_loc,"",%progbits
+ 2607              	.Ldebug_loc0:
+ 2608              	.LLST0:
+ 2609 0000 00000000 		.4byte	.LVL1
+ 2610 0004 11000000 		.4byte	.LVL3-1
+ 2611 0008 0100     		.2byte	0x1
+ 2612 000a 50       		.byte	0x50
+ 2613 000b 11000000 		.4byte	.LVL3-1
+ 2614 000f 36000000 		.4byte	.LVL7
+ 2615 0013 0100     		.2byte	0x1
+ 2616 0015 55       		.byte	0x55
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 49
+
+
+ 2617 0016 36000000 		.4byte	.LVL7
+ 2618 001a 3C000000 		.4byte	.LFE377
+ 2619 001e 0100     		.2byte	0x1
+ 2620 0020 50       		.byte	0x50
+ 2621 0021 00000000 		.4byte	0
+ 2622 0025 00000000 		.4byte	0
+ 2623              	.LLST1:
+ 2624 0029 00000000 		.4byte	.LVL1
+ 2625 002d 11000000 		.4byte	.LVL3-1
+ 2626 0031 0100     		.2byte	0x1
+ 2627 0033 51       		.byte	0x51
+ 2628 0034 11000000 		.4byte	.LVL3-1
+ 2629 0038 36000000 		.4byte	.LVL7
+ 2630 003c 0400     		.2byte	0x4
+ 2631 003e F3       		.byte	0xf3
+ 2632 003f 01       		.uleb128 0x1
+ 2633 0040 51       		.byte	0x51
+ 2634 0041 9F       		.byte	0x9f
+ 2635 0042 36000000 		.4byte	.LVL7
+ 2636 0046 3C000000 		.4byte	.LFE377
+ 2637 004a 0100     		.2byte	0x1
+ 2638 004c 51       		.byte	0x51
+ 2639 004d 00000000 		.4byte	0
+ 2640 0051 00000000 		.4byte	0
+ 2641              	.LLST2:
+ 2642 0055 00000000 		.4byte	.LVL1
+ 2643 0059 11000000 		.4byte	.LVL3-1
+ 2644 005d 0100     		.2byte	0x1
+ 2645 005f 52       		.byte	0x52
+ 2646 0060 11000000 		.4byte	.LVL3-1
+ 2647 0064 36000000 		.4byte	.LVL7
+ 2648 0068 0400     		.2byte	0x4
+ 2649 006a F3       		.byte	0xf3
+ 2650 006b 01       		.uleb128 0x1
+ 2651 006c 52       		.byte	0x52
+ 2652 006d 9F       		.byte	0x9f
+ 2653 006e 36000000 		.4byte	.LVL7
+ 2654 0072 3C000000 		.4byte	.LFE377
+ 2655 0076 0100     		.2byte	0x1
+ 2656 0078 52       		.byte	0x52
+ 2657 0079 00000000 		.4byte	0
+ 2658 007d 00000000 		.4byte	0
+ 2659              	.LLST3:
+ 2660 0081 00000000 		.4byte	.LVL1
+ 2661 0085 0C000000 		.4byte	.LVL2
+ 2662 0089 0100     		.2byte	0x1
+ 2663 008b 53       		.byte	0x53
+ 2664 008c 0C000000 		.4byte	.LVL2
+ 2665 0090 36000000 		.4byte	.LVL7
+ 2666 0094 0400     		.2byte	0x4
+ 2667 0096 F3       		.byte	0xf3
+ 2668 0097 01       		.uleb128 0x1
+ 2669 0098 53       		.byte	0x53
+ 2670 0099 9F       		.byte	0x9f
+ 2671 009a 36000000 		.4byte	.LVL7
+ 2672 009e 3C000000 		.4byte	.LFE377
+ 2673 00a2 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 50
+
+
+ 2674 00a4 53       		.byte	0x53
+ 2675 00a5 00000000 		.4byte	0
+ 2676 00a9 00000000 		.4byte	0
+ 2677              	.LLST4:
+ 2678 00ad 00000000 		.4byte	.LVL1
+ 2679 00b1 22000000 		.4byte	.LVL5
+ 2680 00b5 0200     		.2byte	0x2
+ 2681 00b7 91       		.byte	0x91
+ 2682 00b8 00       		.sleb128 0
+ 2683 00b9 22000000 		.4byte	.LVL5
+ 2684 00bd 3C000000 		.4byte	.LFE377
+ 2685 00c1 0200     		.2byte	0x2
+ 2686 00c3 91       		.byte	0x91
+ 2687 00c4 00       		.sleb128 0
+ 2688 00c5 00000000 		.4byte	0
+ 2689 00c9 00000000 		.4byte	0
+ 2690              	.LLST5:
+ 2691 00cd 0E000000 		.4byte	.LVL8
+ 2692 00d1 12000000 		.4byte	.LVL9
+ 2693 00d5 0200     		.2byte	0x2
+ 2694 00d7 30       		.byte	0x30
+ 2695 00d8 9F       		.byte	0x9f
+ 2696 00d9 12000000 		.4byte	.LVL9
+ 2697 00dd 15000000 		.4byte	.LVL10-1
+ 2698 00e1 0100     		.2byte	0x1
+ 2699 00e3 50       		.byte	0x50
+ 2700 00e4 00000000 		.4byte	0
+ 2701 00e8 00000000 		.4byte	0
+ 2702              		.section	.debug_aranges,"",%progbits
+ 2703 0000 3C000000 		.4byte	0x3c
+ 2704 0004 0200     		.2byte	0x2
+ 2705 0006 00000000 		.4byte	.Ldebug_info0
+ 2706 000a 04       		.byte	0x4
+ 2707 000b 00       		.byte	0
+ 2708 000c 0000     		.2byte	0
+ 2709 000e 0000     		.2byte	0
+ 2710 0010 00000000 		.4byte	.LFB378
+ 2711 0014 0C000000 		.4byte	.LFE378-.LFB378
+ 2712 0018 00000000 		.4byte	.LFB377
+ 2713 001c 3C000000 		.4byte	.LFE377-.LFB377
+ 2714 0020 00000000 		.4byte	.LFB379
+ 2715 0024 02000000 		.4byte	.LFE379-.LFB379
+ 2716 0028 00000000 		.4byte	.LFB380
+ 2717 002c 02000000 		.4byte	.LFE380-.LFB380
+ 2718 0030 00000000 		.4byte	.LFB381
+ 2719 0034 1C000000 		.4byte	.LFE381-.LFB381
+ 2720 0038 00000000 		.4byte	0
+ 2721 003c 00000000 		.4byte	0
+ 2722              		.section	.debug_ranges,"",%progbits
+ 2723              	.Ldebug_ranges0:
+ 2724 0000 00000000 		.4byte	.LFB378
+ 2725 0004 0C000000 		.4byte	.LFE378
+ 2726 0008 00000000 		.4byte	.LFB377
+ 2727 000c 3C000000 		.4byte	.LFE377
+ 2728 0010 00000000 		.4byte	.LFB379
+ 2729 0014 02000000 		.4byte	.LFE379
+ 2730 0018 00000000 		.4byte	.LFB380
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 51
+
+
+ 2731 001c 02000000 		.4byte	.LFE380
+ 2732 0020 00000000 		.4byte	.LFB381
+ 2733 0024 1C000000 		.4byte	.LFE381
+ 2734 0028 00000000 		.4byte	0
+ 2735 002c 00000000 		.4byte	0
+ 2736              		.section	.debug_line,"",%progbits
+ 2737              	.Ldebug_line0:
+ 2738 0000 BA030000 		.section	.debug_str,"MS",%progbits,1
+ 2738      02005103 
+ 2738      00000201 
+ 2738      FB0E0D00 
+ 2738      01010101 
+ 2739              	.LASF148:
+ 2740 0000 74657874 		.ascii	"text_space_zero\000"
+ 2740      5F737061 
+ 2740      63655F7A 
+ 2740      65726F00 
+ 2741              	.LASF38:
+ 2742 0010 75736572 		.ascii	"user_data\000"
+ 2742      5F646174 
+ 2742      6100
+ 2743              	.LASF202:
+ 2744 001a 44495350 		.ascii	"DISP_SPI_MODE_DIO\000"
+ 2744      5F535049 
+ 2744      5F4D4F44 
+ 2744      455F4449 
+ 2744      4F00
+ 2745              	.LASF59:
+ 2746 002c 6C617374 		.ascii	"last_part\000"
+ 2746      5F706172 
+ 2746      7400
+ 2747              	.LASF231:
+ 2748 0036 5F646973 		.ascii	"_disp_spi_send_flag_t\000"
+ 2748      705F7370 
+ 2748      695F7365 
+ 2748      6E645F66 
+ 2748      6C61675F 
+ 2749              	.LASF146:
+ 2750 004c 76616C75 		.ascii	"value_txt_str\000"
+ 2750      655F7478 
+ 2750      745F7374 
+ 2750      7200
+ 2751              	.LASF4:
+ 2752 005a 73697A65 		.ascii	"size_t\000"
+ 2752      5F7400
+ 2753              	.LASF219:
+ 2754 0061 64697370 		.ascii	"display_spi_release\000"
+ 2754      6C61795F 
+ 2754      7370695F 
+ 2754      72656C65 
+ 2754      61736500 
+ 2755              	.LASF185:
+ 2756 0075 4C565F54 		.ascii	"LV_TEXTAREA_PART_SCROLLBAR\000"
+ 2756      45585441 
+ 2756      5245415F 
+ 2756      50415254 
+ 2756      5F534352 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 52
+
+
+ 2757              	.LASF105:
+ 2758 0090 636C6963 		.ascii	"click\000"
+ 2758      6B00
+ 2759              	.LASF73:
+ 2760 0096 636C6561 		.ascii	"clean_dcache_cb\000"
+ 2760      6E5F6463 
+ 2760      61636865 
+ 2760      5F636200 
+ 2761              	.LASF24:
+ 2762 00a6 75696E74 		.ascii	"uint64_t\000"
+ 2762      36345F74 
+ 2762      00
+ 2763              	.LASF150:
+ 2764 00af 74657874 		.ascii	"text_font_normal\000"
+ 2764      5F666F6E 
+ 2764      745F6E6F 
+ 2764      726D616C 
+ 2764      00
+ 2765              	.LASF154:
+ 2766 00c0 6C765F64 		.ascii	"lv_design_res_t\000"
+ 2766      65736967 
+ 2766      6E5F7265 
+ 2766      735F7400 
+ 2767              	.LASF3:
+ 2768 00d0 7369676E 		.ascii	"signed char\000"
+ 2768      65642063 
+ 2768      68617200 
+ 2769              	.LASF5:
+ 2770 00dc 5F5F7569 		.ascii	"__uint8_t\000"
+ 2770      6E74385F 
+ 2770      7400
+ 2771              	.LASF211:
+ 2772 00e6 64697370 		.ascii	"disp_spi_read_data\000"
+ 2772      5F737069 
+ 2772      5F726561 
+ 2772      645F6461 
+ 2772      746100
+ 2773              	.LASF39:
+ 2774 00f9 72657065 		.ascii	"repeat_count\000"
+ 2774      61745F63 
+ 2774      6F756E74 
+ 2774      00
+ 2775              	.LASF50:
+ 2776 0106 6C765F61 		.ascii	"lv_align_t\000"
+ 2776      6C69676E 
+ 2776      5F7400
+ 2777              	.LASF82:
+ 2778 0111 70726576 		.ascii	"prev_scr\000"
+ 2778      5F736372 
+ 2778      00
+ 2779              	.LASF139:
+ 2780 011a 62675F6F 		.ascii	"bg_opa_cover\000"
+ 2780      70615F63 
+ 2780      6F766572 
+ 2780      00
+ 2781              	.LASF176:
+ 2782 0127 5F4C565F 		.ascii	"_LV_BTN_PART_VIRTUAL_LAST\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 53
+
+
+ 2782      42544E5F 
+ 2782      50415254 
+ 2782      5F564952 
+ 2782      5455414C 
+ 2783              	.LASF16:
+ 2784 0141 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2784      206C6F6E 
+ 2784      6720756E 
+ 2784      7369676E 
+ 2784      65642069 
+ 2785              	.LASF141:
+ 2786 0158 626F7264 		.ascii	"border_side_full\000"
+ 2786      65725F73 
+ 2786      6964655F 
+ 2786      66756C6C 
+ 2786      00
+ 2787              	.LASF217:
+ 2788 0169 61646472 		.ascii	"addr\000"
+ 2788      00
+ 2789              	.LASF30:
+ 2790 016e 6E5F7369 		.ascii	"n_size\000"
+ 2790      7A6500
+ 2791              	.LASF90:
+ 2792 0175 696E765F 		.ascii	"inv_area_joined\000"
+ 2792      61726561 
+ 2792      5F6A6F69 
+ 2792      6E656400 
+ 2793              	.LASF226:
+ 2794 0185 5F6C765F 		.ascii	"_lv_refr_get_disp_refreshing\000"
+ 2794      72656672 
+ 2794      5F676574 
+ 2794      5F646973 
+ 2794      705F7265 
+ 2795              	.LASF33:
+ 2796 01a2 6C765F6C 		.ascii	"lv_ll_t\000"
+ 2796      6C5F7400 
+ 2797              	.LASF157:
+ 2798 01aa 6C765F65 		.ascii	"lv_event_cb_t\000"
+ 2798      76656E74 
+ 2798      5F63625F 
+ 2798      7400
+ 2799              	.LASF83:
+ 2800 01b8 746F705F 		.ascii	"top_layer\000"
+ 2800      6C617965 
+ 2800      7200
+ 2801              	.LASF79:
+ 2802 01c2 72656672 		.ascii	"refr_task\000"
+ 2802      5F746173 
+ 2802      6B00
+ 2803              	.LASF165:
+ 2804 01cc 6D69645F 		.ascii	"mid_align\000"
+ 2804      616C6967 
+ 2804      6E00
+ 2805              	.LASF209:
+ 2806 01d6 5F646973 		.ascii	"_disp_spi_read_data\000"
+ 2806      705F7370 
+ 2806      695F7265 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 54
+
+
+ 2806      61645F64 
+ 2806      61746100 
+ 2807              	.LASF20:
+ 2808 01ea 696E7431 		.ascii	"int16_t\000"
+ 2808      365F7400 
+ 2809              	.LASF183:
+ 2810 01f2 5F4C565F 		.ascii	"_LV_PAGE_PART_REAL_LAST\000"
+ 2810      50414745 
+ 2810      5F504152 
+ 2810      545F5245 
+ 2810      414C5F4C 
+ 2811              	.LASF112:
+ 2812 020a 67657374 		.ascii	"gesture_parent\000"
+ 2812      7572655F 
+ 2812      70617265 
+ 2812      6E7400
+ 2813              	.LASF70:
+ 2814 0219 7365745F 		.ascii	"set_px_cb\000"
+ 2814      70785F63 
+ 2814      6200
+ 2815              	.LASF161:
+ 2816 0223 786F6673 		.ascii	"xofs\000"
+ 2816      00
+ 2817              	.LASF109:
+ 2818 0228 68696464 		.ascii	"hidden\000"
+ 2818      656E00
+ 2819              	.LASF199:
+ 2820 022f 44495350 		.ascii	"DISP_SPI_ADDRESS_16\000"
+ 2820      5F535049 
+ 2820      5F414444 
+ 2820      52455353 
+ 2820      5F313600 
+ 2821              	.LASF164:
+ 2822 0243 6175746F 		.ascii	"auto_realign\000"
+ 2822      5F726561 
+ 2822      6C69676E 
+ 2822      00
+ 2823              	.LASF98:
+ 2824 0250 7369676E 		.ascii	"signal_cb\000"
+ 2824      616C5F63 
+ 2824      6200
+ 2825              	.LASF104:
+ 2826 025a 6578745F 		.ascii	"ext_draw_pad\000"
+ 2826      64726177 
+ 2826      5F706164 
+ 2826      00
+ 2827              	.LASF124:
+ 2828 0267 7374796C 		.ascii	"style_cnt\000"
+ 2828      655F636E 
+ 2828      7400
+ 2829              	.LASF198:
+ 2830 0271 44495350 		.ascii	"DISP_SPI_ADDRESS_8\000"
+ 2830      5F535049 
+ 2830      5F414444 
+ 2830      52455353 
+ 2830      5F3800
+ 2831              	.LASF156:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 55
+
+
+ 2832 0284 6C765F65 		.ascii	"lv_event_t\000"
+ 2832      76656E74 
+ 2832      5F7400
+ 2833              	.LASF94:
+ 2834 028f 70617265 		.ascii	"parent\000"
+ 2834      6E7400
+ 2835              	.LASF49:
+ 2836 0296 6C765F61 		.ascii	"lv_area_t\000"
+ 2836      7265615F 
+ 2836      7400
+ 2837              	.LASF118:
+ 2838 02a0 73746174 		.ascii	"state\000"
+ 2838      6500
+ 2839              	.LASF12:
+ 2840 02a6 6C6F6E67 		.ascii	"long int\000"
+ 2840      20696E74 
+ 2840      00
+ 2841              	.LASF170:
+ 2842 02af 5F4C565F 		.ascii	"_LV_OBJ_PART_REAL_LAST\000"
+ 2842      4F424A5F 
+ 2842      50415254 
+ 2842      5F524541 
+ 2842      4C5F4C41 
+ 2843              	.LASF68:
+ 2844 02c6 666C7573 		.ascii	"flush_cb\000"
+ 2844      685F6362 
+ 2844      00
+ 2845              	.LASF61:
+ 2846 02cf 5F6C765F 		.ascii	"_lv_task_t\000"
+ 2846      7461736B 
+ 2846      5F7400
+ 2847              	.LASF168:
+ 2848 02da 4C565F4F 		.ascii	"LV_OBJ_PART_MAIN\000"
+ 2848      424A5F50 
+ 2848      4152545F 
+ 2848      4D41494E 
+ 2848      00
+ 2849              	.LASF56:
+ 2850 02eb 666C7573 		.ascii	"flushing\000"
+ 2850      68696E67 
+ 2850      00
+ 2851              	.LASF1:
+ 2852 02f4 6C6F6E67 		.ascii	"long long int\000"
+ 2852      206C6F6E 
+ 2852      6720696E 
+ 2852      7400
+ 2853              	.LASF102:
+ 2854 0302 6578745F 		.ascii	"ext_click_pad_hor\000"
+ 2854      636C6963 
+ 2854      6B5F7061 
+ 2854      645F686F 
+ 2854      7200
+ 2855              	.LASF174:
+ 2856 0314 5F4C565F 		.ascii	"_LV_CONT_PART_REAL_LAST\000"
+ 2856      434F4E54 
+ 2856      5F504152 
+ 2856      545F5245 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 56
+
+
+ 2856      414C5F4C 
+ 2857              	.LASF149:
+ 2858 032c 74657874 		.ascii	"text_decor_none\000"
+ 2858      5F646563 
+ 2858      6F725F6E 
+ 2858      6F6E6500 
+ 2859              	.LASF65:
+ 2860 033c 62756666 		.ascii	"buffer\000"
+ 2860      657200
+ 2861              	.LASF87:
+ 2862 0343 62675F69 		.ascii	"bg_img\000"
+ 2862      6D6700
+ 2863              	.LASF96:
+ 2864 034a 636F6F72 		.ascii	"coords\000"
+ 2864      647300
+ 2865              	.LASF75:
+ 2866 0351 636F6C6F 		.ascii	"color_chroma_key\000"
+ 2866      725F6368 
+ 2866      726F6D61 
+ 2866      5F6B6579 
+ 2866      00
+ 2867              	.LASF206:
+ 2868 0362 62797465 		.ascii	"byte\000"
+ 2868      00
+ 2869              	.LASF13:
+ 2870 0367 5F5F7569 		.ascii	"__uint32_t\000"
+ 2870      6E743332 
+ 2870      5F7400
+ 2871              	.LASF40:
+ 2872 0372 6C765F74 		.ascii	"lv_task_t\000"
+ 2872      61736B5F 
+ 2872      7400
+ 2873              	.LASF200:
+ 2874 037c 44495350 		.ascii	"DISP_SPI_ADDRESS_24\000"
+ 2874      5F535049 
+ 2874      5F414444 
+ 2874      52455353 
+ 2874      5F323400 
+ 2875              	.LASF7:
+ 2876 0390 5F5F696E 		.ascii	"__int16_t\000"
+ 2876      7431365F 
+ 2876      7400
+ 2877              	.LASF181:
+ 2878 039a 5F4C565F 		.ascii	"_LV_PAGE_PART_VIRTUAL_LAST\000"
+ 2878      50414745 
+ 2878      5F504152 
+ 2878      545F5649 
+ 2878      52545541 
+ 2879              	.LASF190:
+ 2880 03b5 5F4C565F 		.ascii	"_LV_TEXTAREA_PART_REAL_LAST\000"
+ 2880      54455854 
+ 2880      41524541 
+ 2880      5F504152 
+ 2880      545F5245 
+ 2881              	.LASF28:
+ 2882 03d1 6C765F72 		.ascii	"lv_res_t\000"
+ 2882      65735F74 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 57
+
+
+ 2882      00
+ 2883              	.LASF84:
+ 2884 03da 7379735F 		.ascii	"sys_layer\000"
+ 2884      6C617965 
+ 2884      7200
+ 2885              	.LASF131:
+ 2886 03e4 72616469 		.ascii	"radius_zero\000"
+ 2886      75735F7A 
+ 2886      65726F00 
+ 2887              	.LASF27:
+ 2888 03f0 6C765F6F 		.ascii	"lv_obj_user_data_t\000"
+ 2888      626A5F75 
+ 2888      7365725F 
+ 2888      64617461 
+ 2888      5F7400
+ 2889              	.LASF0:
+ 2890 0403 756E7369 		.ascii	"unsigned int\000"
+ 2890      676E6564 
+ 2890      20696E74 
+ 2890      00
+ 2891              	.LASF21:
+ 2892 0410 75696E74 		.ascii	"uint16_t\000"
+ 2892      31365F74 
+ 2892      00
+ 2893              	.LASF155:
+ 2894 0419 6C765F64 		.ascii	"lv_design_cb_t\000"
+ 2894      65736967 
+ 2894      6E5F6362 
+ 2894      5F7400
+ 2895              	.LASF111:
+ 2896 0428 6164765F 		.ascii	"adv_hittest\000"
+ 2896      68697474 
+ 2896      65737400 
+ 2897              	.LASF175:
+ 2898 0434 4C565F42 		.ascii	"LV_BTN_PART_MAIN\000"
+ 2898      544E5F50 
+ 2898      4152545F 
+ 2898      4D41494E 
+ 2898      00
+ 2899              	.LASF180:
+ 2900 0445 4C565F50 		.ascii	"LV_PAGE_PART_EDGE_FLASH\000"
+ 2900      4147455F 
+ 2900      50415254 
+ 2900      5F454447 
+ 2900      455F464C 
+ 2901              	.LASF14:
+ 2902 045d 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2902      20756E73 
+ 2902      69676E65 
+ 2902      6420696E 
+ 2902      7400
+ 2903              	.LASF63:
+ 2904 046f 686F725F 		.ascii	"hor_res\000"
+ 2904      72657300 
+ 2905              	.LASF114:
+ 2906 0477 64726167 		.ascii	"drag_dir\000"
+ 2906      5F646972 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 58
+
+
+ 2906      00
+ 2907              	.LASF89:
+ 2908 0480 696E765F 		.ascii	"inv_areas\000"
+ 2908      61726561 
+ 2908      7300
+ 2909              	.LASF37:
+ 2910 048a 7461736B 		.ascii	"task_cb\000"
+ 2910      5F636200 
+ 2911              	.LASF214:
+ 2912 0492 64617461 		.ascii	"data\000"
+ 2912      00
+ 2913              	.LASF103:
+ 2914 0497 6578745F 		.ascii	"ext_click_pad_ver\000"
+ 2914      636C6963 
+ 2914      6B5F7061 
+ 2914      645F7665 
+ 2914      7200
+ 2915              	.LASF222:
+ 2916 04a9 7370695F 		.ascii	"spi_flags\000"
+ 2916      666C6167 
+ 2916      7300
+ 2917              	.LASF10:
+ 2918 04b3 73686F72 		.ascii	"short unsigned int\000"
+ 2918      7420756E 
+ 2918      7369676E 
+ 2918      65642069 
+ 2918      6E7400
+ 2919              	.LASF229:
+ 2920 04c6 696C6939 		.ascii	"ili9341\\disp_spi.c\000"
+ 2920      3334315C 
+ 2920      64697370 
+ 2920      5F737069 
+ 2920      2E6300
+ 2921              	.LASF151:
+ 2922 04d9 6C765F73 		.ascii	"lv_style_list_t\000"
+ 2922      74796C65 
+ 2922      5F6C6973 
+ 2922      745F7400 
+ 2923              	.LASF97:
+ 2924 04e9 6576656E 		.ascii	"event_cb\000"
+ 2924      745F6362 
+ 2924      00
+ 2925              	.LASF133:
+ 2926 04f2 636C6970 		.ascii	"clip_corner_off\000"
+ 2926      5F636F72 
+ 2926      6E65725F 
+ 2926      6F666600 
+ 2927              	.LASF143:
+ 2928 0502 6F75746C 		.ascii	"outline_width_zero\000"
+ 2928      696E655F 
+ 2928      77696474 
+ 2928      685F7A65 
+ 2928      726F00
+ 2929              	.LASF140:
+ 2930 0515 626F7264 		.ascii	"border_width_zero\000"
+ 2930      65725F77 
+ 2930      69647468 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 59
+
+
+ 2930      5F7A6572 
+ 2930      6F00
+ 2931              	.LASF125:
+ 2932 0527 6861735F 		.ascii	"has_local\000"
+ 2932      6C6F6361 
+ 2932      6C00
+ 2933              	.LASF191:
+ 2934 0531 44495350 		.ascii	"DISP_SPI_SEND_QUEUED\000"
+ 2934      5F535049 
+ 2934      5F53454E 
+ 2934      445F5155 
+ 2934      45554544 
+ 2935              	.LASF201:
+ 2936 0546 44495350 		.ascii	"DISP_SPI_ADDRESS_32\000"
+ 2936      5F535049 
+ 2936      5F414444 
+ 2936      52455353 
+ 2936      5F333200 
+ 2937              	.LASF172:
+ 2938 055a 4C565F43 		.ascii	"LV_CONT_PART_MAIN\000"
+ 2938      4F4E545F 
+ 2938      50415254 
+ 2938      5F4D4149 
+ 2938      4E00
+ 2939              	.LASF186:
+ 2940 056c 4C565F54 		.ascii	"LV_TEXTAREA_PART_EDGE_FLASH\000"
+ 2940      45585441 
+ 2940      5245415F 
+ 2940      50415254 
+ 2940      5F454447 
+ 2941              	.LASF204:
+ 2942 0588 44495350 		.ascii	"DISP_SPI_MODE_DIOQIO_ADDR\000"
+ 2942      5F535049 
+ 2942      5F4D4F44 
+ 2942      455F4449 
+ 2942      4F51494F 
+ 2943              	.LASF184:
+ 2944 05a2 4C565F54 		.ascii	"LV_TEXTAREA_PART_BG\000"
+ 2944      45585441 
+ 2944      5245415F 
+ 2944      50415254 
+ 2944      5F424700 
+ 2945              	.LASF76:
+ 2946 05b6 6C765F64 		.ascii	"lv_disp_drv_t\000"
+ 2946      6973705F 
+ 2946      6472765F 
+ 2946      7400
+ 2947              	.LASF142:
+ 2948 05c4 626F7264 		.ascii	"border_post_off\000"
+ 2948      65725F70 
+ 2948      6F73745F 
+ 2948      6F666600 
+ 2949              	.LASF121:
+ 2950 05d4 6C765F64 		.ascii	"lv_drag_dir_t\000"
+ 2950      7261675F 
+ 2950      6469725F 
+ 2950      7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 60
+
+
+ 2951              	.LASF159:
+ 2952 05e2 6C765F73 		.ascii	"lv_signal_cb_t\000"
+ 2952      69676E61 
+ 2952      6C5F6362 
+ 2952      5F7400
+ 2953              	.LASF11:
+ 2954 05f1 5F5F696E 		.ascii	"__int32_t\000"
+ 2954      7433325F 
+ 2954      7400
+ 2955              	.LASF119:
+ 2956 05fb 7265616C 		.ascii	"realign\000"
+ 2956      69676E00 
+ 2957              	.LASF48:
+ 2958 0603 6C765F6F 		.ascii	"lv_opa_t\000"
+ 2958      70615F74 
+ 2958      00
+ 2959              	.LASF51:
+ 2960 060c 62756631 		.ascii	"buf1\000"
+ 2960      00
+ 2961              	.LASF67:
+ 2962 0611 726F7461 		.ascii	"rotated\000"
+ 2962      74656400 
+ 2963              	.LASF117:
+ 2964 0619 70726F74 		.ascii	"protect\000"
+ 2964      65637400 
+ 2965              	.LASF130:
+ 2966 0621 69676E6F 		.ascii	"ignore_cache\000"
+ 2966      72655F63 
+ 2966      61636865 
+ 2966      00
+ 2967              	.LASF160:
+ 2968 062e 62617365 		.ascii	"base\000"
+ 2968      00
+ 2969              	.LASF153:
+ 2970 0633 6C765F64 		.ascii	"lv_design_mode_t\000"
+ 2970      65736967 
+ 2970      6E5F6D6F 
+ 2970      64655F74 
+ 2970      00
+ 2971              	.LASF195:
+ 2972 0644 44495350 		.ascii	"DISP_SPI_RECEIVE\000"
+ 2972      5F535049 
+ 2972      5F524543 
+ 2972      45495645 
+ 2972      00
+ 2973              	.LASF32:
+ 2974 0655 7461696C 		.ascii	"tail\000"
+ 2974      00
+ 2975              	.LASF62:
+ 2976 065a 5F646973 		.ascii	"_disp_drv_t\000"
+ 2976      705F6472 
+ 2976      765F7400 
+ 2977              	.LASF17:
+ 2978 0666 73697A65 		.ascii	"sizetype\000"
+ 2978      74797065 
+ 2978      00
+ 2979              	.LASF137:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 61
+
+
+ 2980 066f 626C656E 		.ascii	"blend_mode_all_normal\000"
+ 2980      645F6D6F 
+ 2980      64655F61 
+ 2980      6C6C5F6E 
+ 2980      6F726D61 
+ 2981              	.LASF134:
+ 2982 0685 7472616E 		.ascii	"transform_all_zero\000"
+ 2982      73666F72 
+ 2982      6D5F616C 
+ 2982      6C5F7A65 
+ 2982      726F00
+ 2983              	.LASF2:
+ 2984 0698 6C6F6E67 		.ascii	"long double\000"
+ 2984      20646F75 
+ 2984      626C6500 
+ 2985              	.LASF136:
+ 2986 06a4 6D617267 		.ascii	"margin_all_zero\000"
+ 2986      696E5F61 
+ 2986      6C6C5F7A 
+ 2986      65726F00 
+ 2987              	.LASF45:
+ 2988 06b4 66756C6C 		.ascii	"full\000"
+ 2988      00
+ 2989              	.LASF152:
+ 2990 06b9 6C765F62 		.ascii	"lv_bidi_dir_t\000"
+ 2990      6964695F 
+ 2990      6469725F 
+ 2990      7400
+ 2991              	.LASF166:
+ 2992 06c7 6C765F72 		.ascii	"lv_realign_t\000"
+ 2992      65616C69 
+ 2992      676E5F74 
+ 2992      00
+ 2993              	.LASF169:
+ 2994 06d4 5F4C565F 		.ascii	"_LV_OBJ_PART_VIRTUAL_LAST\000"
+ 2994      4F424A5F 
+ 2994      50415254 
+ 2994      5F564952 
+ 2994      5455414C 
+ 2995              	.LASF86:
+ 2996 06ee 62675F63 		.ascii	"bg_color\000"
+ 2996      6F6C6F72 
+ 2996      00
+ 2997              	.LASF189:
+ 2998 06f7 5F4C565F 		.ascii	"_LV_TEXTAREA_PART_VIRTUAL_LAST\000"
+ 2998      54455854 
+ 2998      41524541 
+ 2998      5F504152 
+ 2998      545F5649 
+ 2999              	.LASF196:
+ 3000 0716 44495350 		.ascii	"DISP_SPI_CMD_8\000"
+ 3000      5F535049 
+ 3000      5F434D44 
+ 3000      5F3800
+ 3001              	.LASF224:
+ 3002 0725 73656E64 		.ascii	"send_spi\000"
+ 3002      5F737069 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 62
+
+
+ 3002      00
+ 3003              	.LASF113:
+ 3004 072e 666F6375 		.ascii	"focus_parent\000"
+ 3004      735F7061 
+ 3004      72656E74 
+ 3004      00
+ 3005              	.LASF115:
+ 3006 073b 62617365 		.ascii	"base_dir\000"
+ 3006      5F646972 
+ 3006      00
+ 3007              	.LASF88:
+ 3008 0744 62675F6F 		.ascii	"bg_opa\000"
+ 3008      706100
+ 3009              	.LASF230:
+ 3010 074b 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 3010      73657273 
+ 3010      5C737472 
+ 3010      61705C44 
+ 3010      6F63756D 
+ 3011 0778 69393334 		.ascii	"i9341_master.cydsn\000"
+ 3011      315F6D61 
+ 3011      73746572 
+ 3011      2E637964 
+ 3011      736E00
+ 3012              	.LASF147:
+ 3013 078b 696D675F 		.ascii	"img_recolor_opa_transp\000"
+ 3013      7265636F 
+ 3013      6C6F725F 
+ 3013      6F70615F 
+ 3013      7472616E 
+ 3014              	.LASF43:
+ 3015 07a2 626C7565 		.ascii	"blue\000"
+ 3015      00
+ 3016              	.LASF144:
+ 3017 07a7 70617474 		.ascii	"pattern_img_null\000"
+ 3017      65726E5F 
+ 3017      696D675F 
+ 3017      6E756C6C 
+ 3017      00
+ 3018              	.LASF41:
+ 3019 07b8 7072696F 		.ascii	"prio\000"
+ 3019      00
+ 3020              	.LASF173:
+ 3021 07bd 5F4C565F 		.ascii	"_LV_CONT_PART_VIRTUAL_LAST\000"
+ 3021      434F4E54 
+ 3021      5F504152 
+ 3021      545F5649 
+ 3021      52545541 
+ 3022              	.LASF227:
+ 3023 07d8 6C765F64 		.ascii	"lv_disp_flush_ready\000"
+ 3023      6973705F 
+ 3023      666C7573 
+ 3023      685F7265 
+ 3023      61647900 
+ 3024              	.LASF15:
+ 3025 07ec 5F5F7569 		.ascii	"__uint64_t\000"
+ 3025      6E743634 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 63
+
+
+ 3025      5F7400
+ 3026              	.LASF100:
+ 3027 07f7 6578745F 		.ascii	"ext_attr\000"
+ 3027      61747472 
+ 3027      00
+ 3028              	.LASF42:
+ 3029 0800 67726565 		.ascii	"green_h\000"
+ 3029      6E5F6800 
+ 3030              	.LASF44:
+ 3031 0808 67726565 		.ascii	"green_l\000"
+ 3031      6E5F6C00 
+ 3032              	.LASF46:
+ 3033 0810 6C765F63 		.ascii	"lv_color16_t\000"
+ 3033      6F6C6F72 
+ 3033      31365F74 
+ 3033      00
+ 3034              	.LASF138:
+ 3035 081d 62675F6F 		.ascii	"bg_opa_transp\000"
+ 3035      70615F74 
+ 3035      72616E73 
+ 3035      7000
+ 3036              	.LASF107:
+ 3037 082b 64726167 		.ascii	"drag_throw\000"
+ 3037      5F746872 
+ 3037      6F7700
+ 3038              	.LASF223:
+ 3039 0836 7370695F 		.ascii	"spi_xfer_is_ongoing\000"
+ 3039      78666572 
+ 3039      5F69735F 
+ 3039      6F6E676F 
+ 3039      696E6700 
+ 3040              	.LASF187:
+ 3041 084a 4C565F54 		.ascii	"LV_TEXTAREA_PART_CURSOR\000"
+ 3041      45585441 
+ 3041      5245415F 
+ 3041      50415254 
+ 3041      5F435552 
+ 3042              	.LASF122:
+ 3043 0862 5F426F6F 		.ascii	"_Bool\000"
+ 3043      6C00
+ 3044              	.LASF22:
+ 3045 0868 696E7433 		.ascii	"int32_t\000"
+ 3045      325F7400 
+ 3046              	.LASF6:
+ 3047 0870 756E7369 		.ascii	"unsigned char\000"
+ 3047      676E6564 
+ 3047      20636861 
+ 3047      7200
+ 3048              	.LASF162:
+ 3049 087e 796F6673 		.ascii	"yofs\000"
+ 3049      00
+ 3050              	.LASF72:
+ 3051 0883 77616974 		.ascii	"wait_cb\000"
+ 3051      5F636200 
+ 3052              	.LASF123:
+ 3053 088b 6C765F73 		.ascii	"lv_style_t\000"
+ 3053      74796C65 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 64
+
+
+ 3053      5F7400
+ 3054              	.LASF220:
+ 3055 0896 64697370 		.ascii	"display_colors_sent_notification\000"
+ 3055      6C61795F 
+ 3055      636F6C6F 
+ 3055      72735F73 
+ 3055      656E745F 
+ 3056              	.LASF203:
+ 3057 08b7 44495350 		.ascii	"DISP_SPI_MODE_QIO\000"
+ 3057      5F535049 
+ 3057      5F4D4F44 
+ 3057      455F5149 
+ 3057      4F00
+ 3058              	.LASF188:
+ 3059 08c9 4C565F54 		.ascii	"LV_TEXTAREA_PART_PLACEHOLDER\000"
+ 3059      45585441 
+ 3059      5245415F 
+ 3059      50415254 
+ 3059      5F504C41 
+ 3060              	.LASF128:
+ 3061 08e6 69676E6F 		.ascii	"ignore_trans\000"
+ 3061      72655F74 
+ 3061      72616E73 
+ 3061      00
+ 3062              	.LASF179:
+ 3063 08f3 4C565F50 		.ascii	"LV_PAGE_PART_SCROLLBAR\000"
+ 3063      4147455F 
+ 3063      50415254 
+ 3063      5F534352 
+ 3063      4F4C4C42 
+ 3064              	.LASF55:
+ 3065 090a 61726561 		.ascii	"area\000"
+ 3065      00
+ 3066              	.LASF167:
+ 3067 090f 6C765F73 		.ascii	"lv_state_t\000"
+ 3067      74617465 
+ 3067      5F7400
+ 3068              	.LASF93:
+ 3069 091a 5F6C765F 		.ascii	"_lv_obj_t\000"
+ 3069      6F626A5F 
+ 3069      7400
+ 3070              	.LASF193:
+ 3071 0924 44495350 		.ascii	"DISP_SPI_SEND_SYNCHRONOUS\000"
+ 3071      5F535049 
+ 3071      5F53454E 
+ 3071      445F5359 
+ 3071      4E434852 
+ 3072              	.LASF19:
+ 3073 093e 75696E74 		.ascii	"uint8_t\000"
+ 3073      385F7400 
+ 3074              	.LASF74:
+ 3075 0946 6770755F 		.ascii	"gpu_wait_cb\000"
+ 3075      77616974 
+ 3075      5F636200 
+ 3076              	.LASF228:
+ 3077 0952 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3077      43313120 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 65
+
+
+ 3077      352E342E 
+ 3077      31203230 
+ 3077      31363036 
+ 3078 0985 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3078      20726576 
+ 3078      6973696F 
+ 3078      6E203233 
+ 3078      37373135 
+ 3079 09b8 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 3079      66756E63 
+ 3079      74696F6E 
+ 3079      2D736563 
+ 3079      74696F6E 
+ 3080              	.LASF225:
+ 3081 09e0 73656E64 		.ascii	"send_spi_dma\000"
+ 3081      5F737069 
+ 3081      5F646D61 
+ 3081      00
+ 3082              	.LASF54:
+ 3083 09ed 73697A65 		.ascii	"size\000"
+ 3083      00
+ 3084              	.LASF91:
+ 3085 09f2 696E765F 		.ascii	"inv_p\000"
+ 3085      7000
+ 3086              	.LASF31:
+ 3087 09f8 68656164 		.ascii	"head\000"
+ 3087      00
+ 3088              	.LASF132:
+ 3089 09fd 6F70615F 		.ascii	"opa_scale_cover\000"
+ 3089      7363616C 
+ 3089      655F636F 
+ 3089      76657200 
+ 3090              	.LASF129:
+ 3091 0a0d 76616C69 		.ascii	"valid_cache\000"
+ 3091      645F6361 
+ 3091      63686500 
+ 3092              	.LASF101:
+ 3093 0a19 7374796C 		.ascii	"style_list\000"
+ 3093      655F6C69 
+ 3093      737400
+ 3094              	.LASF208:
+ 3095 0a24 64776F72 		.ascii	"dword\000"
+ 3095      6400
+ 3096              	.LASF171:
+ 3097 0a2a 4C565F4F 		.ascii	"LV_OBJ_PART_ALL\000"
+ 3097      424A5F50 
+ 3097      4152545F 
+ 3097      414C4C00 
+ 3098              	.LASF158:
+ 3099 0a3a 6C765F73 		.ascii	"lv_signal_t\000"
+ 3099      69676E61 
+ 3099      6C5F7400 
+ 3100              	.LASF36:
+ 3101 0a46 6C617374 		.ascii	"last_run\000"
+ 3101      5F72756E 
+ 3101      00
+ 3102              	.LASF64:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 66
+
+
+ 3103 0a4f 7665725F 		.ascii	"ver_res\000"
+ 3103      72657300 
+ 3104              	.LASF215:
+ 3105 0a57 6C656E67 		.ascii	"length\000"
+ 3105      746800
+ 3106              	.LASF29:
+ 3107 0a5e 6C765F6C 		.ascii	"lv_ll_node_t\000"
+ 3107      6C5F6E6F 
+ 3107      64655F74 
+ 3107      00
+ 3108              	.LASF18:
+ 3109 0a6b 63686172 		.ascii	"char\000"
+ 3109      00
+ 3110              	.LASF92:
+ 3111 0a70 6C617374 		.ascii	"last_activity_time\000"
+ 3111      5F616374 
+ 3111      69766974 
+ 3111      795F7469 
+ 3111      6D6500
+ 3112              	.LASF66:
+ 3113 0a83 616E7469 		.ascii	"antialiasing\000"
+ 3113      616C6961 
+ 3113      73696E67 
+ 3113      00
+ 3114              	.LASF126:
+ 3115 0a90 6861735F 		.ascii	"has_trans\000"
+ 3115      7472616E 
+ 3115      7300
+ 3116              	.LASF9:
+ 3117 0a9a 5F5F7569 		.ascii	"__uint16_t\000"
+ 3117      6E743136 
+ 3117      5F7400
+ 3118              	.LASF116:
+ 3119 0aa5 67726F75 		.ascii	"group_p\000"
+ 3119      705F7000 
+ 3120              	.LASF8:
+ 3121 0aad 73686F72 		.ascii	"short int\000"
+ 3121      7420696E 
+ 3121      7400
+ 3122              	.LASF34:
+ 3123 0ab7 6C765F74 		.ascii	"lv_task_cb_t\000"
+ 3123      61736B5F 
+ 3123      63625F74 
+ 3123      00
+ 3124              	.LASF60:
+ 3125 0ac4 6C765F64 		.ascii	"lv_disp_buf_t\000"
+ 3125      6973705F 
+ 3125      6275665F 
+ 3125      7400
+ 3126              	.LASF205:
+ 3127 0ad2 64697370 		.ascii	"disp_spi_send_flag_t\000"
+ 3127      5F737069 
+ 3127      5F73656E 
+ 3127      645F666C 
+ 3127      61675F74 
+ 3128              	.LASF47:
+ 3129 0ae7 6C765F63 		.ascii	"lv_color_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 67
+
+
+ 3129      6F6C6F72 
+ 3129      5F7400
+ 3130              	.LASF35:
+ 3131 0af2 70657269 		.ascii	"period\000"
+ 3131      6F6400
+ 3132              	.LASF207:
+ 3133 0af9 776F7264 		.ascii	"word\000"
+ 3133      00
+ 3134              	.LASF182:
+ 3135 0afe 4C565F50 		.ascii	"LV_PAGE_PART_SCROLLABLE\000"
+ 3135      4147455F 
+ 3135      50415254 
+ 3135      5F534352 
+ 3135      4F4C4C41 
+ 3136              	.LASF106:
+ 3137 0b16 64726167 		.ascii	"drag\000"
+ 3137      00
+ 3138              	.LASF26:
+ 3139 0b1b 6C765F64 		.ascii	"lv_disp_drv_user_data_t\000"
+ 3139      6973705F 
+ 3139      6472765F 
+ 3139      75736572 
+ 3139      5F646174 
+ 3140              	.LASF221:
+ 3141 0b33 64697370 		.ascii	"disp\000"
+ 3141      00
+ 3142              	.LASF58:
+ 3143 0b38 6C617374 		.ascii	"last_area\000"
+ 3143      5F617265 
+ 3143      6100
+ 3144              	.LASF57:
+ 3145 0b42 666C7573 		.ascii	"flushing_last\000"
+ 3145      68696E67 
+ 3145      5F6C6173 
+ 3145      7400
+ 3146              	.LASF194:
+ 3147 0b50 44495350 		.ascii	"DISP_SPI_SIGNAL_FLUSH\000"
+ 3147      5F535049 
+ 3147      5F534947 
+ 3147      4E414C5F 
+ 3147      464C5553 
+ 3148              	.LASF177:
+ 3149 0b66 5F4C565F 		.ascii	"_LV_BTN_PART_REAL_LAST\000"
+ 3149      42544E5F 
+ 3149      50415254 
+ 3149      5F524541 
+ 3149      4C5F4C41 
+ 3150              	.LASF71:
+ 3151 0b7d 6D6F6E69 		.ascii	"monitor_cb\000"
+ 3151      746F725F 
+ 3151      636200
+ 3152              	.LASF23:
+ 3153 0b88 75696E74 		.ascii	"uint32_t\000"
+ 3153      33325F74 
+ 3153      00
+ 3154              	.LASF212:
+ 3155 0b91 64697370 		.ascii	"display_tl_poll_is_busy\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 68
+
+
+ 3155      6C61795F 
+ 3155      746C5F70 
+ 3155      6F6C6C5F 
+ 3155      69735F62 
+ 3156              	.LASF52:
+ 3157 0ba9 62756632 		.ascii	"buf2\000"
+ 3157      00
+ 3158              	.LASF69:
+ 3159 0bae 726F756E 		.ascii	"rounder_cb\000"
+ 3159      6465725F 
+ 3159      636200
+ 3160              	.LASF53:
+ 3161 0bb9 6275665F 		.ascii	"buf_act\000"
+ 3161      61637400 
+ 3162              	.LASF178:
+ 3163 0bc1 4C565F50 		.ascii	"LV_PAGE_PART_BG\000"
+ 3163      4147455F 
+ 3163      50415254 
+ 3163      5F424700 
+ 3164              	.LASF77:
+ 3165 0bd1 5F646973 		.ascii	"_disp_t\000"
+ 3165      705F7400 
+ 3166              	.LASF81:
+ 3167 0bd9 6163745F 		.ascii	"act_scr\000"
+ 3167      73637200 
+ 3168              	.LASF216:
+ 3169 0be1 666C6167 		.ascii	"flags\000"
+ 3169      7300
+ 3170              	.LASF218:
+ 3171 0be7 64697370 		.ascii	"display_spi_acquire\000"
+ 3171      6C61795F 
+ 3171      7370695F 
+ 3171      61637175 
+ 3171      69726500 
+ 3172              	.LASF145:
+ 3173 0bfb 73686164 		.ascii	"shadow_width_zero\000"
+ 3173      6F775F77 
+ 3173      69647468 
+ 3173      5F7A6572 
+ 3173      6F00
+ 3174              	.LASF80:
+ 3175 0c0d 7363725F 		.ascii	"scr_ll\000"
+ 3175      6C6C00
+ 3176              	.LASF108:
+ 3177 0c14 64726167 		.ascii	"drag_parent\000"
+ 3177      5F706172 
+ 3177      656E7400 
+ 3178              	.LASF213:
+ 3179 0c20 64697370 		.ascii	"display_spi_transaction\000"
+ 3179      6C61795F 
+ 3179      7370695F 
+ 3179      7472616E 
+ 3179      73616374 
+ 3180              	.LASF78:
+ 3181 0c38 64726976 		.ascii	"driver\000"
+ 3181      657200
+ 3182              	.LASF163:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccl91fmi.s 			page 69
+
+
+ 3183 0c3f 616C6967 		.ascii	"align\000"
+ 3183      6E00
+ 3184              	.LASF197:
+ 3185 0c45 44495350 		.ascii	"DISP_SPI_CMD_16\000"
+ 3185      5F535049 
+ 3185      5F434D44 
+ 3185      5F313600 
+ 3186              	.LASF120:
+ 3187 0c55 6C765F64 		.ascii	"lv_disp_t\000"
+ 3187      6973705F 
+ 3187      7400
+ 3188              	.LASF135:
+ 3189 0c5f 7061645F 		.ascii	"pad_all_zero\000"
+ 3189      616C6C5F 
+ 3189      7A65726F 
+ 3189      00
+ 3190              	.LASF99:
+ 3191 0c6c 64657369 		.ascii	"design_cb\000"
+ 3191      676E5F63 
+ 3191      6200
+ 3192              	.LASF210:
+ 3193 0c76 5F64756D 		.ascii	"_dummy_byte\000"
+ 3193      6D795F62 
+ 3193      79746500 
+ 3194              	.LASF85:
+ 3195 0c82 64656C5F 		.ascii	"del_prev\000"
+ 3195      70726576 
+ 3195      00
+ 3196              	.LASF110:
+ 3197 0c8b 70617265 		.ascii	"parent_event\000"
+ 3197      6E745F65 
+ 3197      76656E74 
+ 3197      00
+ 3198              	.LASF127:
+ 3199 0c98 736B6970 		.ascii	"skip_trans\000"
+ 3199      5F747261 
+ 3199      6E7300
+ 3200              	.LASF95:
+ 3201 0ca3 6368696C 		.ascii	"child_ll\000"
+ 3201      645F6C6C 
+ 3201      00
+ 3202              	.LASF192:
+ 3203 0cac 44495350 		.ascii	"DISP_SPI_SEND_POLLING\000"
+ 3203      5F535049 
+ 3203      5F53454E 
+ 3203      445F504F 
+ 3203      4C4C494E 
+ 3204              	.LASF25:
+ 3205 0cc2 6C765F63 		.ascii	"lv_coord_t\000"
+ 3205      6F6F7264 
+ 3205      5F7400
+ 3206              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

@@ -1,0 +1,1376 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_async.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.lv_async_task_cb,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	lv_async_task_cb, %function
+  24              	lv_async_task_cb:
+  25              	.LFB2:
+  26              		.file 1 "lvgl\\src\\lv_misc\\lv_async.c"
+   1:lvgl\src\lv_misc/lv_async.c **** /**
+   2:lvgl\src\lv_misc/lv_async.c ****  * @file lv_async.c
+   3:lvgl\src\lv_misc/lv_async.c ****  *
+   4:lvgl\src\lv_misc/lv_async.c ****  */
+   5:lvgl\src\lv_misc/lv_async.c **** 
+   6:lvgl\src\lv_misc/lv_async.c **** /*********************
+   7:lvgl\src\lv_misc/lv_async.c ****  *      INCLUDES
+   8:lvgl\src\lv_misc/lv_async.c ****  *********************/
+   9:lvgl\src\lv_misc/lv_async.c **** 
+  10:lvgl\src\lv_misc/lv_async.c **** #include "lv_async.h"
+  11:lvgl\src\lv_misc/lv_async.c **** 
+  12:lvgl\src\lv_misc/lv_async.c **** /*********************
+  13:lvgl\src\lv_misc/lv_async.c ****  *      DEFINES
+  14:lvgl\src\lv_misc/lv_async.c ****  *********************/
+  15:lvgl\src\lv_misc/lv_async.c **** 
+  16:lvgl\src\lv_misc/lv_async.c **** /**********************
+  17:lvgl\src\lv_misc/lv_async.c ****  *      TYPEDEFS
+  18:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  19:lvgl\src\lv_misc/lv_async.c **** 
+  20:lvgl\src\lv_misc/lv_async.c **** /**********************
+  21:lvgl\src\lv_misc/lv_async.c ****  *  STATIC PROTOTYPES
+  22:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  23:lvgl\src\lv_misc/lv_async.c **** 
+  24:lvgl\src\lv_misc/lv_async.c **** static void lv_async_task_cb(lv_task_t * task);
+  25:lvgl\src\lv_misc/lv_async.c **** 
+  26:lvgl\src\lv_misc/lv_async.c **** /**********************
+  27:lvgl\src\lv_misc/lv_async.c ****  *  STATIC VARIABLES
+  28:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  29:lvgl\src\lv_misc/lv_async.c **** 
+  30:lvgl\src\lv_misc/lv_async.c **** /**********************
+  31:lvgl\src\lv_misc/lv_async.c ****  *      MACROS
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 2
+
+
+  32:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  33:lvgl\src\lv_misc/lv_async.c **** 
+  34:lvgl\src\lv_misc/lv_async.c **** /**********************
+  35:lvgl\src\lv_misc/lv_async.c ****  *   GLOBAL FUNCTIONS
+  36:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  37:lvgl\src\lv_misc/lv_async.c **** 
+  38:lvgl\src\lv_misc/lv_async.c **** lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
+  39:lvgl\src\lv_misc/lv_async.c **** {
+  40:lvgl\src\lv_misc/lv_async.c ****     /*Allocate an info structure */
+  41:lvgl\src\lv_misc/lv_async.c ****     lv_async_info_t * info = lv_mem_alloc(sizeof(lv_async_info_t));
+  42:lvgl\src\lv_misc/lv_async.c **** 
+  43:lvgl\src\lv_misc/lv_async.c ****     if(info == NULL)
+  44:lvgl\src\lv_misc/lv_async.c ****         return LV_RES_INV;
+  45:lvgl\src\lv_misc/lv_async.c **** 
+  46:lvgl\src\lv_misc/lv_async.c ****     /* Create a new task */
+  47:lvgl\src\lv_misc/lv_async.c ****     /* Use highest priority so that it will run before a refresh */
+  48:lvgl\src\lv_misc/lv_async.c ****     lv_task_t * task = lv_task_create(lv_async_task_cb, 0, LV_TASK_PRIO_HIGHEST, info);
+  49:lvgl\src\lv_misc/lv_async.c **** 
+  50:lvgl\src\lv_misc/lv_async.c ****     if(task == NULL) {
+  51:lvgl\src\lv_misc/lv_async.c ****         lv_mem_free(info);
+  52:lvgl\src\lv_misc/lv_async.c ****         return LV_RES_INV;
+  53:lvgl\src\lv_misc/lv_async.c ****     }
+  54:lvgl\src\lv_misc/lv_async.c **** 
+  55:lvgl\src\lv_misc/lv_async.c ****     info->cb = async_xcb;
+  56:lvgl\src\lv_misc/lv_async.c ****     info->user_data = user_data;
+  57:lvgl\src\lv_misc/lv_async.c **** 
+  58:lvgl\src\lv_misc/lv_async.c ****     /* Set the task's user data */
+  59:lvgl\src\lv_misc/lv_async.c ****     task->user_data = info;
+  60:lvgl\src\lv_misc/lv_async.c ****     lv_task_set_repeat_count(task, 1);
+  61:lvgl\src\lv_misc/lv_async.c ****     return LV_RES_OK;
+  62:lvgl\src\lv_misc/lv_async.c **** }
+  63:lvgl\src\lv_misc/lv_async.c **** 
+  64:lvgl\src\lv_misc/lv_async.c **** /**********************
+  65:lvgl\src\lv_misc/lv_async.c ****  *   STATIC FUNCTIONS
+  66:lvgl\src\lv_misc/lv_async.c ****  **********************/
+  67:lvgl\src\lv_misc/lv_async.c **** 
+  68:lvgl\src\lv_misc/lv_async.c **** static void lv_async_task_cb(lv_task_t * task)
+  69:lvgl\src\lv_misc/lv_async.c **** {
+  27              		.loc 1 69 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+  70:lvgl\src\lv_misc/lv_async.c ****     lv_async_info_t * info = (lv_async_info_t *)task->user_data;
+  36              		.loc 1 70 0
+  37 0002 C468     		ldr	r4, [r0, #12]
+  38              	.LVL1:
+  71:lvgl\src\lv_misc/lv_async.c **** 
+  72:lvgl\src\lv_misc/lv_async.c ****     info->cb(info->user_data);
+  39              		.loc 1 72 0
+  40 0004 2368     		ldr	r3, [r4]
+  41 0006 6068     		ldr	r0, [r4, #4]
+  42              	.LVL2:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 3
+
+
+  43 0008 9847     		blx	r3
+  44              	.LVL3:
+  73:lvgl\src\lv_misc/lv_async.c **** 
+  74:lvgl\src\lv_misc/lv_async.c ****     lv_mem_free(info);
+  45              		.loc 1 74 0
+  46 000a 2046     		mov	r0, r4
+  47 000c FFF7FEFF 		bl	lv_mem_free
+  48              	.LVL4:
+  49 0010 10BD     		pop	{r4, pc}
+  50              		.cfi_endproc
+  51              	.LFE2:
+  52              		.size	lv_async_task_cb, .-lv_async_task_cb
+  53 0012 00BF     		.section	.text.lv_async_call,"ax",%progbits
+  54              		.align	2
+  55              		.global	lv_async_call
+  56              		.thumb
+  57              		.thumb_func
+  58              		.type	lv_async_call, %function
+  59              	lv_async_call:
+  60              	.LFB1:
+  39:lvgl\src\lv_misc/lv_async.c ****     /*Allocate an info structure */
+  61              		.loc 1 39 0
+  62              		.cfi_startproc
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              	.LVL5:
+  66 0000 70B5     		push	{r4, r5, r6, lr}
+  67              		.cfi_def_cfa_offset 16
+  68              		.cfi_offset 4, -16
+  69              		.cfi_offset 5, -12
+  70              		.cfi_offset 6, -8
+  71              		.cfi_offset 14, -4
+  72 0002 0646     		mov	r6, r0
+  73 0004 0D46     		mov	r5, r1
+  41:lvgl\src\lv_misc/lv_async.c **** 
+  74              		.loc 1 41 0
+  75 0006 0820     		movs	r0, #8
+  76              	.LVL6:
+  77 0008 FFF7FEFF 		bl	lv_mem_alloc
+  78              	.LVL7:
+  43:lvgl\src\lv_misc/lv_async.c ****         return LV_RES_INV;
+  79              		.loc 1 43 0
+  80 000c A0B1     		cbz	r0, .L6
+  81 000e 0446     		mov	r4, r0
+  48:lvgl\src\lv_misc/lv_async.c **** 
+  82              		.loc 1 48 0
+  83 0010 0346     		mov	r3, r0
+  84 0012 0522     		movs	r2, #5
+  85 0014 0021     		movs	r1, #0
+  86 0016 0948     		ldr	r0, .L8
+  87              	.LVL8:
+  88 0018 FFF7FEFF 		bl	lv_task_create
+  89              	.LVL9:
+  50:lvgl\src\lv_misc/lv_async.c ****         lv_mem_free(info);
+  90              		.loc 1 50 0
+  91 001c 20B9     		cbnz	r0, .L5
+  51:lvgl\src\lv_misc/lv_async.c ****         return LV_RES_INV;
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 4
+
+
+  92              		.loc 1 51 0
+  93 001e 2046     		mov	r0, r4
+  94              	.LVL10:
+  95 0020 FFF7FEFF 		bl	lv_mem_free
+  96              	.LVL11:
+  52:lvgl\src\lv_misc/lv_async.c ****     }
+  97              		.loc 1 52 0
+  98 0024 0020     		movs	r0, #0
+  99 0026 70BD     		pop	{r4, r5, r6, pc}
+ 100              	.LVL12:
+ 101              	.L5:
+  55:lvgl\src\lv_misc/lv_async.c ****     info->user_data = user_data;
+ 102              		.loc 1 55 0
+ 103 0028 2660     		str	r6, [r4]
+  56:lvgl\src\lv_misc/lv_async.c **** 
+ 104              		.loc 1 56 0
+ 105 002a 6560     		str	r5, [r4, #4]
+  59:lvgl\src\lv_misc/lv_async.c ****     lv_task_set_repeat_count(task, 1);
+ 106              		.loc 1 59 0
+ 107 002c C460     		str	r4, [r0, #12]
+  60:lvgl\src\lv_misc/lv_async.c ****     return LV_RES_OK;
+ 108              		.loc 1 60 0
+ 109 002e 0121     		movs	r1, #1
+ 110 0030 FFF7FEFF 		bl	lv_task_set_repeat_count
+ 111              	.LVL13:
+  61:lvgl\src\lv_misc/lv_async.c **** }
+ 112              		.loc 1 61 0
+ 113 0034 0120     		movs	r0, #1
+ 114 0036 70BD     		pop	{r4, r5, r6, pc}
+ 115              	.LVL14:
+ 116              	.L6:
+  44:lvgl\src\lv_misc/lv_async.c **** 
+ 117              		.loc 1 44 0
+ 118 0038 0020     		movs	r0, #0
+ 119              	.LVL15:
+  62:lvgl\src\lv_misc/lv_async.c **** 
+ 120              		.loc 1 62 0
+ 121 003a 70BD     		pop	{r4, r5, r6, pc}
+ 122              	.LVL16:
+ 123              	.L9:
+ 124              		.align	2
+ 125              	.L8:
+ 126 003c 00000000 		.word	lv_async_task_cb
+ 127              		.cfi_endproc
+ 128              	.LFE1:
+ 129              		.size	lv_async_call, .-lv_async_call
+ 130              		.text
+ 131              	.Letext0:
+ 132              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 133              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 134              		.file 4 "lvgl\\src\\lv_misc\\lv_types.h"
+ 135              		.file 5 "lvgl\\src\\lv_misc\\lv_task.h"
+ 136              		.file 6 "lvgl\\src\\lv_misc\\lv_async.h"
+ 137              		.file 7 "lvgl\\src\\lv_misc\\lv_mem.h"
+ 138              		.section	.debug_info,"",%progbits
+ 139              	.Ldebug_info0:
+ 140 0000 12030000 		.4byte	0x312
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 5
+
+
+ 141 0004 0400     		.2byte	0x4
+ 142 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 143 000a 04       		.byte	0x4
+ 144 000b 01       		.uleb128 0x1
+ 145 000c 9A020000 		.4byte	.LASF45
+ 146 0010 0C       		.byte	0xc
+ 147 0011 80010000 		.4byte	.LASF46
+ 148 0015 FC010000 		.4byte	.LASF47
+ 149 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 150 001d 00000000 		.4byte	0
+ 151 0021 00000000 		.4byte	.Ldebug_line0
+ 152 0025 02       		.uleb128 0x2
+ 153 0026 01       		.byte	0x1
+ 154 0027 06       		.byte	0x6
+ 155 0028 24010000 		.4byte	.LASF0
+ 156 002c 03       		.uleb128 0x3
+ 157 002d E9000000 		.4byte	.LASF4
+ 158 0031 02       		.byte	0x2
+ 159 0032 1D       		.byte	0x1d
+ 160 0033 37000000 		.4byte	0x37
+ 161 0037 02       		.uleb128 0x2
+ 162 0038 01       		.byte	0x1
+ 163 0039 08       		.byte	0x8
+ 164 003a 08010000 		.4byte	.LASF1
+ 165 003e 02       		.uleb128 0x2
+ 166 003f 02       		.byte	0x2
+ 167 0040 05       		.byte	0x5
+ 168 0041 0A000000 		.4byte	.LASF2
+ 169 0045 02       		.uleb128 0x2
+ 170 0046 02       		.byte	0x2
+ 171 0047 07       		.byte	0x7
+ 172 0048 6D010000 		.4byte	.LASF3
+ 173 004c 03       		.uleb128 0x3
+ 174 004d 5A020000 		.4byte	.LASF5
+ 175 0051 02       		.byte	0x2
+ 176 0052 3F       		.byte	0x3f
+ 177 0053 57000000 		.4byte	0x57
+ 178 0057 02       		.uleb128 0x2
+ 179 0058 04       		.byte	0x4
+ 180 0059 05       		.byte	0x5
+ 181 005a D9000000 		.4byte	.LASF6
+ 182 005e 03       		.uleb128 0x3
+ 183 005f 33000000 		.4byte	.LASF7
+ 184 0063 02       		.byte	0x2
+ 185 0064 41       		.byte	0x41
+ 186 0065 69000000 		.4byte	0x69
+ 187 0069 02       		.uleb128 0x2
+ 188 006a 04       		.byte	0x4
+ 189 006b 07       		.byte	0x7
+ 190 006c EA010000 		.4byte	.LASF8
+ 191 0070 02       		.uleb128 0x2
+ 192 0071 08       		.byte	0x8
+ 193 0072 05       		.byte	0x5
+ 194 0073 A0000000 		.4byte	.LASF9
+ 195 0077 02       		.uleb128 0x2
+ 196 0078 08       		.byte	0x8
+ 197 0079 07       		.byte	0x7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 6
+
+
+ 198 007a 30010000 		.4byte	.LASF10
+ 199 007e 04       		.uleb128 0x4
+ 200 007f 04       		.byte	0x4
+ 201 0080 05       		.byte	0x5
+ 202 0081 696E7400 		.ascii	"int\000"
+ 203 0085 02       		.uleb128 0x2
+ 204 0086 04       		.byte	0x4
+ 205 0087 07       		.byte	0x7
+ 206 0088 50010000 		.4byte	.LASF11
+ 207 008c 03       		.uleb128 0x3
+ 208 008d 6F000000 		.4byte	.LASF12
+ 209 0091 03       		.byte	0x3
+ 210 0092 18       		.byte	0x18
+ 211 0093 2C000000 		.4byte	0x2c
+ 212 0097 03       		.uleb128 0x3
+ 213 0098 9C010000 		.4byte	.LASF13
+ 214 009c 03       		.byte	0x3
+ 215 009d 2C       		.byte	0x2c
+ 216 009e 4C000000 		.4byte	0x4c
+ 217 00a2 03       		.uleb128 0x3
+ 218 00a3 47010000 		.4byte	.LASF14
+ 219 00a7 03       		.byte	0x3
+ 220 00a8 30       		.byte	0x30
+ 221 00a9 5E000000 		.4byte	0x5e
+ 222 00ad 05       		.uleb128 0x5
+ 223 00ae 04       		.byte	0x4
+ 224 00af 02       		.uleb128 0x2
+ 225 00b0 08       		.byte	0x8
+ 226 00b1 04       		.byte	0x4
+ 227 00b2 FC000000 		.4byte	.LASF15
+ 228 00b6 06       		.uleb128 0x6
+ 229 00b7 01       		.byte	0x1
+ 230 00b8 37000000 		.4byte	0x37
+ 231 00bc 04       		.byte	0x4
+ 232 00bd 2F       		.byte	0x2f
+ 233 00be CF000000 		.4byte	0xcf
+ 234 00c2 07       		.uleb128 0x7
+ 235 00c3 42030000 		.4byte	.LASF16
+ 236 00c7 00       		.byte	0
+ 237 00c8 07       		.uleb128 0x7
+ 238 00c9 AC010000 		.4byte	.LASF17
+ 239 00cd 01       		.byte	0x1
+ 240 00ce 00       		.byte	0
+ 241 00cf 03       		.uleb128 0x3
+ 242 00d0 AE000000 		.4byte	.LASF18
+ 243 00d4 04       		.byte	0x4
+ 244 00d5 34       		.byte	0x34
+ 245 00d6 8C000000 		.4byte	0x8c
+ 246 00da 02       		.uleb128 0x2
+ 247 00db 04       		.byte	0x4
+ 248 00dc 07       		.byte	0x7
+ 249 00dd 14000000 		.4byte	.LASF19
+ 250 00e1 03       		.uleb128 0x3
+ 251 00e2 64020000 		.4byte	.LASF20
+ 252 00e6 05       		.byte	0x5
+ 253 00e7 29       		.byte	0x29
+ 254 00e8 EC000000 		.4byte	0xec
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 7
+
+
+ 255 00ec 08       		.uleb128 0x8
+ 256 00ed 04       		.byte	0x4
+ 257 00ee F2000000 		.4byte	0xf2
+ 258 00f2 09       		.uleb128 0x9
+ 259 00f3 FD000000 		.4byte	0xfd
+ 260 00f7 0A       		.uleb128 0xa
+ 261 00f8 FD000000 		.4byte	0xfd
+ 262 00fc 00       		.byte	0
+ 263 00fd 08       		.uleb128 0x8
+ 264 00fe 04       		.byte	0x4
+ 265 00ff 03010000 		.4byte	0x103
+ 266 0103 0B       		.uleb128 0xb
+ 267 0104 95000000 		.4byte	.LASF35
+ 268 0108 18       		.byte	0x18
+ 269 0109 05       		.byte	0x5
+ 270 010a 3C       		.byte	0x3c
+ 271 010b 5B010000 		.4byte	0x15b
+ 272 010f 0C       		.uleb128 0xc
+ 273 0110 E2000000 		.4byte	.LASF21
+ 274 0114 05       		.byte	0x5
+ 275 0115 3D       		.byte	0x3d
+ 276 0116 A2000000 		.4byte	0xa2
+ 277 011a 00       		.byte	0
+ 278 011b 0C       		.uleb128 0xc
+ 279 011c F3000000 		.4byte	.LASF22
+ 280 0120 05       		.byte	0x5
+ 281 0121 3E       		.byte	0x3e
+ 282 0122 A2000000 		.4byte	0xa2
+ 283 0126 04       		.byte	0x4
+ 284 0127 0C       		.uleb128 0xc
+ 285 0128 A4010000 		.4byte	.LASF23
+ 286 012c 05       		.byte	0x5
+ 287 012d 3F       		.byte	0x3f
+ 288 012e E1000000 		.4byte	0xe1
+ 289 0132 08       		.byte	0x8
+ 290 0133 0C       		.uleb128 0xc
+ 291 0134 50000000 		.4byte	.LASF24
+ 292 0138 05       		.byte	0x5
+ 293 0139 41       		.byte	0x41
+ 294 013a AD000000 		.4byte	0xad
+ 295 013e 0C       		.byte	0xc
+ 296 013f 0C       		.uleb128 0xc
+ 297 0140 8D020000 		.4byte	.LASF25
+ 298 0144 05       		.byte	0x5
+ 299 0145 43       		.byte	0x43
+ 300 0146 97000000 		.4byte	0x97
+ 301 014a 10       		.byte	0x10
+ 302 014b 0D       		.uleb128 0xd
+ 303 014c 4D030000 		.4byte	.LASF48
+ 304 0150 05       		.byte	0x5
+ 305 0151 44       		.byte	0x44
+ 306 0152 8C000000 		.4byte	0x8c
+ 307 0156 01       		.byte	0x1
+ 308 0157 03       		.byte	0x3
+ 309 0158 05       		.byte	0x5
+ 310 0159 14       		.byte	0x14
+ 311 015a 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 8
+
+
+ 312 015b 06       		.uleb128 0x6
+ 313 015c 01       		.byte	0x1
+ 314 015d 37000000 		.4byte	0x37
+ 315 0161 05       		.byte	0x5
+ 316 0162 2E       		.byte	0x2e
+ 317 0163 92010000 		.4byte	0x192
+ 318 0167 07       		.uleb128 0x7
+ 319 0168 B7000000 		.4byte	.LASF26
+ 320 016c 00       		.byte	0
+ 321 016d 07       		.uleb128 0x7
+ 322 016e 81000000 		.4byte	.LASF27
+ 323 0172 01       		.byte	0x1
+ 324 0173 07       		.uleb128 0x7
+ 325 0174 22000000 		.4byte	.LASF28
+ 326 0178 02       		.byte	0x2
+ 327 0179 07       		.uleb128 0x7
+ 328 017a C8000000 		.4byte	.LASF29
+ 329 017e 03       		.byte	0x3
+ 330 017f 07       		.uleb128 0x7
+ 331 0180 B6010000 		.4byte	.LASF30
+ 332 0184 04       		.byte	0x4
+ 333 0185 07       		.uleb128 0x7
+ 334 0186 5A000000 		.4byte	.LASF31
+ 335 018a 05       		.byte	0x5
+ 336 018b 07       		.uleb128 0x7
+ 337 018c 3E000000 		.4byte	.LASF32
+ 338 0190 06       		.byte	0x6
+ 339 0191 00       		.byte	0
+ 340 0192 03       		.uleb128 0x3
+ 341 0193 00000000 		.4byte	.LASF33
+ 342 0197 05       		.byte	0x5
+ 343 0198 45       		.byte	0x45
+ 344 0199 03010000 		.4byte	0x103
+ 345 019d 03       		.uleb128 0x3
+ 346 019e 28030000 		.4byte	.LASF34
+ 347 01a2 06       		.byte	0x6
+ 348 01a3 1F       		.byte	0x1f
+ 349 01a4 A8010000 		.4byte	0x1a8
+ 350 01a8 08       		.uleb128 0x8
+ 351 01a9 04       		.byte	0x4
+ 352 01aa AE010000 		.4byte	0x1ae
+ 353 01ae 09       		.uleb128 0x9
+ 354 01af B9010000 		.4byte	0x1b9
+ 355 01b3 0A       		.uleb128 0xa
+ 356 01b4 AD000000 		.4byte	0xad
+ 357 01b8 00       		.byte	0
+ 358 01b9 0B       		.uleb128 0xb
+ 359 01ba C8010000 		.4byte	.LASF36
+ 360 01be 08       		.byte	0x8
+ 361 01bf 06       		.byte	0x6
+ 362 01c0 21       		.byte	0x21
+ 363 01c1 DD010000 		.4byte	0x1dd
+ 364 01c5 0E       		.uleb128 0xe
+ 365 01c6 636200   		.ascii	"cb\000"
+ 366 01c9 06       		.byte	0x6
+ 367 01ca 22       		.byte	0x22
+ 368 01cb 9D010000 		.4byte	0x19d
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 9
+
+
+ 369 01cf 00       		.byte	0
+ 370 01d0 0C       		.uleb128 0xc
+ 371 01d1 50000000 		.4byte	.LASF24
+ 372 01d5 06       		.byte	0x6
+ 373 01d6 23       		.byte	0x23
+ 374 01d7 AD000000 		.4byte	0xad
+ 375 01db 04       		.byte	0x4
+ 376 01dc 00       		.byte	0
+ 377 01dd 03       		.uleb128 0x3
+ 378 01de 5D010000 		.4byte	.LASF37
+ 379 01e2 06       		.byte	0x6
+ 380 01e3 24       		.byte	0x24
+ 381 01e4 B9010000 		.4byte	0x1b9
+ 382 01e8 0F       		.uleb128 0xf
+ 383 01e9 D9010000 		.4byte	.LASF49
+ 384 01ed 01       		.byte	0x1
+ 385 01ee 44       		.byte	0x44
+ 386 01ef 00000000 		.4byte	.LFB2
+ 387 01f3 12000000 		.4byte	.LFE2-.LFB2
+ 388 01f7 01       		.uleb128 0x1
+ 389 01f8 9C       		.byte	0x9c
+ 390 01f9 2A020000 		.4byte	0x22a
+ 391 01fd 10       		.uleb128 0x10
+ 392 01fe 1D000000 		.4byte	.LASF38
+ 393 0202 01       		.byte	0x1
+ 394 0203 44       		.byte	0x44
+ 395 0204 2A020000 		.4byte	0x22a
+ 396 0208 00000000 		.4byte	.LLST0
+ 397 020c 11       		.uleb128 0x11
+ 398 020d 55020000 		.4byte	.LASF40
+ 399 0211 01       		.byte	0x1
+ 400 0212 46       		.byte	0x46
+ 401 0213 30020000 		.4byte	0x230
+ 402 0217 01       		.uleb128 0x1
+ 403 0218 54       		.byte	0x54
+ 404 0219 12       		.uleb128 0x12
+ 405 021a 10000000 		.4byte	.LVL4
+ 406 021e E9020000 		.4byte	0x2e9
+ 407 0222 13       		.uleb128 0x13
+ 408 0223 01       		.uleb128 0x1
+ 409 0224 50       		.byte	0x50
+ 410 0225 02       		.uleb128 0x2
+ 411 0226 74       		.byte	0x74
+ 412 0227 00       		.sleb128 0
+ 413 0228 00       		.byte	0
+ 414 0229 00       		.byte	0
+ 415 022a 08       		.uleb128 0x8
+ 416 022b 04       		.byte	0x4
+ 417 022c 92010000 		.4byte	0x192
+ 418 0230 08       		.uleb128 0x8
+ 419 0231 04       		.byte	0x4
+ 420 0232 DD010000 		.4byte	0x1dd
+ 421 0236 14       		.uleb128 0x14
+ 422 0237 16010000 		.4byte	.LASF50
+ 423 023b 01       		.byte	0x1
+ 424 023c 26       		.byte	0x26
+ 425 023d CF000000 		.4byte	0xcf
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 10
+
+
+ 426 0241 00000000 		.4byte	.LFB1
+ 427 0245 40000000 		.4byte	.LFE1-.LFB1
+ 428 0249 01       		.uleb128 0x1
+ 429 024a 9C       		.byte	0x9c
+ 430 024b E9020000 		.4byte	0x2e9
+ 431 024f 10       		.uleb128 0x10
+ 432 0250 77000000 		.4byte	.LASF39
+ 433 0254 01       		.byte	0x1
+ 434 0255 26       		.byte	0x26
+ 435 0256 9D010000 		.4byte	0x19d
+ 436 025a 21000000 		.4byte	.LLST1
+ 437 025e 10       		.uleb128 0x10
+ 438 025f 50000000 		.4byte	.LASF24
+ 439 0263 01       		.byte	0x1
+ 440 0264 26       		.byte	0x26
+ 441 0265 AD000000 		.4byte	0xad
+ 442 0269 4D000000 		.4byte	.LLST2
+ 443 026d 15       		.uleb128 0x15
+ 444 026e 55020000 		.4byte	.LASF40
+ 445 0272 01       		.byte	0x1
+ 446 0273 29       		.byte	0x29
+ 447 0274 30020000 		.4byte	0x230
+ 448 0278 79000000 		.4byte	.LLST3
+ 449 027c 15       		.uleb128 0x15
+ 450 027d 1D000000 		.4byte	.LASF38
+ 451 0281 01       		.byte	0x1
+ 452 0282 30       		.byte	0x30
+ 453 0283 2A020000 		.4byte	0x22a
+ 454 0287 AD000000 		.4byte	.LLST4
+ 455 028b 16       		.uleb128 0x16
+ 456 028c 0C000000 		.4byte	.LVL7
+ 457 0290 F4020000 		.4byte	0x2f4
+ 458 0294 9E020000 		.4byte	0x29e
+ 459 0298 13       		.uleb128 0x13
+ 460 0299 01       		.uleb128 0x1
+ 461 029a 50       		.byte	0x50
+ 462 029b 01       		.uleb128 0x1
+ 463 029c 38       		.byte	0x38
+ 464 029d 00       		.byte	0
+ 465 029e 16       		.uleb128 0x16
+ 466 029f 1C000000 		.4byte	.LVL9
+ 467 02a3 FF020000 		.4byte	0x2ff
+ 468 02a7 C5020000 		.4byte	0x2c5
+ 469 02ab 13       		.uleb128 0x13
+ 470 02ac 01       		.uleb128 0x1
+ 471 02ad 50       		.byte	0x50
+ 472 02ae 05       		.uleb128 0x5
+ 473 02af 03       		.byte	0x3
+ 474 02b0 00000000 		.4byte	lv_async_task_cb
+ 475 02b4 13       		.uleb128 0x13
+ 476 02b5 01       		.uleb128 0x1
+ 477 02b6 51       		.byte	0x51
+ 478 02b7 01       		.uleb128 0x1
+ 479 02b8 30       		.byte	0x30
+ 480 02b9 13       		.uleb128 0x13
+ 481 02ba 01       		.uleb128 0x1
+ 482 02bb 52       		.byte	0x52
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 11
+
+
+ 483 02bc 01       		.uleb128 0x1
+ 484 02bd 35       		.byte	0x35
+ 485 02be 13       		.uleb128 0x13
+ 486 02bf 01       		.uleb128 0x1
+ 487 02c0 53       		.byte	0x53
+ 488 02c1 02       		.uleb128 0x2
+ 489 02c2 74       		.byte	0x74
+ 490 02c3 00       		.sleb128 0
+ 491 02c4 00       		.byte	0
+ 492 02c5 16       		.uleb128 0x16
+ 493 02c6 24000000 		.4byte	.LVL11
+ 494 02ca E9020000 		.4byte	0x2e9
+ 495 02ce D9020000 		.4byte	0x2d9
+ 496 02d2 13       		.uleb128 0x13
+ 497 02d3 01       		.uleb128 0x1
+ 498 02d4 50       		.byte	0x50
+ 499 02d5 02       		.uleb128 0x2
+ 500 02d6 74       		.byte	0x74
+ 501 02d7 00       		.sleb128 0
+ 502 02d8 00       		.byte	0
+ 503 02d9 12       		.uleb128 0x12
+ 504 02da 34000000 		.4byte	.LVL13
+ 505 02de 0A030000 		.4byte	0x30a
+ 506 02e2 13       		.uleb128 0x13
+ 507 02e3 01       		.uleb128 0x1
+ 508 02e4 51       		.byte	0x51
+ 509 02e5 01       		.uleb128 0x1
+ 510 02e6 31       		.byte	0x31
+ 511 02e7 00       		.byte	0
+ 512 02e8 00       		.byte	0
+ 513 02e9 17       		.uleb128 0x17
+ 514 02ea 36030000 		.4byte	.LASF41
+ 515 02ee 36030000 		.4byte	.LASF41
+ 516 02f2 07       		.byte	0x7
+ 517 02f3 58       		.byte	0x58
+ 518 02f4 17       		.uleb128 0x17
+ 519 02f5 71020000 		.4byte	.LASF42
+ 520 02f9 71020000 		.4byte	.LASF42
+ 521 02fd 07       		.byte	0x7
+ 522 02fe 52       		.byte	0x52
+ 523 02ff 17       		.uleb128 0x17
+ 524 0300 7E020000 		.4byte	.LASF43
+ 525 0304 7E020000 		.4byte	.LASF43
+ 526 0308 05       		.byte	0x5
+ 527 0309 6B       		.byte	0x6b
+ 528 030a 17       		.uleb128 0x17
+ 529 030b 3C020000 		.4byte	.LASF44
+ 530 030f 3C020000 		.4byte	.LASF44
+ 531 0313 05       		.byte	0x5
+ 532 0314 93       		.byte	0x93
+ 533 0315 00       		.byte	0
+ 534              		.section	.debug_abbrev,"",%progbits
+ 535              	.Ldebug_abbrev0:
+ 536 0000 01       		.uleb128 0x1
+ 537 0001 11       		.uleb128 0x11
+ 538 0002 01       		.byte	0x1
+ 539 0003 25       		.uleb128 0x25
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 12
+
+
+ 540 0004 0E       		.uleb128 0xe
+ 541 0005 13       		.uleb128 0x13
+ 542 0006 0B       		.uleb128 0xb
+ 543 0007 03       		.uleb128 0x3
+ 544 0008 0E       		.uleb128 0xe
+ 545 0009 1B       		.uleb128 0x1b
+ 546 000a 0E       		.uleb128 0xe
+ 547 000b 55       		.uleb128 0x55
+ 548 000c 17       		.uleb128 0x17
+ 549 000d 11       		.uleb128 0x11
+ 550 000e 01       		.uleb128 0x1
+ 551 000f 10       		.uleb128 0x10
+ 552 0010 17       		.uleb128 0x17
+ 553 0011 00       		.byte	0
+ 554 0012 00       		.byte	0
+ 555 0013 02       		.uleb128 0x2
+ 556 0014 24       		.uleb128 0x24
+ 557 0015 00       		.byte	0
+ 558 0016 0B       		.uleb128 0xb
+ 559 0017 0B       		.uleb128 0xb
+ 560 0018 3E       		.uleb128 0x3e
+ 561 0019 0B       		.uleb128 0xb
+ 562 001a 03       		.uleb128 0x3
+ 563 001b 0E       		.uleb128 0xe
+ 564 001c 00       		.byte	0
+ 565 001d 00       		.byte	0
+ 566 001e 03       		.uleb128 0x3
+ 567 001f 16       		.uleb128 0x16
+ 568 0020 00       		.byte	0
+ 569 0021 03       		.uleb128 0x3
+ 570 0022 0E       		.uleb128 0xe
+ 571 0023 3A       		.uleb128 0x3a
+ 572 0024 0B       		.uleb128 0xb
+ 573 0025 3B       		.uleb128 0x3b
+ 574 0026 0B       		.uleb128 0xb
+ 575 0027 49       		.uleb128 0x49
+ 576 0028 13       		.uleb128 0x13
+ 577 0029 00       		.byte	0
+ 578 002a 00       		.byte	0
+ 579 002b 04       		.uleb128 0x4
+ 580 002c 24       		.uleb128 0x24
+ 581 002d 00       		.byte	0
+ 582 002e 0B       		.uleb128 0xb
+ 583 002f 0B       		.uleb128 0xb
+ 584 0030 3E       		.uleb128 0x3e
+ 585 0031 0B       		.uleb128 0xb
+ 586 0032 03       		.uleb128 0x3
+ 587 0033 08       		.uleb128 0x8
+ 588 0034 00       		.byte	0
+ 589 0035 00       		.byte	0
+ 590 0036 05       		.uleb128 0x5
+ 591 0037 0F       		.uleb128 0xf
+ 592 0038 00       		.byte	0
+ 593 0039 0B       		.uleb128 0xb
+ 594 003a 0B       		.uleb128 0xb
+ 595 003b 00       		.byte	0
+ 596 003c 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 13
+
+
+ 597 003d 06       		.uleb128 0x6
+ 598 003e 04       		.uleb128 0x4
+ 599 003f 01       		.byte	0x1
+ 600 0040 0B       		.uleb128 0xb
+ 601 0041 0B       		.uleb128 0xb
+ 602 0042 49       		.uleb128 0x49
+ 603 0043 13       		.uleb128 0x13
+ 604 0044 3A       		.uleb128 0x3a
+ 605 0045 0B       		.uleb128 0xb
+ 606 0046 3B       		.uleb128 0x3b
+ 607 0047 0B       		.uleb128 0xb
+ 608 0048 01       		.uleb128 0x1
+ 609 0049 13       		.uleb128 0x13
+ 610 004a 00       		.byte	0
+ 611 004b 00       		.byte	0
+ 612 004c 07       		.uleb128 0x7
+ 613 004d 28       		.uleb128 0x28
+ 614 004e 00       		.byte	0
+ 615 004f 03       		.uleb128 0x3
+ 616 0050 0E       		.uleb128 0xe
+ 617 0051 1C       		.uleb128 0x1c
+ 618 0052 0B       		.uleb128 0xb
+ 619 0053 00       		.byte	0
+ 620 0054 00       		.byte	0
+ 621 0055 08       		.uleb128 0x8
+ 622 0056 0F       		.uleb128 0xf
+ 623 0057 00       		.byte	0
+ 624 0058 0B       		.uleb128 0xb
+ 625 0059 0B       		.uleb128 0xb
+ 626 005a 49       		.uleb128 0x49
+ 627 005b 13       		.uleb128 0x13
+ 628 005c 00       		.byte	0
+ 629 005d 00       		.byte	0
+ 630 005e 09       		.uleb128 0x9
+ 631 005f 15       		.uleb128 0x15
+ 632 0060 01       		.byte	0x1
+ 633 0061 27       		.uleb128 0x27
+ 634 0062 19       		.uleb128 0x19
+ 635 0063 01       		.uleb128 0x1
+ 636 0064 13       		.uleb128 0x13
+ 637 0065 00       		.byte	0
+ 638 0066 00       		.byte	0
+ 639 0067 0A       		.uleb128 0xa
+ 640 0068 05       		.uleb128 0x5
+ 641 0069 00       		.byte	0
+ 642 006a 49       		.uleb128 0x49
+ 643 006b 13       		.uleb128 0x13
+ 644 006c 00       		.byte	0
+ 645 006d 00       		.byte	0
+ 646 006e 0B       		.uleb128 0xb
+ 647 006f 13       		.uleb128 0x13
+ 648 0070 01       		.byte	0x1
+ 649 0071 03       		.uleb128 0x3
+ 650 0072 0E       		.uleb128 0xe
+ 651 0073 0B       		.uleb128 0xb
+ 652 0074 0B       		.uleb128 0xb
+ 653 0075 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 14
+
+
+ 654 0076 0B       		.uleb128 0xb
+ 655 0077 3B       		.uleb128 0x3b
+ 656 0078 0B       		.uleb128 0xb
+ 657 0079 01       		.uleb128 0x1
+ 658 007a 13       		.uleb128 0x13
+ 659 007b 00       		.byte	0
+ 660 007c 00       		.byte	0
+ 661 007d 0C       		.uleb128 0xc
+ 662 007e 0D       		.uleb128 0xd
+ 663 007f 00       		.byte	0
+ 664 0080 03       		.uleb128 0x3
+ 665 0081 0E       		.uleb128 0xe
+ 666 0082 3A       		.uleb128 0x3a
+ 667 0083 0B       		.uleb128 0xb
+ 668 0084 3B       		.uleb128 0x3b
+ 669 0085 0B       		.uleb128 0xb
+ 670 0086 49       		.uleb128 0x49
+ 671 0087 13       		.uleb128 0x13
+ 672 0088 38       		.uleb128 0x38
+ 673 0089 0B       		.uleb128 0xb
+ 674 008a 00       		.byte	0
+ 675 008b 00       		.byte	0
+ 676 008c 0D       		.uleb128 0xd
+ 677 008d 0D       		.uleb128 0xd
+ 678 008e 00       		.byte	0
+ 679 008f 03       		.uleb128 0x3
+ 680 0090 0E       		.uleb128 0xe
+ 681 0091 3A       		.uleb128 0x3a
+ 682 0092 0B       		.uleb128 0xb
+ 683 0093 3B       		.uleb128 0x3b
+ 684 0094 0B       		.uleb128 0xb
+ 685 0095 49       		.uleb128 0x49
+ 686 0096 13       		.uleb128 0x13
+ 687 0097 0B       		.uleb128 0xb
+ 688 0098 0B       		.uleb128 0xb
+ 689 0099 0D       		.uleb128 0xd
+ 690 009a 0B       		.uleb128 0xb
+ 691 009b 0C       		.uleb128 0xc
+ 692 009c 0B       		.uleb128 0xb
+ 693 009d 38       		.uleb128 0x38
+ 694 009e 0B       		.uleb128 0xb
+ 695 009f 00       		.byte	0
+ 696 00a0 00       		.byte	0
+ 697 00a1 0E       		.uleb128 0xe
+ 698 00a2 0D       		.uleb128 0xd
+ 699 00a3 00       		.byte	0
+ 700 00a4 03       		.uleb128 0x3
+ 701 00a5 08       		.uleb128 0x8
+ 702 00a6 3A       		.uleb128 0x3a
+ 703 00a7 0B       		.uleb128 0xb
+ 704 00a8 3B       		.uleb128 0x3b
+ 705 00a9 0B       		.uleb128 0xb
+ 706 00aa 49       		.uleb128 0x49
+ 707 00ab 13       		.uleb128 0x13
+ 708 00ac 38       		.uleb128 0x38
+ 709 00ad 0B       		.uleb128 0xb
+ 710 00ae 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 15
+
+
+ 711 00af 00       		.byte	0
+ 712 00b0 0F       		.uleb128 0xf
+ 713 00b1 2E       		.uleb128 0x2e
+ 714 00b2 01       		.byte	0x1
+ 715 00b3 03       		.uleb128 0x3
+ 716 00b4 0E       		.uleb128 0xe
+ 717 00b5 3A       		.uleb128 0x3a
+ 718 00b6 0B       		.uleb128 0xb
+ 719 00b7 3B       		.uleb128 0x3b
+ 720 00b8 0B       		.uleb128 0xb
+ 721 00b9 27       		.uleb128 0x27
+ 722 00ba 19       		.uleb128 0x19
+ 723 00bb 11       		.uleb128 0x11
+ 724 00bc 01       		.uleb128 0x1
+ 725 00bd 12       		.uleb128 0x12
+ 726 00be 06       		.uleb128 0x6
+ 727 00bf 40       		.uleb128 0x40
+ 728 00c0 18       		.uleb128 0x18
+ 729 00c1 9642     		.uleb128 0x2116
+ 730 00c3 19       		.uleb128 0x19
+ 731 00c4 01       		.uleb128 0x1
+ 732 00c5 13       		.uleb128 0x13
+ 733 00c6 00       		.byte	0
+ 734 00c7 00       		.byte	0
+ 735 00c8 10       		.uleb128 0x10
+ 736 00c9 05       		.uleb128 0x5
+ 737 00ca 00       		.byte	0
+ 738 00cb 03       		.uleb128 0x3
+ 739 00cc 0E       		.uleb128 0xe
+ 740 00cd 3A       		.uleb128 0x3a
+ 741 00ce 0B       		.uleb128 0xb
+ 742 00cf 3B       		.uleb128 0x3b
+ 743 00d0 0B       		.uleb128 0xb
+ 744 00d1 49       		.uleb128 0x49
+ 745 00d2 13       		.uleb128 0x13
+ 746 00d3 02       		.uleb128 0x2
+ 747 00d4 17       		.uleb128 0x17
+ 748 00d5 00       		.byte	0
+ 749 00d6 00       		.byte	0
+ 750 00d7 11       		.uleb128 0x11
+ 751 00d8 34       		.uleb128 0x34
+ 752 00d9 00       		.byte	0
+ 753 00da 03       		.uleb128 0x3
+ 754 00db 0E       		.uleb128 0xe
+ 755 00dc 3A       		.uleb128 0x3a
+ 756 00dd 0B       		.uleb128 0xb
+ 757 00de 3B       		.uleb128 0x3b
+ 758 00df 0B       		.uleb128 0xb
+ 759 00e0 49       		.uleb128 0x49
+ 760 00e1 13       		.uleb128 0x13
+ 761 00e2 02       		.uleb128 0x2
+ 762 00e3 18       		.uleb128 0x18
+ 763 00e4 00       		.byte	0
+ 764 00e5 00       		.byte	0
+ 765 00e6 12       		.uleb128 0x12
+ 766 00e7 898201   		.uleb128 0x4109
+ 767 00ea 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 16
+
+
+ 768 00eb 11       		.uleb128 0x11
+ 769 00ec 01       		.uleb128 0x1
+ 770 00ed 31       		.uleb128 0x31
+ 771 00ee 13       		.uleb128 0x13
+ 772 00ef 00       		.byte	0
+ 773 00f0 00       		.byte	0
+ 774 00f1 13       		.uleb128 0x13
+ 775 00f2 8A8201   		.uleb128 0x410a
+ 776 00f5 00       		.byte	0
+ 777 00f6 02       		.uleb128 0x2
+ 778 00f7 18       		.uleb128 0x18
+ 779 00f8 9142     		.uleb128 0x2111
+ 780 00fa 18       		.uleb128 0x18
+ 781 00fb 00       		.byte	0
+ 782 00fc 00       		.byte	0
+ 783 00fd 14       		.uleb128 0x14
+ 784 00fe 2E       		.uleb128 0x2e
+ 785 00ff 01       		.byte	0x1
+ 786 0100 3F       		.uleb128 0x3f
+ 787 0101 19       		.uleb128 0x19
+ 788 0102 03       		.uleb128 0x3
+ 789 0103 0E       		.uleb128 0xe
+ 790 0104 3A       		.uleb128 0x3a
+ 791 0105 0B       		.uleb128 0xb
+ 792 0106 3B       		.uleb128 0x3b
+ 793 0107 0B       		.uleb128 0xb
+ 794 0108 27       		.uleb128 0x27
+ 795 0109 19       		.uleb128 0x19
+ 796 010a 49       		.uleb128 0x49
+ 797 010b 13       		.uleb128 0x13
+ 798 010c 11       		.uleb128 0x11
+ 799 010d 01       		.uleb128 0x1
+ 800 010e 12       		.uleb128 0x12
+ 801 010f 06       		.uleb128 0x6
+ 802 0110 40       		.uleb128 0x40
+ 803 0111 18       		.uleb128 0x18
+ 804 0112 9742     		.uleb128 0x2117
+ 805 0114 19       		.uleb128 0x19
+ 806 0115 01       		.uleb128 0x1
+ 807 0116 13       		.uleb128 0x13
+ 808 0117 00       		.byte	0
+ 809 0118 00       		.byte	0
+ 810 0119 15       		.uleb128 0x15
+ 811 011a 34       		.uleb128 0x34
+ 812 011b 00       		.byte	0
+ 813 011c 03       		.uleb128 0x3
+ 814 011d 0E       		.uleb128 0xe
+ 815 011e 3A       		.uleb128 0x3a
+ 816 011f 0B       		.uleb128 0xb
+ 817 0120 3B       		.uleb128 0x3b
+ 818 0121 0B       		.uleb128 0xb
+ 819 0122 49       		.uleb128 0x49
+ 820 0123 13       		.uleb128 0x13
+ 821 0124 02       		.uleb128 0x2
+ 822 0125 17       		.uleb128 0x17
+ 823 0126 00       		.byte	0
+ 824 0127 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 17
+
+
+ 825 0128 16       		.uleb128 0x16
+ 826 0129 898201   		.uleb128 0x4109
+ 827 012c 01       		.byte	0x1
+ 828 012d 11       		.uleb128 0x11
+ 829 012e 01       		.uleb128 0x1
+ 830 012f 31       		.uleb128 0x31
+ 831 0130 13       		.uleb128 0x13
+ 832 0131 01       		.uleb128 0x1
+ 833 0132 13       		.uleb128 0x13
+ 834 0133 00       		.byte	0
+ 835 0134 00       		.byte	0
+ 836 0135 17       		.uleb128 0x17
+ 837 0136 2E       		.uleb128 0x2e
+ 838 0137 00       		.byte	0
+ 839 0138 3F       		.uleb128 0x3f
+ 840 0139 19       		.uleb128 0x19
+ 841 013a 3C       		.uleb128 0x3c
+ 842 013b 19       		.uleb128 0x19
+ 843 013c 6E       		.uleb128 0x6e
+ 844 013d 0E       		.uleb128 0xe
+ 845 013e 03       		.uleb128 0x3
+ 846 013f 0E       		.uleb128 0xe
+ 847 0140 3A       		.uleb128 0x3a
+ 848 0141 0B       		.uleb128 0xb
+ 849 0142 3B       		.uleb128 0x3b
+ 850 0143 0B       		.uleb128 0xb
+ 851 0144 00       		.byte	0
+ 852 0145 00       		.byte	0
+ 853 0146 00       		.byte	0
+ 854              		.section	.debug_loc,"",%progbits
+ 855              	.Ldebug_loc0:
+ 856              	.LLST0:
+ 857 0000 00000000 		.4byte	.LVL0
+ 858 0004 08000000 		.4byte	.LVL2
+ 859 0008 0100     		.2byte	0x1
+ 860 000a 50       		.byte	0x50
+ 861 000b 08000000 		.4byte	.LVL2
+ 862 000f 12000000 		.4byte	.LFE2
+ 863 0013 0400     		.2byte	0x4
+ 864 0015 F3       		.byte	0xf3
+ 865 0016 01       		.uleb128 0x1
+ 866 0017 50       		.byte	0x50
+ 867 0018 9F       		.byte	0x9f
+ 868 0019 00000000 		.4byte	0
+ 869 001d 00000000 		.4byte	0
+ 870              	.LLST1:
+ 871 0021 00000000 		.4byte	.LVL5
+ 872 0025 08000000 		.4byte	.LVL6
+ 873 0029 0100     		.2byte	0x1
+ 874 002b 50       		.byte	0x50
+ 875 002c 08000000 		.4byte	.LVL6
+ 876 0030 3C000000 		.4byte	.LVL16
+ 877 0034 0100     		.2byte	0x1
+ 878 0036 56       		.byte	0x56
+ 879 0037 3C000000 		.4byte	.LVL16
+ 880 003b 40000000 		.4byte	.LFE1
+ 881 003f 0400     		.2byte	0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 18
+
+
+ 882 0041 F3       		.byte	0xf3
+ 883 0042 01       		.uleb128 0x1
+ 884 0043 50       		.byte	0x50
+ 885 0044 9F       		.byte	0x9f
+ 886 0045 00000000 		.4byte	0
+ 887 0049 00000000 		.4byte	0
+ 888              	.LLST2:
+ 889 004d 00000000 		.4byte	.LVL5
+ 890 0051 0B000000 		.4byte	.LVL7-1
+ 891 0055 0100     		.2byte	0x1
+ 892 0057 51       		.byte	0x51
+ 893 0058 0B000000 		.4byte	.LVL7-1
+ 894 005c 3C000000 		.4byte	.LVL16
+ 895 0060 0100     		.2byte	0x1
+ 896 0062 55       		.byte	0x55
+ 897 0063 3C000000 		.4byte	.LVL16
+ 898 0067 40000000 		.4byte	.LFE1
+ 899 006b 0400     		.2byte	0x4
+ 900 006d F3       		.byte	0xf3
+ 901 006e 01       		.uleb128 0x1
+ 902 006f 51       		.byte	0x51
+ 903 0070 9F       		.byte	0x9f
+ 904 0071 00000000 		.4byte	0
+ 905 0075 00000000 		.4byte	0
+ 906              	.LLST3:
+ 907 0079 0C000000 		.4byte	.LVL7
+ 908 007d 18000000 		.4byte	.LVL8
+ 909 0081 0100     		.2byte	0x1
+ 910 0083 50       		.byte	0x50
+ 911 0084 18000000 		.4byte	.LVL8
+ 912 0088 1B000000 		.4byte	.LVL9-1
+ 913 008c 0100     		.2byte	0x1
+ 914 008e 53       		.byte	0x53
+ 915 008f 1B000000 		.4byte	.LVL9-1
+ 916 0093 38000000 		.4byte	.LVL14
+ 917 0097 0100     		.2byte	0x1
+ 918 0099 54       		.byte	0x54
+ 919 009a 38000000 		.4byte	.LVL14
+ 920 009e 3A000000 		.4byte	.LVL15
+ 921 00a2 0100     		.2byte	0x1
+ 922 00a4 50       		.byte	0x50
+ 923 00a5 00000000 		.4byte	0
+ 924 00a9 00000000 		.4byte	0
+ 925              	.LLST4:
+ 926 00ad 1C000000 		.4byte	.LVL9
+ 927 00b1 20000000 		.4byte	.LVL10
+ 928 00b5 0100     		.2byte	0x1
+ 929 00b7 50       		.byte	0x50
+ 930 00b8 28000000 		.4byte	.LVL12
+ 931 00bc 33000000 		.4byte	.LVL13-1
+ 932 00c0 0100     		.2byte	0x1
+ 933 00c2 50       		.byte	0x50
+ 934 00c3 00000000 		.4byte	0
+ 935 00c7 00000000 		.4byte	0
+ 936              		.section	.debug_aranges,"",%progbits
+ 937 0000 24000000 		.4byte	0x24
+ 938 0004 0200     		.2byte	0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 19
+
+
+ 939 0006 00000000 		.4byte	.Ldebug_info0
+ 940 000a 04       		.byte	0x4
+ 941 000b 00       		.byte	0
+ 942 000c 0000     		.2byte	0
+ 943 000e 0000     		.2byte	0
+ 944 0010 00000000 		.4byte	.LFB2
+ 945 0014 12000000 		.4byte	.LFE2-.LFB2
+ 946 0018 00000000 		.4byte	.LFB1
+ 947 001c 40000000 		.4byte	.LFE1-.LFB1
+ 948 0020 00000000 		.4byte	0
+ 949 0024 00000000 		.4byte	0
+ 950              		.section	.debug_ranges,"",%progbits
+ 951              	.Ldebug_ranges0:
+ 952 0000 00000000 		.4byte	.LFB2
+ 953 0004 12000000 		.4byte	.LFE2
+ 954 0008 00000000 		.4byte	.LFB1
+ 955 000c 40000000 		.4byte	.LFE1
+ 956 0010 00000000 		.4byte	0
+ 957 0014 00000000 		.4byte	0
+ 958              		.section	.debug_line,"",%progbits
+ 959              	.Ldebug_line0:
+ 960 0000 9D010000 		.section	.debug_str,"MS",%progbits,1
+ 960      02006401 
+ 960      00000201 
+ 960      FB0E0D00 
+ 960      01010101 
+ 961              	.LASF33:
+ 962 0000 6C765F74 		.ascii	"lv_task_t\000"
+ 962      61736B5F 
+ 962      7400
+ 963              	.LASF2:
+ 964 000a 73686F72 		.ascii	"short int\000"
+ 964      7420696E 
+ 964      7400
+ 965              	.LASF19:
+ 966 0014 73697A65 		.ascii	"sizetype\000"
+ 966      74797065 
+ 966      00
+ 967              	.LASF38:
+ 968 001d 7461736B 		.ascii	"task\000"
+ 968      00
+ 969              	.LASF28:
+ 970 0022 4C565F54 		.ascii	"LV_TASK_PRIO_LOW\000"
+ 970      41534B5F 
+ 970      5052494F 
+ 970      5F4C4F57 
+ 970      00
+ 971              	.LASF7:
+ 972 0033 5F5F7569 		.ascii	"__uint32_t\000"
+ 972      6E743332 
+ 972      5F7400
+ 973              	.LASF32:
+ 974 003e 5F4C565F 		.ascii	"_LV_TASK_PRIO_NUM\000"
+ 974      5441534B 
+ 974      5F505249 
+ 974      4F5F4E55 
+ 974      4D00
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 20
+
+
+ 975              	.LASF24:
+ 976 0050 75736572 		.ascii	"user_data\000"
+ 976      5F646174 
+ 976      6100
+ 977              	.LASF31:
+ 978 005a 4C565F54 		.ascii	"LV_TASK_PRIO_HIGHEST\000"
+ 978      41534B5F 
+ 978      5052494F 
+ 978      5F484947 
+ 978      48455354 
+ 979              	.LASF12:
+ 980 006f 75696E74 		.ascii	"uint8_t\000"
+ 980      385F7400 
+ 981              	.LASF39:
+ 982 0077 6173796E 		.ascii	"async_xcb\000"
+ 982      635F7863 
+ 982      6200
+ 983              	.LASF27:
+ 984 0081 4C565F54 		.ascii	"LV_TASK_PRIO_LOWEST\000"
+ 984      41534B5F 
+ 984      5052494F 
+ 984      5F4C4F57 
+ 984      45535400 
+ 985              	.LASF35:
+ 986 0095 5F6C765F 		.ascii	"_lv_task_t\000"
+ 986      7461736B 
+ 986      5F7400
+ 987              	.LASF9:
+ 988 00a0 6C6F6E67 		.ascii	"long long int\000"
+ 988      206C6F6E 
+ 988      6720696E 
+ 988      7400
+ 989              	.LASF18:
+ 990 00ae 6C765F72 		.ascii	"lv_res_t\000"
+ 990      65735F74 
+ 990      00
+ 991              	.LASF26:
+ 992 00b7 4C565F54 		.ascii	"LV_TASK_PRIO_OFF\000"
+ 992      41534B5F 
+ 992      5052494F 
+ 992      5F4F4646 
+ 992      00
+ 993              	.LASF29:
+ 994 00c8 4C565F54 		.ascii	"LV_TASK_PRIO_MID\000"
+ 994      41534B5F 
+ 994      5052494F 
+ 994      5F4D4944 
+ 994      00
+ 995              	.LASF6:
+ 996 00d9 6C6F6E67 		.ascii	"long int\000"
+ 996      20696E74 
+ 996      00
+ 997              	.LASF21:
+ 998 00e2 70657269 		.ascii	"period\000"
+ 998      6F6400
+ 999              	.LASF4:
+ 1000 00e9 5F5F7569 		.ascii	"__uint8_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 21
+
+
+ 1000      6E74385F 
+ 1000      7400
+ 1001              	.LASF22:
+ 1002 00f3 6C617374 		.ascii	"last_run\000"
+ 1002      5F72756E 
+ 1002      00
+ 1003              	.LASF15:
+ 1004 00fc 6C6F6E67 		.ascii	"long double\000"
+ 1004      20646F75 
+ 1004      626C6500 
+ 1005              	.LASF1:
+ 1006 0108 756E7369 		.ascii	"unsigned char\000"
+ 1006      676E6564 
+ 1006      20636861 
+ 1006      7200
+ 1007              	.LASF50:
+ 1008 0116 6C765F61 		.ascii	"lv_async_call\000"
+ 1008      73796E63 
+ 1008      5F63616C 
+ 1008      6C00
+ 1009              	.LASF0:
+ 1010 0124 7369676E 		.ascii	"signed char\000"
+ 1010      65642063 
+ 1010      68617200 
+ 1011              	.LASF10:
+ 1012 0130 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1012      206C6F6E 
+ 1012      6720756E 
+ 1012      7369676E 
+ 1012      65642069 
+ 1013              	.LASF14:
+ 1014 0147 75696E74 		.ascii	"uint32_t\000"
+ 1014      33325F74 
+ 1014      00
+ 1015              	.LASF11:
+ 1016 0150 756E7369 		.ascii	"unsigned int\000"
+ 1016      676E6564 
+ 1016      20696E74 
+ 1016      00
+ 1017              	.LASF37:
+ 1018 015d 6C765F61 		.ascii	"lv_async_info_t\000"
+ 1018      73796E63 
+ 1018      5F696E66 
+ 1018      6F5F7400 
+ 1019              	.LASF3:
+ 1020 016d 73686F72 		.ascii	"short unsigned int\000"
+ 1020      7420756E 
+ 1020      7369676E 
+ 1020      65642069 
+ 1020      6E7400
+ 1021              	.LASF46:
+ 1022 0180 6C76676C 		.ascii	"lvgl\\src\\lv_misc\\lv_async.c\000"
+ 1022      5C737263 
+ 1022      5C6C765F 
+ 1022      6D697363 
+ 1022      5C6C765F 
+ 1023              	.LASF13:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 22
+
+
+ 1024 019c 696E7433 		.ascii	"int32_t\000"
+ 1024      325F7400 
+ 1025              	.LASF23:
+ 1026 01a4 7461736B 		.ascii	"task_cb\000"
+ 1026      5F636200 
+ 1027              	.LASF17:
+ 1028 01ac 4C565F52 		.ascii	"LV_RES_OK\000"
+ 1028      45535F4F 
+ 1028      4B00
+ 1029              	.LASF30:
+ 1030 01b6 4C565F54 		.ascii	"LV_TASK_PRIO_HIGH\000"
+ 1030      41534B5F 
+ 1030      5052494F 
+ 1030      5F484947 
+ 1030      4800
+ 1031              	.LASF36:
+ 1032 01c8 5F6C765F 		.ascii	"_lv_async_info_t\000"
+ 1032      6173796E 
+ 1032      635F696E 
+ 1032      666F5F74 
+ 1032      00
+ 1033              	.LASF49:
+ 1034 01d9 6C765F61 		.ascii	"lv_async_task_cb\000"
+ 1034      73796E63 
+ 1034      5F746173 
+ 1034      6B5F6362 
+ 1034      00
+ 1035              	.LASF8:
+ 1036 01ea 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1036      20756E73 
+ 1036      69676E65 
+ 1036      6420696E 
+ 1036      7400
+ 1037              	.LASF47:
+ 1038 01fc 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 1038      73657273 
+ 1038      5C737472 
+ 1038      61705C44 
+ 1038      6F63756D 
+ 1039 0229 69393334 		.ascii	"i9341_master.cydsn\000"
+ 1039      315F6D61 
+ 1039      73746572 
+ 1039      2E637964 
+ 1039      736E00
+ 1040              	.LASF44:
+ 1041 023c 6C765F74 		.ascii	"lv_task_set_repeat_count\000"
+ 1041      61736B5F 
+ 1041      7365745F 
+ 1041      72657065 
+ 1041      61745F63 
+ 1042              	.LASF40:
+ 1043 0255 696E666F 		.ascii	"info\000"
+ 1043      00
+ 1044              	.LASF5:
+ 1045 025a 5F5F696E 		.ascii	"__int32_t\000"
+ 1045      7433325F 
+ 1045      7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccEoi7AG.s 			page 23
+
+
+ 1046              	.LASF20:
+ 1047 0264 6C765F74 		.ascii	"lv_task_cb_t\000"
+ 1047      61736B5F 
+ 1047      63625F74 
+ 1047      00
+ 1048              	.LASF42:
+ 1049 0271 6C765F6D 		.ascii	"lv_mem_alloc\000"
+ 1049      656D5F61 
+ 1049      6C6C6F63 
+ 1049      00
+ 1050              	.LASF43:
+ 1051 027e 6C765F74 		.ascii	"lv_task_create\000"
+ 1051      61736B5F 
+ 1051      63726561 
+ 1051      746500
+ 1052              	.LASF25:
+ 1053 028d 72657065 		.ascii	"repeat_count\000"
+ 1053      61745F63 
+ 1053      6F756E74 
+ 1053      00
+ 1054              	.LASF45:
+ 1055 029a 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1055      43313120 
+ 1055      352E342E 
+ 1055      31203230 
+ 1055      31363036 
+ 1056 02cd 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1056      20726576 
+ 1056      6973696F 
+ 1056      6E203233 
+ 1056      37373135 
+ 1057 0300 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1057      66756E63 
+ 1057      74696F6E 
+ 1057      2D736563 
+ 1057      74696F6E 
+ 1058              	.LASF34:
+ 1059 0328 6C765F61 		.ascii	"lv_async_cb_t\000"
+ 1059      73796E63 
+ 1059      5F63625F 
+ 1059      7400
+ 1060              	.LASF41:
+ 1061 0336 6C765F6D 		.ascii	"lv_mem_free\000"
+ 1061      656D5F66 
+ 1061      72656500 
+ 1062              	.LASF16:
+ 1063 0342 4C565F52 		.ascii	"LV_RES_INV\000"
+ 1063      45535F49 
+ 1063      4E5600
+ 1064              	.LASF48:
+ 1065 034d 7072696F 		.ascii	"prio\000"
+ 1065      00
+ 1066              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

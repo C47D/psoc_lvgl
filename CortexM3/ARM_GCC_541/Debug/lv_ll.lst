@@ -1,0 +1,4755 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_ll.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.node_set_prev,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	node_set_prev, %function
+  24              	node_set_prev:
+  25              	.LFB15:
+  26              		.file 1 "lvgl\\src\\lv_misc\\lv_ll.c"
+   1:lvgl\src\lv_misc/lv_ll.c **** /**
+   2:lvgl\src\lv_misc/lv_ll.c ****  * @file lv_ll.c
+   3:lvgl\src\lv_misc/lv_ll.c ****  * Handle linked lists.
+   4:lvgl\src\lv_misc/lv_ll.c ****  * The nodes are dynamically allocated by the 'lv_mem' module,
+   5:lvgl\src\lv_misc/lv_ll.c ****  */
+   6:lvgl\src\lv_misc/lv_ll.c **** 
+   7:lvgl\src\lv_misc/lv_ll.c **** /*********************
+   8:lvgl\src\lv_misc/lv_ll.c ****  *      INCLUDES
+   9:lvgl\src\lv_misc/lv_ll.c ****  *********************/
+  10:lvgl\src\lv_misc/lv_ll.c **** #include <stdint.h>
+  11:lvgl\src\lv_misc/lv_ll.c **** #include <string.h>
+  12:lvgl\src\lv_misc/lv_ll.c **** 
+  13:lvgl\src\lv_misc/lv_ll.c **** #include "lv_ll.h"
+  14:lvgl\src\lv_misc/lv_ll.c **** #include "lv_mem.h"
+  15:lvgl\src\lv_misc/lv_ll.c **** 
+  16:lvgl\src\lv_misc/lv_ll.c **** /*********************
+  17:lvgl\src\lv_misc/lv_ll.c ****  *      DEFINES
+  18:lvgl\src\lv_misc/lv_ll.c ****  *********************/
+  19:lvgl\src\lv_misc/lv_ll.c **** #define LL_NODE_META_SIZE (sizeof(lv_ll_node_t *) + sizeof(lv_ll_node_t *))
+  20:lvgl\src\lv_misc/lv_ll.c **** #define LL_PREV_P_OFFSET(ll_p) (ll_p->n_size)
+  21:lvgl\src\lv_misc/lv_ll.c **** #define LL_NEXT_P_OFFSET(ll_p) (ll_p->n_size + sizeof(lv_ll_node_t *))
+  22:lvgl\src\lv_misc/lv_ll.c **** 
+  23:lvgl\src\lv_misc/lv_ll.c **** /**********************
+  24:lvgl\src\lv_misc/lv_ll.c ****  *      TYPEDEFS
+  25:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+  26:lvgl\src\lv_misc/lv_ll.c **** 
+  27:lvgl\src\lv_misc/lv_ll.c **** /**********************
+  28:lvgl\src\lv_misc/lv_ll.c ****  *  STATIC PROTOTYPES
+  29:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+  30:lvgl\src\lv_misc/lv_ll.c **** static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * prev);
+  31:lvgl\src\lv_misc/lv_ll.c **** static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * next);
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 2
+
+
+  32:lvgl\src\lv_misc/lv_ll.c **** 
+  33:lvgl\src\lv_misc/lv_ll.c **** /**********************
+  34:lvgl\src\lv_misc/lv_ll.c ****  *  STATIC VARIABLES
+  35:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+  36:lvgl\src\lv_misc/lv_ll.c **** 
+  37:lvgl\src\lv_misc/lv_ll.c **** /**********************
+  38:lvgl\src\lv_misc/lv_ll.c ****  *      MACROS
+  39:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+  40:lvgl\src\lv_misc/lv_ll.c **** 
+  41:lvgl\src\lv_misc/lv_ll.c **** /**********************
+  42:lvgl\src\lv_misc/lv_ll.c ****  *   GLOBAL FUNCTIONS
+  43:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+  44:lvgl\src\lv_misc/lv_ll.c **** 
+  45:lvgl\src\lv_misc/lv_ll.c **** /**
+  46:lvgl\src\lv_misc/lv_ll.c ****  * Initialize linked list
+  47:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_dsc pointer to ll_dsc variable
+  48:lvgl\src\lv_misc/lv_ll.c ****  * @param node_size the size of 1 node in bytes
+  49:lvgl\src\lv_misc/lv_ll.c ****  */
+  50:lvgl\src\lv_misc/lv_ll.c **** void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
+  51:lvgl\src\lv_misc/lv_ll.c **** {
+  52:lvgl\src\lv_misc/lv_ll.c ****     ll_p->head = NULL;
+  53:lvgl\src\lv_misc/lv_ll.c ****     ll_p->tail = NULL;
+  54:lvgl\src\lv_misc/lv_ll.c **** #ifdef LV_ARCH_64
+  55:lvgl\src\lv_misc/lv_ll.c ****     /*Round the size up to 8*/
+  56:lvgl\src\lv_misc/lv_ll.c ****     node_size = (node_size + 7) & (~0x7);
+  57:lvgl\src\lv_misc/lv_ll.c **** #else
+  58:lvgl\src\lv_misc/lv_ll.c ****     /*Round the size up to 4*/
+  59:lvgl\src\lv_misc/lv_ll.c ****     node_size = (node_size + 3) & (~0x3);
+  60:lvgl\src\lv_misc/lv_ll.c **** #endif
+  61:lvgl\src\lv_misc/lv_ll.c **** 
+  62:lvgl\src\lv_misc/lv_ll.c ****     ll_p->n_size = node_size;
+  63:lvgl\src\lv_misc/lv_ll.c **** }
+  64:lvgl\src\lv_misc/lv_ll.c **** 
+  65:lvgl\src\lv_misc/lv_ll.c **** /**
+  66:lvgl\src\lv_misc/lv_ll.c ****  * Add a new head to a linked list
+  67:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+  68:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the new head
+  69:lvgl\src\lv_misc/lv_ll.c ****  */
+  70:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_ins_head(lv_ll_t * ll_p)
+  71:lvgl\src\lv_misc/lv_ll.c **** {
+  72:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+  73:lvgl\src\lv_misc/lv_ll.c **** 
+  74:lvgl\src\lv_misc/lv_ll.c ****     n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+  75:lvgl\src\lv_misc/lv_ll.c **** 
+  76:lvgl\src\lv_misc/lv_ll.c ****     if(n_new != NULL) {
+  77:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, NULL);       /*No prev. before the new head*/
+  78:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, ll_p->head); /*After new comes the old head*/
+  79:lvgl\src\lv_misc/lv_ll.c **** 
+  80:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->head != NULL) { /*If there is old head then before it goes the new*/
+  81:lvgl\src\lv_misc/lv_ll.c ****             node_set_prev(ll_p, ll_p->head, n_new);
+  82:lvgl\src\lv_misc/lv_ll.c ****         }
+  83:lvgl\src\lv_misc/lv_ll.c **** 
+  84:lvgl\src\lv_misc/lv_ll.c ****         ll_p->head = n_new;      /*Set the new head in the dsc.*/
+  85:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail == NULL) { /*If there is no tail (1. node) set the tail too*/
+  86:lvgl\src\lv_misc/lv_ll.c ****             ll_p->tail = n_new;
+  87:lvgl\src\lv_misc/lv_ll.c ****         }
+  88:lvgl\src\lv_misc/lv_ll.c ****     }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 3
+
+
+  89:lvgl\src\lv_misc/lv_ll.c **** 
+  90:lvgl\src\lv_misc/lv_ll.c ****     return n_new;
+  91:lvgl\src\lv_misc/lv_ll.c **** }
+  92:lvgl\src\lv_misc/lv_ll.c **** 
+  93:lvgl\src\lv_misc/lv_ll.c **** /**
+  94:lvgl\src\lv_misc/lv_ll.c ****  * Insert a new node in front of the n_act node
+  95:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+  96:lvgl\src\lv_misc/lv_ll.c ****  * @param n_act pointer a node
+  97:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the new head
+  98:lvgl\src\lv_misc/lv_ll.c ****  */
+  99:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
+ 100:lvgl\src\lv_misc/lv_ll.c **** {
+ 101:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ 102:lvgl\src\lv_misc/lv_ll.c **** 
+ 103:lvgl\src\lv_misc/lv_ll.c ****     if(NULL == ll_p || NULL == n_act) return NULL;
+ 104:lvgl\src\lv_misc/lv_ll.c **** 
+ 105:lvgl\src\lv_misc/lv_ll.c ****     if(_lv_ll_get_head(ll_p) == n_act) {
+ 106:lvgl\src\lv_misc/lv_ll.c ****         n_new = _lv_ll_ins_head(ll_p);
+ 107:lvgl\src\lv_misc/lv_ll.c ****         if(n_new == NULL) return NULL;
+ 108:lvgl\src\lv_misc/lv_ll.c ****     }
+ 109:lvgl\src\lv_misc/lv_ll.c ****     else {
+ 110:lvgl\src\lv_misc/lv_ll.c ****         n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+ 111:lvgl\src\lv_misc/lv_ll.c ****         if(n_new == NULL) return NULL;
+ 112:lvgl\src\lv_misc/lv_ll.c **** 
+ 113:lvgl\src\lv_misc/lv_ll.c ****         lv_ll_node_t * n_prev;
+ 114:lvgl\src\lv_misc/lv_ll.c ****         n_prev = _lv_ll_get_prev(ll_p, n_act);
+ 115:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_prev, n_new);
+ 116:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, n_prev);
+ 117:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_act, n_new);
+ 118:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, n_act);
+ 119:lvgl\src\lv_misc/lv_ll.c ****     }
+ 120:lvgl\src\lv_misc/lv_ll.c **** 
+ 121:lvgl\src\lv_misc/lv_ll.c ****     return n_new;
+ 122:lvgl\src\lv_misc/lv_ll.c **** }
+ 123:lvgl\src\lv_misc/lv_ll.c **** 
+ 124:lvgl\src\lv_misc/lv_ll.c **** /**
+ 125:lvgl\src\lv_misc/lv_ll.c ****  * Add a new tail to a linked list
+ 126:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 127:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the new tail
+ 128:lvgl\src\lv_misc/lv_ll.c ****  */
+ 129:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_ins_tail(lv_ll_t * ll_p)
+ 130:lvgl\src\lv_misc/lv_ll.c **** {
+ 131:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ 132:lvgl\src\lv_misc/lv_ll.c **** 
+ 133:lvgl\src\lv_misc/lv_ll.c ****     n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+ 134:lvgl\src\lv_misc/lv_ll.c **** 
+ 135:lvgl\src\lv_misc/lv_ll.c ****     if(n_new != NULL) {
+ 136:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, NULL);       /*No next after the new tail*/
+ 137:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, ll_p->tail); /*The prev. before new is the old tail*/
+ 138:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail != NULL) {                /*If there is old tail then the new comes after it*
+ 139:lvgl\src\lv_misc/lv_ll.c ****             node_set_next(ll_p, ll_p->tail, n_new);
+ 140:lvgl\src\lv_misc/lv_ll.c ****         }
+ 141:lvgl\src\lv_misc/lv_ll.c **** 
+ 142:lvgl\src\lv_misc/lv_ll.c ****         ll_p->tail = n_new;      /*Set the new tail in the dsc.*/
+ 143:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->head == NULL) { /*If there is no head (1. node) set the head too*/
+ 144:lvgl\src\lv_misc/lv_ll.c ****             ll_p->head = n_new;
+ 145:lvgl\src\lv_misc/lv_ll.c ****         }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 4
+
+
+ 146:lvgl\src\lv_misc/lv_ll.c ****     }
+ 147:lvgl\src\lv_misc/lv_ll.c **** 
+ 148:lvgl\src\lv_misc/lv_ll.c ****     return n_new;
+ 149:lvgl\src\lv_misc/lv_ll.c **** }
+ 150:lvgl\src\lv_misc/lv_ll.c **** 
+ 151:lvgl\src\lv_misc/lv_ll.c **** /**
+ 152:lvgl\src\lv_misc/lv_ll.c ****  * Remove the node 'node_p' from 'll_p' linked list.
+ 153:lvgl\src\lv_misc/lv_ll.c ****  * It does not free the the memory of node.
+ 154:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to the linked list of 'node_p'
+ 155:lvgl\src\lv_misc/lv_ll.c ****  * @param node_p pointer to node in 'll_p' linked list
+ 156:lvgl\src\lv_misc/lv_ll.c ****  */
+ 157:lvgl\src\lv_misc/lv_ll.c **** void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
+ 158:lvgl\src\lv_misc/lv_ll.c **** {
+ 159:lvgl\src\lv_misc/lv_ll.c ****     if(_lv_ll_get_head(ll_p) == node_p) {
+ 160:lvgl\src\lv_misc/lv_ll.c ****         /*The new head will be the node after 'n_act'*/
+ 161:lvgl\src\lv_misc/lv_ll.c ****         ll_p->head = _lv_ll_get_next(ll_p, node_p);
+ 162:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->head == NULL) {
+ 163:lvgl\src\lv_misc/lv_ll.c ****             ll_p->tail = NULL;
+ 164:lvgl\src\lv_misc/lv_ll.c ****         }
+ 165:lvgl\src\lv_misc/lv_ll.c ****         else {
+ 166:lvgl\src\lv_misc/lv_ll.c ****             node_set_prev(ll_p, ll_p->head, NULL);
+ 167:lvgl\src\lv_misc/lv_ll.c ****         }
+ 168:lvgl\src\lv_misc/lv_ll.c ****     }
+ 169:lvgl\src\lv_misc/lv_ll.c ****     else if(_lv_ll_get_tail(ll_p) == node_p) {
+ 170:lvgl\src\lv_misc/lv_ll.c ****         /*The new tail will be the  node before 'n_act'*/
+ 171:lvgl\src\lv_misc/lv_ll.c ****         ll_p->tail = _lv_ll_get_prev(ll_p, node_p);
+ 172:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail == NULL) {
+ 173:lvgl\src\lv_misc/lv_ll.c ****             ll_p->head = NULL;
+ 174:lvgl\src\lv_misc/lv_ll.c ****         }
+ 175:lvgl\src\lv_misc/lv_ll.c ****         else {
+ 176:lvgl\src\lv_misc/lv_ll.c ****             node_set_next(ll_p, ll_p->tail, NULL);
+ 177:lvgl\src\lv_misc/lv_ll.c ****         }
+ 178:lvgl\src\lv_misc/lv_ll.c ****     }
+ 179:lvgl\src\lv_misc/lv_ll.c ****     else {
+ 180:lvgl\src\lv_misc/lv_ll.c ****         lv_ll_node_t * n_prev = _lv_ll_get_prev(ll_p, node_p);
+ 181:lvgl\src\lv_misc/lv_ll.c ****         lv_ll_node_t * n_next = _lv_ll_get_next(ll_p, node_p);
+ 182:lvgl\src\lv_misc/lv_ll.c **** 
+ 183:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_prev, n_next);
+ 184:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_next, n_prev);
+ 185:lvgl\src\lv_misc/lv_ll.c ****     }
+ 186:lvgl\src\lv_misc/lv_ll.c **** }
+ 187:lvgl\src\lv_misc/lv_ll.c **** 
+ 188:lvgl\src\lv_misc/lv_ll.c **** /**
+ 189:lvgl\src\lv_misc/lv_ll.c ****  * Remove and free all elements from a linked list. The list remain valid but become empty.
+ 190:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 191:lvgl\src\lv_misc/lv_ll.c ****  */
+ 192:lvgl\src\lv_misc/lv_ll.c **** void _lv_ll_clear(lv_ll_t * ll_p)
+ 193:lvgl\src\lv_misc/lv_ll.c **** {
+ 194:lvgl\src\lv_misc/lv_ll.c ****     void * i;
+ 195:lvgl\src\lv_misc/lv_ll.c ****     void * i_next;
+ 196:lvgl\src\lv_misc/lv_ll.c **** 
+ 197:lvgl\src\lv_misc/lv_ll.c ****     i      = _lv_ll_get_head(ll_p);
+ 198:lvgl\src\lv_misc/lv_ll.c ****     i_next = NULL;
+ 199:lvgl\src\lv_misc/lv_ll.c **** 
+ 200:lvgl\src\lv_misc/lv_ll.c ****     while(i != NULL) {
+ 201:lvgl\src\lv_misc/lv_ll.c ****         i_next = _lv_ll_get_next(ll_p, i);
+ 202:lvgl\src\lv_misc/lv_ll.c **** 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 5
+
+
+ 203:lvgl\src\lv_misc/lv_ll.c ****         _lv_ll_remove(ll_p, i);
+ 204:lvgl\src\lv_misc/lv_ll.c ****         lv_mem_free(i);
+ 205:lvgl\src\lv_misc/lv_ll.c **** 
+ 206:lvgl\src\lv_misc/lv_ll.c ****         i = i_next;
+ 207:lvgl\src\lv_misc/lv_ll.c ****     }
+ 208:lvgl\src\lv_misc/lv_ll.c **** }
+ 209:lvgl\src\lv_misc/lv_ll.c **** 
+ 210:lvgl\src\lv_misc/lv_ll.c **** /**
+ 211:lvgl\src\lv_misc/lv_ll.c ****  * Move a node to a new linked list
+ 212:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_ori_p pointer to the original (old) linked list
+ 213:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_new_p pointer to the new linked list
+ 214:lvgl\src\lv_misc/lv_ll.c ****  * @param node pointer to a node
+ 215:lvgl\src\lv_misc/lv_ll.c ****  * @param head true: be the head in the new list
+ 216:lvgl\src\lv_misc/lv_ll.c ****  *             false be the head in the new list
+ 217:lvgl\src\lv_misc/lv_ll.c ****  */
+ 218:lvgl\src\lv_misc/lv_ll.c **** void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
+ 219:lvgl\src\lv_misc/lv_ll.c **** {
+ 220:lvgl\src\lv_misc/lv_ll.c ****     _lv_ll_remove(ll_ori_p, node);
+ 221:lvgl\src\lv_misc/lv_ll.c **** 
+ 222:lvgl\src\lv_misc/lv_ll.c ****     if(head) {
+ 223:lvgl\src\lv_misc/lv_ll.c ****         /*Set node as head*/
+ 224:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_new_p, node, NULL);
+ 225:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_new_p, node, ll_new_p->head);
+ 226:lvgl\src\lv_misc/lv_ll.c **** 
+ 227:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->head != NULL) { /*If there is old head then before it goes the new*/
+ 228:lvgl\src\lv_misc/lv_ll.c ****             node_set_prev(ll_new_p, ll_new_p->head, node);
+ 229:lvgl\src\lv_misc/lv_ll.c ****         }
+ 230:lvgl\src\lv_misc/lv_ll.c **** 
+ 231:lvgl\src\lv_misc/lv_ll.c ****         ll_new_p->head = node;       /*Set the new head in the dsc.*/
+ 232:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->tail == NULL) { /*If there is no tail (first node) set the tail too*/
+ 233:lvgl\src\lv_misc/lv_ll.c ****             ll_new_p->tail = node;
+ 234:lvgl\src\lv_misc/lv_ll.c ****         }
+ 235:lvgl\src\lv_misc/lv_ll.c ****     }
+ 236:lvgl\src\lv_misc/lv_ll.c ****     else {
+ 237:lvgl\src\lv_misc/lv_ll.c ****         /*Set node as tail*/
+ 238:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_new_p, node, ll_new_p->tail);
+ 239:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_new_p, node, NULL);
+ 240:lvgl\src\lv_misc/lv_ll.c **** 
+ 241:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->tail != NULL) { /*If there is old tail then after it goes the new*/
+ 242:lvgl\src\lv_misc/lv_ll.c ****             node_set_next(ll_new_p, ll_new_p->tail, node);
+ 243:lvgl\src\lv_misc/lv_ll.c ****         }
+ 244:lvgl\src\lv_misc/lv_ll.c **** 
+ 245:lvgl\src\lv_misc/lv_ll.c ****         ll_new_p->tail = node;       /*Set the new tail in the dsc.*/
+ 246:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->head == NULL) { /*If there is no head (first node) set the head too*/
+ 247:lvgl\src\lv_misc/lv_ll.c ****             ll_new_p->head = node;
+ 248:lvgl\src\lv_misc/lv_ll.c ****         }
+ 249:lvgl\src\lv_misc/lv_ll.c ****     }
+ 250:lvgl\src\lv_misc/lv_ll.c **** }
+ 251:lvgl\src\lv_misc/lv_ll.c **** 
+ 252:lvgl\src\lv_misc/lv_ll.c **** /**
+ 253:lvgl\src\lv_misc/lv_ll.c ****  * Return with head node of the linked list
+ 254:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 255:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the head of 'll_p'
+ 256:lvgl\src\lv_misc/lv_ll.c ****  */
+ 257:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_get_head(const lv_ll_t * ll_p)
+ 258:lvgl\src\lv_misc/lv_ll.c **** {
+ 259:lvgl\src\lv_misc/lv_ll.c ****     void * head = NULL;
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 6
+
+
+ 260:lvgl\src\lv_misc/lv_ll.c **** 
+ 261:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p != NULL) {
+ 262:lvgl\src\lv_misc/lv_ll.c ****         head = ll_p->head;
+ 263:lvgl\src\lv_misc/lv_ll.c ****     }
+ 264:lvgl\src\lv_misc/lv_ll.c **** 
+ 265:lvgl\src\lv_misc/lv_ll.c ****     return head;
+ 266:lvgl\src\lv_misc/lv_ll.c **** }
+ 267:lvgl\src\lv_misc/lv_ll.c **** 
+ 268:lvgl\src\lv_misc/lv_ll.c **** /**
+ 269:lvgl\src\lv_misc/lv_ll.c ****  * Return with tail node of the linked list
+ 270:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 271:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the head of 'll_p'
+ 272:lvgl\src\lv_misc/lv_ll.c ****  */
+ 273:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_get_tail(const lv_ll_t * ll_p)
+ 274:lvgl\src\lv_misc/lv_ll.c **** {
+ 275:lvgl\src\lv_misc/lv_ll.c ****     void * tail = NULL;
+ 276:lvgl\src\lv_misc/lv_ll.c **** 
+ 277:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p != NULL) {
+ 278:lvgl\src\lv_misc/lv_ll.c ****         tail = ll_p->tail;
+ 279:lvgl\src\lv_misc/lv_ll.c ****     }
+ 280:lvgl\src\lv_misc/lv_ll.c **** 
+ 281:lvgl\src\lv_misc/lv_ll.c ****     return tail;
+ 282:lvgl\src\lv_misc/lv_ll.c **** }
+ 283:lvgl\src\lv_misc/lv_ll.c **** 
+ 284:lvgl\src\lv_misc/lv_ll.c **** /**
+ 285:lvgl\src\lv_misc/lv_ll.c ****  * Return with the pointer of the next node after 'n_act'
+ 286:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 287:lvgl\src\lv_misc/lv_ll.c ****  * @param n_act pointer a node
+ 288:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the next node
+ 289:lvgl\src\lv_misc/lv_ll.c ****  */
+ 290:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
+ 291:lvgl\src\lv_misc/lv_ll.c **** {
+ 292:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return NULL;
+ 293:lvgl\src\lv_misc/lv_ll.c **** 
+ 294:lvgl\src\lv_misc/lv_ll.c ****     /* Pointer to the next node is stored in the end of this node.
+ 295:lvgl\src\lv_misc/lv_ll.c ****      * Go there and return the address found there */
+ 296:lvgl\src\lv_misc/lv_ll.c ****     const lv_ll_node_t * n_act_d = n_act;
+ 297:lvgl\src\lv_misc/lv_ll.c ****     n_act_d += LL_NEXT_P_OFFSET(ll_p);
+ 298:lvgl\src\lv_misc/lv_ll.c ****     return *((lv_ll_node_t **)n_act_d);
+ 299:lvgl\src\lv_misc/lv_ll.c **** }
+ 300:lvgl\src\lv_misc/lv_ll.c **** 
+ 301:lvgl\src\lv_misc/lv_ll.c **** /**
+ 302:lvgl\src\lv_misc/lv_ll.c ****  * Return with the pointer of the previous node after 'n_act'
+ 303:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 304:lvgl\src\lv_misc/lv_ll.c ****  * @param n_act pointer a node
+ 305:lvgl\src\lv_misc/lv_ll.c ****  * @return pointer to the previous node
+ 306:lvgl\src\lv_misc/lv_ll.c ****  */
+ 307:lvgl\src\lv_misc/lv_ll.c **** void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
+ 308:lvgl\src\lv_misc/lv_ll.c **** {
+ 309:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return NULL;
+ 310:lvgl\src\lv_misc/lv_ll.c **** 
+ 311:lvgl\src\lv_misc/lv_ll.c ****     /* Pointer to the prev. node is stored in the end of this node.
+ 312:lvgl\src\lv_misc/lv_ll.c ****      * Go there and return the address found there */
+ 313:lvgl\src\lv_misc/lv_ll.c ****     const lv_ll_node_t * n_act_d = n_act;
+ 314:lvgl\src\lv_misc/lv_ll.c ****     n_act_d += LL_PREV_P_OFFSET(ll_p);
+ 315:lvgl\src\lv_misc/lv_ll.c ****     return *((lv_ll_node_t **)n_act_d);
+ 316:lvgl\src\lv_misc/lv_ll.c **** }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 7
+
+
+ 317:lvgl\src\lv_misc/lv_ll.c **** 
+ 318:lvgl\src\lv_misc/lv_ll.c **** /**
+ 319:lvgl\src\lv_misc/lv_ll.c ****  * Return the length of the linked list.
+ 320:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 321:lvgl\src\lv_misc/lv_ll.c ****  * @return length of the linked list
+ 322:lvgl\src\lv_misc/lv_ll.c ****  */
+ 323:lvgl\src\lv_misc/lv_ll.c **** uint32_t _lv_ll_get_len(const lv_ll_t * ll_p)
+ 324:lvgl\src\lv_misc/lv_ll.c **** {
+ 325:lvgl\src\lv_misc/lv_ll.c ****     uint32_t len = 0;
+ 326:lvgl\src\lv_misc/lv_ll.c ****     void * node;
+ 327:lvgl\src\lv_misc/lv_ll.c **** 
+ 328:lvgl\src\lv_misc/lv_ll.c ****     for(node = _lv_ll_get_head(ll_p); node != NULL; node = _lv_ll_get_next(ll_p, node)) {
+ 329:lvgl\src\lv_misc/lv_ll.c ****         len++;
+ 330:lvgl\src\lv_misc/lv_ll.c ****     }
+ 331:lvgl\src\lv_misc/lv_ll.c **** 
+ 332:lvgl\src\lv_misc/lv_ll.c ****     return len;
+ 333:lvgl\src\lv_misc/lv_ll.c **** }
+ 334:lvgl\src\lv_misc/lv_ll.c **** 
+ 335:lvgl\src\lv_misc/lv_ll.c **** /**
+ 336:lvgl\src\lv_misc/lv_ll.c ****  * Move a node before an other node in the same linked list
+ 337:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to a linked list
+ 338:lvgl\src\lv_misc/lv_ll.c ****  * @param n_act pointer to node to move
+ 339:lvgl\src\lv_misc/lv_ll.c ****  * @param n_after pointer to a node which should be after `n_act`
+ 340:lvgl\src\lv_misc/lv_ll.c ****  */
+ 341:lvgl\src\lv_misc/lv_ll.c **** void _lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
+ 342:lvgl\src\lv_misc/lv_ll.c **** {
+ 343:lvgl\src\lv_misc/lv_ll.c ****     if(n_act == n_after) return; /*Can't move before itself*/
+ 344:lvgl\src\lv_misc/lv_ll.c **** 
+ 345:lvgl\src\lv_misc/lv_ll.c ****     void * n_before;
+ 346:lvgl\src\lv_misc/lv_ll.c ****     if(n_after != NULL)
+ 347:lvgl\src\lv_misc/lv_ll.c ****         n_before = _lv_ll_get_prev(ll_p, n_after);
+ 348:lvgl\src\lv_misc/lv_ll.c ****     else
+ 349:lvgl\src\lv_misc/lv_ll.c ****         n_before = _lv_ll_get_tail(ll_p); /*if `n_after` is NULL `n_act` should be the new tail*/
+ 350:lvgl\src\lv_misc/lv_ll.c **** 
+ 351:lvgl\src\lv_misc/lv_ll.c ****     if(n_act == n_before) return; /*Already before `n_after`*/
+ 352:lvgl\src\lv_misc/lv_ll.c **** 
+ 353:lvgl\src\lv_misc/lv_ll.c ****     /*It's much easier to remove from the list and add again*/
+ 354:lvgl\src\lv_misc/lv_ll.c ****     _lv_ll_remove(ll_p, n_act);
+ 355:lvgl\src\lv_misc/lv_ll.c **** 
+ 356:lvgl\src\lv_misc/lv_ll.c ****     /*Add again by setting the prev. and next nodes*/
+ 357:lvgl\src\lv_misc/lv_ll.c ****     node_set_next(ll_p, n_before, n_act);
+ 358:lvgl\src\lv_misc/lv_ll.c ****     node_set_prev(ll_p, n_act, n_before);
+ 359:lvgl\src\lv_misc/lv_ll.c ****     node_set_prev(ll_p, n_after, n_act);
+ 360:lvgl\src\lv_misc/lv_ll.c ****     node_set_next(ll_p, n_act, n_after);
+ 361:lvgl\src\lv_misc/lv_ll.c **** 
+ 362:lvgl\src\lv_misc/lv_ll.c ****     /*If `n_act` was moved before NULL then it become the new tail*/
+ 363:lvgl\src\lv_misc/lv_ll.c ****     if(n_after == NULL) ll_p->tail = n_act;
+ 364:lvgl\src\lv_misc/lv_ll.c **** 
+ 365:lvgl\src\lv_misc/lv_ll.c ****     /*If `n_act` was moved before `NULL` then it's the new head*/
+ 366:lvgl\src\lv_misc/lv_ll.c ****     if(n_before == NULL) ll_p->head = n_act;
+ 367:lvgl\src\lv_misc/lv_ll.c **** }
+ 368:lvgl\src\lv_misc/lv_ll.c **** 
+ 369:lvgl\src\lv_misc/lv_ll.c **** /**
+ 370:lvgl\src\lv_misc/lv_ll.c ****  * Check if a linked list is empty
+ 371:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to a linked list
+ 372:lvgl\src\lv_misc/lv_ll.c ****  * @return true: the linked list is empty; false: not empty
+ 373:lvgl\src\lv_misc/lv_ll.c ****  */
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 8
+
+
+ 374:lvgl\src\lv_misc/lv_ll.c **** bool _lv_ll_is_empty(lv_ll_t * ll_p)
+ 375:lvgl\src\lv_misc/lv_ll.c **** {
+ 376:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return true;
+ 377:lvgl\src\lv_misc/lv_ll.c **** 
+ 378:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p->head == NULL && ll_p->tail == NULL) return true;
+ 379:lvgl\src\lv_misc/lv_ll.c **** 
+ 380:lvgl\src\lv_misc/lv_ll.c ****     return false;
+ 381:lvgl\src\lv_misc/lv_ll.c **** }
+ 382:lvgl\src\lv_misc/lv_ll.c **** 
+ 383:lvgl\src\lv_misc/lv_ll.c **** /**********************
+ 384:lvgl\src\lv_misc/lv_ll.c ****  *   STATIC FUNCTIONS
+ 385:lvgl\src\lv_misc/lv_ll.c ****  **********************/
+ 386:lvgl\src\lv_misc/lv_ll.c **** 
+ 387:lvgl\src\lv_misc/lv_ll.c **** /**
+ 388:lvgl\src\lv_misc/lv_ll.c ****  * Set the previous node pointer of a node
+ 389:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 390:lvgl\src\lv_misc/lv_ll.c ****  * @param act pointer to a node which prev. node pointer should be set
+ 391:lvgl\src\lv_misc/lv_ll.c ****  * @param prev pointer to a node which should be the previous node before 'act'
+ 392:lvgl\src\lv_misc/lv_ll.c ****  */
+ 393:lvgl\src\lv_misc/lv_ll.c **** static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * prev)
+ 394:lvgl\src\lv_misc/lv_ll.c **** {
+  27              		.loc 1 394 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32              	.LVL0:
+ 395:lvgl\src\lv_misc/lv_ll.c ****     if(act == NULL) return; /*Can't set the prev node of `NULL`*/
+  33              		.loc 1 395 0
+  34 0000 0B46     		mov	r3, r1
+  35 0002 09B1     		cbz	r1, .L1
+  36              	.LVL1:
+ 396:lvgl\src\lv_misc/lv_ll.c **** 
+ 397:lvgl\src\lv_misc/lv_ll.c ****     uint8_t * act8 = (uint8_t *) act;
+ 398:lvgl\src\lv_misc/lv_ll.c **** 
+ 399:lvgl\src\lv_misc/lv_ll.c ****     act8 += LL_PREV_P_OFFSET(ll_p);
+  37              		.loc 1 399 0
+  38 0004 0168     		ldr	r1, [r0]
+  39              	.LVL2:
+ 400:lvgl\src\lv_misc/lv_ll.c **** 
+ 401:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;
+ 402:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t ** prev_node_p = (lv_ll_node_t **) &prev;
+ 403:lvgl\src\lv_misc/lv_ll.c **** 
+ 404:lvgl\src\lv_misc/lv_ll.c ****     *act_node_p = *prev_node_p;
+  40              		.loc 1 404 0
+  41 0006 5A50     		str	r2, [r3, r1]
+  42              	.LVL3:
+  43              	.L1:
+  44 0008 7047     		bx	lr
+  45              		.cfi_endproc
+  46              	.LFE15:
+  47              		.size	node_set_prev, .-node_set_prev
+  48 000a 00BF     		.section	.text.node_set_next,"ax",%progbits
+  49              		.align	2
+  50              		.thumb
+  51              		.thumb_func
+  52              		.type	node_set_next, %function
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 9
+
+
+  53              	node_set_next:
+  54              	.LFB16:
+ 405:lvgl\src\lv_misc/lv_ll.c **** }
+ 406:lvgl\src\lv_misc/lv_ll.c **** 
+ 407:lvgl\src\lv_misc/lv_ll.c **** /**
+ 408:lvgl\src\lv_misc/lv_ll.c ****  * Set the 'next node pointer' of a node
+ 409:lvgl\src\lv_misc/lv_ll.c ****  * @param ll_p pointer to linked list
+ 410:lvgl\src\lv_misc/lv_ll.c ****  * @param act pointer to a node which next node pointer should be set
+ 411:lvgl\src\lv_misc/lv_ll.c ****  * @param next pointer to a node which should be the next node before 'act'
+ 412:lvgl\src\lv_misc/lv_ll.c ****  */
+ 413:lvgl\src\lv_misc/lv_ll.c **** static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * next)
+ 414:lvgl\src\lv_misc/lv_ll.c **** {
+  55              		.loc 1 414 0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59              		@ link register save eliminated.
+  60              	.LVL4:
+ 415:lvgl\src\lv_misc/lv_ll.c ****     if(act == NULL) return; /*Can't set the next node of `NULL`*/
+  61              		.loc 1 415 0
+  62 0000 21B1     		cbz	r1, .L7
+ 414:lvgl\src\lv_misc/lv_ll.c ****     if(act == NULL) return; /*Can't set the next node of `NULL`*/
+  63              		.loc 1 414 0
+  64 0002 10B4     		push	{r4}
+  65              		.cfi_def_cfa_offset 4
+  66              		.cfi_offset 4, -4
+  67              	.LVL5:
+ 416:lvgl\src\lv_misc/lv_ll.c ****     uint8_t * act8 = (uint8_t *) act;
+ 417:lvgl\src\lv_misc/lv_ll.c **** 
+ 418:lvgl\src\lv_misc/lv_ll.c ****     act8 += LL_NEXT_P_OFFSET(ll_p);
+  68              		.loc 1 418 0
+  69 0004 0368     		ldr	r3, [r0]
+  70 0006 0433     		adds	r3, r3, #4
+  71              	.LVL6:
+ 419:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;
+ 420:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t ** next_node_p = (lv_ll_node_t **) &next;
+ 421:lvgl\src\lv_misc/lv_ll.c **** 
+ 422:lvgl\src\lv_misc/lv_ll.c ****     *act_node_p = *next_node_p;
+  72              		.loc 1 422 0
+  73 0008 CA50     		str	r2, [r1, r3]
+ 423:lvgl\src\lv_misc/lv_ll.c **** }
+  74              		.loc 1 423 0
+  75 000a 10BC     		pop	{r4}
+  76              		.cfi_restore 4
+  77              		.cfi_def_cfa_offset 0
+  78              	.LVL7:
+  79              	.L7:
+  80 000c 7047     		bx	lr
+  81              		.cfi_endproc
+  82              	.LFE16:
+  83              		.size	node_set_next, .-node_set_next
+  84 000e 00BF     		.section	.text._lv_ll_init,"ax",%progbits
+  85              		.align	2
+  86              		.global	_lv_ll_init
+  87              		.thumb
+  88              		.thumb_func
+  89              		.type	_lv_ll_init, %function
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 10
+
+
+  90              	_lv_ll_init:
+  91              	.LFB1:
+  51:lvgl\src\lv_misc/lv_ll.c ****     ll_p->head = NULL;
+  92              		.loc 1 51 0
+  93              		.cfi_startproc
+  94              		@ args = 0, pretend = 0, frame = 0
+  95              		@ frame_needed = 0, uses_anonymous_args = 0
+  96              		@ link register save eliminated.
+  97              	.LVL8:
+  52:lvgl\src\lv_misc/lv_ll.c ****     ll_p->tail = NULL;
+  98              		.loc 1 52 0
+  99 0000 0023     		movs	r3, #0
+ 100 0002 4360     		str	r3, [r0, #4]
+  53:lvgl\src\lv_misc/lv_ll.c **** #ifdef LV_ARCH_64
+ 101              		.loc 1 53 0
+ 102 0004 8360     		str	r3, [r0, #8]
+  59:lvgl\src\lv_misc/lv_ll.c **** #endif
+ 103              		.loc 1 59 0
+ 104 0006 0331     		adds	r1, r1, #3
+ 105              	.LVL9:
+ 106 0008 21F00301 		bic	r1, r1, #3
+ 107              	.LVL10:
+  62:lvgl\src\lv_misc/lv_ll.c **** }
+ 108              		.loc 1 62 0
+ 109 000c 0160     		str	r1, [r0]
+ 110 000e 7047     		bx	lr
+ 111              		.cfi_endproc
+ 112              	.LFE1:
+ 113              		.size	_lv_ll_init, .-_lv_ll_init
+ 114              		.section	.text._lv_ll_ins_head,"ax",%progbits
+ 115              		.align	2
+ 116              		.global	_lv_ll_ins_head
+ 117              		.thumb
+ 118              		.thumb_func
+ 119              		.type	_lv_ll_ins_head, %function
+ 120              	_lv_ll_ins_head:
+ 121              	.LFB2:
+  71:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ 122              		.loc 1 71 0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              	.LVL11:
+ 127 0000 38B5     		push	{r3, r4, r5, lr}
+ 128              		.cfi_def_cfa_offset 16
+ 129              		.cfi_offset 3, -16
+ 130              		.cfi_offset 4, -12
+ 131              		.cfi_offset 5, -8
+ 132              		.cfi_offset 14, -4
+ 133 0002 0446     		mov	r4, r0
+  74:lvgl\src\lv_misc/lv_ll.c **** 
+ 134              		.loc 1 74 0
+ 135 0004 0068     		ldr	r0, [r0]
+ 136              	.LVL12:
+ 137 0006 0830     		adds	r0, r0, #8
+ 138 0008 FFF7FEFF 		bl	lv_mem_alloc
+ 139              	.LVL13:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 11
+
+
+  76:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, NULL);       /*No prev. before the new head*/
+ 140              		.loc 1 76 0
+ 141 000c 0546     		mov	r5, r0
+ 142 000e 98B1     		cbz	r0, .L10
+  77:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, ll_p->head); /*After new comes the old head*/
+ 143              		.loc 1 77 0
+ 144 0010 0022     		movs	r2, #0
+ 145 0012 0146     		mov	r1, r0
+ 146 0014 2046     		mov	r0, r4
+ 147              	.LVL14:
+ 148 0016 FFF7FEFF 		bl	node_set_prev
+ 149              	.LVL15:
+  78:lvgl\src\lv_misc/lv_ll.c **** 
+ 150              		.loc 1 78 0
+ 151 001a 6268     		ldr	r2, [r4, #4]
+ 152 001c 2946     		mov	r1, r5
+ 153 001e 2046     		mov	r0, r4
+ 154 0020 FFF7FEFF 		bl	node_set_next
+ 155              	.LVL16:
+  80:lvgl\src\lv_misc/lv_ll.c ****             node_set_prev(ll_p, ll_p->head, n_new);
+ 156              		.loc 1 80 0
+ 157 0024 6168     		ldr	r1, [r4, #4]
+ 158 0026 19B1     		cbz	r1, .L11
+  81:lvgl\src\lv_misc/lv_ll.c ****         }
+ 159              		.loc 1 81 0
+ 160 0028 2A46     		mov	r2, r5
+ 161 002a 2046     		mov	r0, r4
+ 162 002c FFF7FEFF 		bl	node_set_prev
+ 163              	.LVL17:
+ 164              	.L11:
+  84:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail == NULL) { /*If there is no tail (1. node) set the tail too*/
+ 165              		.loc 1 84 0
+ 166 0030 6560     		str	r5, [r4, #4]
+  85:lvgl\src\lv_misc/lv_ll.c ****             ll_p->tail = n_new;
+ 167              		.loc 1 85 0
+ 168 0032 A368     		ldr	r3, [r4, #8]
+ 169 0034 03B9     		cbnz	r3, .L10
+  86:lvgl\src\lv_misc/lv_ll.c ****         }
+ 170              		.loc 1 86 0
+ 171 0036 A560     		str	r5, [r4, #8]
+ 172              	.L10:
+  91:lvgl\src\lv_misc/lv_ll.c **** 
+ 173              		.loc 1 91 0
+ 174 0038 2846     		mov	r0, r5
+ 175 003a 38BD     		pop	{r3, r4, r5, pc}
+ 176              		.cfi_endproc
+ 177              	.LFE2:
+ 178              		.size	_lv_ll_ins_head, .-_lv_ll_ins_head
+ 179              		.section	.text._lv_ll_ins_tail,"ax",%progbits
+ 180              		.align	2
+ 181              		.global	_lv_ll_ins_tail
+ 182              		.thumb
+ 183              		.thumb_func
+ 184              		.type	_lv_ll_ins_tail, %function
+ 185              	_lv_ll_ins_tail:
+ 186              	.LFB4:
+ 130:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 12
+
+
+ 187              		.loc 1 130 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191              	.LVL18:
+ 192 0000 38B5     		push	{r3, r4, r5, lr}
+ 193              		.cfi_def_cfa_offset 16
+ 194              		.cfi_offset 3, -16
+ 195              		.cfi_offset 4, -12
+ 196              		.cfi_offset 5, -8
+ 197              		.cfi_offset 14, -4
+ 198 0002 0446     		mov	r4, r0
+ 133:lvgl\src\lv_misc/lv_ll.c **** 
+ 199              		.loc 1 133 0
+ 200 0004 0068     		ldr	r0, [r0]
+ 201              	.LVL19:
+ 202 0006 0830     		adds	r0, r0, #8
+ 203 0008 FFF7FEFF 		bl	lv_mem_alloc
+ 204              	.LVL20:
+ 135:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, NULL);       /*No next after the new tail*/
+ 205              		.loc 1 135 0
+ 206 000c 0546     		mov	r5, r0
+ 207 000e 98B1     		cbz	r0, .L14
+ 136:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, ll_p->tail); /*The prev. before new is the old tail*/
+ 208              		.loc 1 136 0
+ 209 0010 0022     		movs	r2, #0
+ 210 0012 0146     		mov	r1, r0
+ 211 0014 2046     		mov	r0, r4
+ 212              	.LVL21:
+ 213 0016 FFF7FEFF 		bl	node_set_next
+ 214              	.LVL22:
+ 137:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail != NULL) {                /*If there is old tail then the new comes after it*
+ 215              		.loc 1 137 0
+ 216 001a A268     		ldr	r2, [r4, #8]
+ 217 001c 2946     		mov	r1, r5
+ 218 001e 2046     		mov	r0, r4
+ 219 0020 FFF7FEFF 		bl	node_set_prev
+ 220              	.LVL23:
+ 138:lvgl\src\lv_misc/lv_ll.c ****             node_set_next(ll_p, ll_p->tail, n_new);
+ 221              		.loc 1 138 0
+ 222 0024 A168     		ldr	r1, [r4, #8]
+ 223 0026 19B1     		cbz	r1, .L15
+ 139:lvgl\src\lv_misc/lv_ll.c ****         }
+ 224              		.loc 1 139 0
+ 225 0028 2A46     		mov	r2, r5
+ 226 002a 2046     		mov	r0, r4
+ 227 002c FFF7FEFF 		bl	node_set_next
+ 228              	.LVL24:
+ 229              	.L15:
+ 142:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->head == NULL) { /*If there is no head (1. node) set the head too*/
+ 230              		.loc 1 142 0
+ 231 0030 A560     		str	r5, [r4, #8]
+ 143:lvgl\src\lv_misc/lv_ll.c ****             ll_p->head = n_new;
+ 232              		.loc 1 143 0
+ 233 0032 6368     		ldr	r3, [r4, #4]
+ 234 0034 03B9     		cbnz	r3, .L14
+ 144:lvgl\src\lv_misc/lv_ll.c ****         }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 13
+
+
+ 235              		.loc 1 144 0
+ 236 0036 6560     		str	r5, [r4, #4]
+ 237              	.L14:
+ 149:lvgl\src\lv_misc/lv_ll.c **** 
+ 238              		.loc 1 149 0
+ 239 0038 2846     		mov	r0, r5
+ 240 003a 38BD     		pop	{r3, r4, r5, pc}
+ 241              		.cfi_endproc
+ 242              	.LFE4:
+ 243              		.size	_lv_ll_ins_tail, .-_lv_ll_ins_tail
+ 244              		.section	.text._lv_ll_get_head,"ax",%progbits
+ 245              		.align	2
+ 246              		.global	_lv_ll_get_head
+ 247              		.thumb
+ 248              		.thumb_func
+ 249              		.type	_lv_ll_get_head, %function
+ 250              	_lv_ll_get_head:
+ 251              	.LFB8:
+ 258:lvgl\src\lv_misc/lv_ll.c ****     void * head = NULL;
+ 252              		.loc 1 258 0
+ 253              		.cfi_startproc
+ 254              		@ args = 0, pretend = 0, frame = 0
+ 255              		@ frame_needed = 0, uses_anonymous_args = 0
+ 256              		@ link register save eliminated.
+ 257              	.LVL25:
+ 261:lvgl\src\lv_misc/lv_ll.c ****         head = ll_p->head;
+ 258              		.loc 1 261 0
+ 259 0000 08B1     		cbz	r0, .L19
+ 262:lvgl\src\lv_misc/lv_ll.c ****     }
+ 260              		.loc 1 262 0
+ 261 0002 4068     		ldr	r0, [r0, #4]
+ 262              	.LVL26:
+ 263 0004 7047     		bx	lr
+ 264              	.LVL27:
+ 265              	.L19:
+ 259:lvgl\src\lv_misc/lv_ll.c **** 
+ 266              		.loc 1 259 0
+ 267 0006 0020     		movs	r0, #0
+ 268              	.LVL28:
+ 266:lvgl\src\lv_misc/lv_ll.c **** 
+ 269              		.loc 1 266 0
+ 270 0008 7047     		bx	lr
+ 271              		.cfi_endproc
+ 272              	.LFE8:
+ 273              		.size	_lv_ll_get_head, .-_lv_ll_get_head
+ 274 000a 00BF     		.section	.text._lv_ll_get_tail,"ax",%progbits
+ 275              		.align	2
+ 276              		.global	_lv_ll_get_tail
+ 277              		.thumb
+ 278              		.thumb_func
+ 279              		.type	_lv_ll_get_tail, %function
+ 280              	_lv_ll_get_tail:
+ 281              	.LFB9:
+ 274:lvgl\src\lv_misc/lv_ll.c ****     void * tail = NULL;
+ 282              		.loc 1 274 0
+ 283              		.cfi_startproc
+ 284              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 14
+
+
+ 285              		@ frame_needed = 0, uses_anonymous_args = 0
+ 286              		@ link register save eliminated.
+ 287              	.LVL29:
+ 277:lvgl\src\lv_misc/lv_ll.c ****         tail = ll_p->tail;
+ 288              		.loc 1 277 0
+ 289 0000 08B1     		cbz	r0, .L22
+ 278:lvgl\src\lv_misc/lv_ll.c ****     }
+ 290              		.loc 1 278 0
+ 291 0002 8068     		ldr	r0, [r0, #8]
+ 292              	.LVL30:
+ 293 0004 7047     		bx	lr
+ 294              	.LVL31:
+ 295              	.L22:
+ 275:lvgl\src\lv_misc/lv_ll.c **** 
+ 296              		.loc 1 275 0
+ 297 0006 0020     		movs	r0, #0
+ 298              	.LVL32:
+ 282:lvgl\src\lv_misc/lv_ll.c **** 
+ 299              		.loc 1 282 0
+ 300 0008 7047     		bx	lr
+ 301              		.cfi_endproc
+ 302              	.LFE9:
+ 303              		.size	_lv_ll_get_tail, .-_lv_ll_get_tail
+ 304 000a 00BF     		.section	.text._lv_ll_get_next,"ax",%progbits
+ 305              		.align	2
+ 306              		.global	_lv_ll_get_next
+ 307              		.thumb
+ 308              		.thumb_func
+ 309              		.type	_lv_ll_get_next, %function
+ 310              	_lv_ll_get_next:
+ 311              	.LFB10:
+ 291:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return NULL;
+ 312              		.loc 1 291 0
+ 313              		.cfi_startproc
+ 314              		@ args = 0, pretend = 0, frame = 0
+ 315              		@ frame_needed = 0, uses_anonymous_args = 0
+ 316              		@ link register save eliminated.
+ 317              	.LVL33:
+ 292:lvgl\src\lv_misc/lv_ll.c **** 
+ 318              		.loc 1 292 0
+ 319 0000 18B1     		cbz	r0, .L25
+ 320              	.LVL34:
+ 297:lvgl\src\lv_misc/lv_ll.c ****     return *((lv_ll_node_t **)n_act_d);
+ 321              		.loc 1 297 0
+ 322 0002 0368     		ldr	r3, [r0]
+ 323 0004 0433     		adds	r3, r3, #4
+ 324              	.LVL35:
+ 298:lvgl\src\lv_misc/lv_ll.c **** }
+ 325              		.loc 1 298 0
+ 326 0006 C858     		ldr	r0, [r1, r3]
+ 327              	.LVL36:
+ 328 0008 7047     		bx	lr
+ 329              	.LVL37:
+ 330              	.L25:
+ 292:lvgl\src\lv_misc/lv_ll.c **** 
+ 331              		.loc 1 292 0
+ 332 000a 0020     		movs	r0, #0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 15
+
+
+ 333              	.LVL38:
+ 299:lvgl\src\lv_misc/lv_ll.c **** 
+ 334              		.loc 1 299 0
+ 335 000c 7047     		bx	lr
+ 336              		.cfi_endproc
+ 337              	.LFE10:
+ 338              		.size	_lv_ll_get_next, .-_lv_ll_get_next
+ 339 000e 00BF     		.section	.text._lv_ll_get_prev,"ax",%progbits
+ 340              		.align	2
+ 341              		.global	_lv_ll_get_prev
+ 342              		.thumb
+ 343              		.thumb_func
+ 344              		.type	_lv_ll_get_prev, %function
+ 345              	_lv_ll_get_prev:
+ 346              	.LFB11:
+ 308:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return NULL;
+ 347              		.loc 1 308 0
+ 348              		.cfi_startproc
+ 349              		@ args = 0, pretend = 0, frame = 0
+ 350              		@ frame_needed = 0, uses_anonymous_args = 0
+ 351              		@ link register save eliminated.
+ 352              	.LVL39:
+ 309:lvgl\src\lv_misc/lv_ll.c **** 
+ 353              		.loc 1 309 0
+ 354 0000 10B1     		cbz	r0, .L28
+ 355              	.LVL40:
+ 314:lvgl\src\lv_misc/lv_ll.c ****     return *((lv_ll_node_t **)n_act_d);
+ 356              		.loc 1 314 0
+ 357 0002 0368     		ldr	r3, [r0]
+ 358              	.LVL41:
+ 315:lvgl\src\lv_misc/lv_ll.c **** }
+ 359              		.loc 1 315 0
+ 360 0004 C858     		ldr	r0, [r1, r3]
+ 361              	.LVL42:
+ 362 0006 7047     		bx	lr
+ 363              	.LVL43:
+ 364              	.L28:
+ 309:lvgl\src\lv_misc/lv_ll.c **** 
+ 365              		.loc 1 309 0
+ 366 0008 0020     		movs	r0, #0
+ 367              	.LVL44:
+ 316:lvgl\src\lv_misc/lv_ll.c **** 
+ 368              		.loc 1 316 0
+ 369 000a 7047     		bx	lr
+ 370              		.cfi_endproc
+ 371              	.LFE11:
+ 372              		.size	_lv_ll_get_prev, .-_lv_ll_get_prev
+ 373              		.section	.text._lv_ll_ins_prev,"ax",%progbits
+ 374              		.align	2
+ 375              		.global	_lv_ll_ins_prev
+ 376              		.thumb
+ 377              		.thumb_func
+ 378              		.type	_lv_ll_ins_prev, %function
+ 379              	_lv_ll_ins_prev:
+ 380              	.LFB3:
+ 100:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ 381              		.loc 1 100 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 16
+
+
+ 382              		.cfi_startproc
+ 383              		@ args = 0, pretend = 0, frame = 0
+ 384              		@ frame_needed = 0, uses_anonymous_args = 0
+ 385              	.LVL45:
+ 103:lvgl\src\lv_misc/lv_ll.c **** 
+ 386              		.loc 1 103 0
+ 387 0000 68B3     		cbz	r0, .L32
+ 100:lvgl\src\lv_misc/lv_ll.c ****     lv_ll_node_t * n_new;
+ 388              		.loc 1 100 0 discriminator 2
+ 389 0002 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 390              		.cfi_def_cfa_offset 24
+ 391              		.cfi_offset 3, -24
+ 392              		.cfi_offset 4, -20
+ 393              		.cfi_offset 5, -16
+ 394              		.cfi_offset 6, -12
+ 395              		.cfi_offset 7, -8
+ 396              		.cfi_offset 14, -4
+ 397 0004 0446     		mov	r4, r0
+ 103:lvgl\src\lv_misc/lv_ll.c **** 
+ 398              		.loc 1 103 0 discriminator 2
+ 399 0006 61B3     		cbz	r1, .L33
+ 400 0008 0D46     		mov	r5, r1
+ 105:lvgl\src\lv_misc/lv_ll.c ****         n_new = _lv_ll_ins_head(ll_p);
+ 401              		.loc 1 105 0
+ 402 000a FFF7FEFF 		bl	_lv_ll_get_head
+ 403              	.LVL46:
+ 404 000e 8542     		cmp	r5, r0
+ 405 0010 04D1     		bne	.L31
+ 106:lvgl\src\lv_misc/lv_ll.c ****         if(n_new == NULL) return NULL;
+ 406              		.loc 1 106 0
+ 407 0012 2046     		mov	r0, r4
+ 408 0014 FFF7FEFF 		bl	_lv_ll_ins_head
+ 409              	.LVL47:
+ 107:lvgl\src\lv_misc/lv_ll.c ****     }
+ 410              		.loc 1 107 0
+ 411 0018 28BB     		cbnz	r0, .L34
+ 412 001a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 413              	.LVL48:
+ 414              	.L31:
+ 415              	.LBB2:
+ 110:lvgl\src\lv_misc/lv_ll.c ****         if(n_new == NULL) return NULL;
+ 416              		.loc 1 110 0
+ 417 001c 2068     		ldr	r0, [r4]
+ 418 001e 0830     		adds	r0, r0, #8
+ 419 0020 FFF7FEFF 		bl	lv_mem_alloc
+ 420              	.LVL49:
+ 111:lvgl\src\lv_misc/lv_ll.c **** 
+ 421              		.loc 1 111 0
+ 422 0024 0646     		mov	r6, r0
+ 423 0026 F8B1     		cbz	r0, .L35
+ 114:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_prev, n_new);
+ 424              		.loc 1 114 0
+ 425 0028 2946     		mov	r1, r5
+ 426 002a 2046     		mov	r0, r4
+ 427              	.LVL50:
+ 428 002c FFF7FEFF 		bl	_lv_ll_get_prev
+ 429              	.LVL51:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 17
+
+
+ 430 0030 0746     		mov	r7, r0
+ 431              	.LVL52:
+ 115:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_new, n_prev);
+ 432              		.loc 1 115 0
+ 433 0032 3246     		mov	r2, r6
+ 434 0034 0146     		mov	r1, r0
+ 435 0036 2046     		mov	r0, r4
+ 436              	.LVL53:
+ 437 0038 FFF7FEFF 		bl	node_set_next
+ 438              	.LVL54:
+ 116:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_act, n_new);
+ 439              		.loc 1 116 0
+ 440 003c 3A46     		mov	r2, r7
+ 441 003e 3146     		mov	r1, r6
+ 442 0040 2046     		mov	r0, r4
+ 443 0042 FFF7FEFF 		bl	node_set_prev
+ 444              	.LVL55:
+ 117:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_p, n_new, n_act);
+ 445              		.loc 1 117 0
+ 446 0046 3246     		mov	r2, r6
+ 447 0048 2946     		mov	r1, r5
+ 448 004a 2046     		mov	r0, r4
+ 449 004c FFF7FEFF 		bl	node_set_prev
+ 450              	.LVL56:
+ 118:lvgl\src\lv_misc/lv_ll.c ****     }
+ 451              		.loc 1 118 0
+ 452 0050 2A46     		mov	r2, r5
+ 453 0052 3146     		mov	r1, r6
+ 454 0054 2046     		mov	r0, r4
+ 455 0056 FFF7FEFF 		bl	node_set_next
+ 456              	.LVL57:
+ 110:lvgl\src\lv_misc/lv_ll.c ****         if(n_new == NULL) return NULL;
+ 457              		.loc 1 110 0
+ 458 005a 3046     		mov	r0, r6
+ 459 005c F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 460              	.LVL58:
+ 461              	.L32:
+ 462              		.cfi_def_cfa_offset 0
+ 463              		.cfi_restore 3
+ 464              		.cfi_restore 4
+ 465              		.cfi_restore 5
+ 466              		.cfi_restore 6
+ 467              		.cfi_restore 7
+ 468              		.cfi_restore 14
+ 469              	.LBE2:
+ 103:lvgl\src\lv_misc/lv_ll.c **** 
+ 470              		.loc 1 103 0
+ 471 005e 0020     		movs	r0, #0
+ 472              	.LVL59:
+ 122:lvgl\src\lv_misc/lv_ll.c **** 
+ 473              		.loc 1 122 0
+ 474 0060 7047     		bx	lr
+ 475              	.LVL60:
+ 476              	.L33:
+ 477              		.cfi_def_cfa_offset 24
+ 478              		.cfi_offset 3, -24
+ 479              		.cfi_offset 4, -20
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 18
+
+
+ 480              		.cfi_offset 5, -16
+ 481              		.cfi_offset 6, -12
+ 482              		.cfi_offset 7, -8
+ 483              		.cfi_offset 14, -4
+ 103:lvgl\src\lv_misc/lv_ll.c **** 
+ 484              		.loc 1 103 0
+ 485 0062 0020     		movs	r0, #0
+ 486              	.LVL61:
+ 487 0064 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 488              	.LVL62:
+ 489              	.L34:
+ 490 0066 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 491              	.LVL63:
+ 492              	.L35:
+ 493              	.LBB3:
+ 111:lvgl\src\lv_misc/lv_ll.c **** 
+ 494              		.loc 1 111 0
+ 495 0068 0020     		movs	r0, #0
+ 496              	.LVL64:
+ 497              	.LBE3:
+ 122:lvgl\src\lv_misc/lv_ll.c **** 
+ 498              		.loc 1 122 0
+ 499 006a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 500              		.cfi_endproc
+ 501              	.LFE3:
+ 502              		.size	_lv_ll_ins_prev, .-_lv_ll_ins_prev
+ 503              		.section	.text._lv_ll_remove,"ax",%progbits
+ 504              		.align	2
+ 505              		.global	_lv_ll_remove
+ 506              		.thumb
+ 507              		.thumb_func
+ 508              		.type	_lv_ll_remove, %function
+ 509              	_lv_ll_remove:
+ 510              	.LFB5:
+ 158:lvgl\src\lv_misc/lv_ll.c ****     if(_lv_ll_get_head(ll_p) == node_p) {
+ 511              		.loc 1 158 0
+ 512              		.cfi_startproc
+ 513              		@ args = 0, pretend = 0, frame = 0
+ 514              		@ frame_needed = 0, uses_anonymous_args = 0
+ 515              	.LVL65:
+ 516 0000 70B5     		push	{r4, r5, r6, lr}
+ 517              		.cfi_def_cfa_offset 16
+ 518              		.cfi_offset 4, -16
+ 519              		.cfi_offset 5, -12
+ 520              		.cfi_offset 6, -8
+ 521              		.cfi_offset 14, -4
+ 522 0002 0446     		mov	r4, r0
+ 523 0004 0D46     		mov	r5, r1
+ 159:lvgl\src\lv_misc/lv_ll.c ****         /*The new head will be the node after 'n_act'*/
+ 524              		.loc 1 159 0
+ 525 0006 FFF7FEFF 		bl	_lv_ll_get_head
+ 526              	.LVL66:
+ 527 000a 8542     		cmp	r5, r0
+ 528 000c 0ED1     		bne	.L38
+ 161:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->head == NULL) {
+ 529              		.loc 1 161 0
+ 530 000e 2946     		mov	r1, r5
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 19
+
+
+ 531 0010 2046     		mov	r0, r4
+ 532 0012 FFF7FEFF 		bl	_lv_ll_get_next
+ 533              	.LVL67:
+ 534 0016 6060     		str	r0, [r4, #4]
+ 162:lvgl\src\lv_misc/lv_ll.c ****             ll_p->tail = NULL;
+ 535              		.loc 1 162 0
+ 536 0018 10B9     		cbnz	r0, .L39
+ 163:lvgl\src\lv_misc/lv_ll.c ****         }
+ 537              		.loc 1 163 0
+ 538 001a 0023     		movs	r3, #0
+ 539 001c A360     		str	r3, [r4, #8]
+ 540 001e 70BD     		pop	{r4, r5, r6, pc}
+ 541              	.LVL68:
+ 542              	.L39:
+ 166:lvgl\src\lv_misc/lv_ll.c ****         }
+ 543              		.loc 1 166 0
+ 544 0020 0022     		movs	r2, #0
+ 545 0022 0146     		mov	r1, r0
+ 546 0024 2046     		mov	r0, r4
+ 547 0026 FFF7FEFF 		bl	node_set_prev
+ 548              	.LVL69:
+ 549 002a 70BD     		pop	{r4, r5, r6, pc}
+ 550              	.LVL70:
+ 551              	.L38:
+ 169:lvgl\src\lv_misc/lv_ll.c ****         /*The new tail will be the  node before 'n_act'*/
+ 552              		.loc 1 169 0
+ 553 002c 2046     		mov	r0, r4
+ 554 002e FFF7FEFF 		bl	_lv_ll_get_tail
+ 555              	.LVL71:
+ 556 0032 8542     		cmp	r5, r0
+ 557 0034 0ED1     		bne	.L41
+ 171:lvgl\src\lv_misc/lv_ll.c ****         if(ll_p->tail == NULL) {
+ 558              		.loc 1 171 0
+ 559 0036 2946     		mov	r1, r5
+ 560 0038 2046     		mov	r0, r4
+ 561 003a FFF7FEFF 		bl	_lv_ll_get_prev
+ 562              	.LVL72:
+ 563 003e A060     		str	r0, [r4, #8]
+ 172:lvgl\src\lv_misc/lv_ll.c ****             ll_p->head = NULL;
+ 564              		.loc 1 172 0
+ 565 0040 10B9     		cbnz	r0, .L42
+ 173:lvgl\src\lv_misc/lv_ll.c ****         }
+ 566              		.loc 1 173 0
+ 567 0042 0023     		movs	r3, #0
+ 568 0044 6360     		str	r3, [r4, #4]
+ 569 0046 70BD     		pop	{r4, r5, r6, pc}
+ 570              	.LVL73:
+ 571              	.L42:
+ 176:lvgl\src\lv_misc/lv_ll.c ****         }
+ 572              		.loc 1 176 0
+ 573 0048 0022     		movs	r2, #0
+ 574 004a 0146     		mov	r1, r0
+ 575 004c 2046     		mov	r0, r4
+ 576 004e FFF7FEFF 		bl	node_set_next
+ 577              	.LVL74:
+ 578 0052 70BD     		pop	{r4, r5, r6, pc}
+ 579              	.LVL75:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 20
+
+
+ 580              	.L41:
+ 581              	.LBB4:
+ 180:lvgl\src\lv_misc/lv_ll.c ****         lv_ll_node_t * n_next = _lv_ll_get_next(ll_p, node_p);
+ 582              		.loc 1 180 0
+ 583 0054 2946     		mov	r1, r5
+ 584 0056 2046     		mov	r0, r4
+ 585 0058 FFF7FEFF 		bl	_lv_ll_get_prev
+ 586              	.LVL76:
+ 587 005c 0646     		mov	r6, r0
+ 588              	.LVL77:
+ 181:lvgl\src\lv_misc/lv_ll.c **** 
+ 589              		.loc 1 181 0
+ 590 005e 2946     		mov	r1, r5
+ 591 0060 2046     		mov	r0, r4
+ 592              	.LVL78:
+ 593 0062 FFF7FEFF 		bl	_lv_ll_get_next
+ 594              	.LVL79:
+ 595 0066 0546     		mov	r5, r0
+ 596              	.LVL80:
+ 183:lvgl\src\lv_misc/lv_ll.c ****         node_set_prev(ll_p, n_next, n_prev);
+ 597              		.loc 1 183 0
+ 598 0068 0246     		mov	r2, r0
+ 599 006a 3146     		mov	r1, r6
+ 600 006c 2046     		mov	r0, r4
+ 601              	.LVL81:
+ 602 006e FFF7FEFF 		bl	node_set_next
+ 603              	.LVL82:
+ 184:lvgl\src\lv_misc/lv_ll.c ****     }
+ 604              		.loc 1 184 0
+ 605 0072 3246     		mov	r2, r6
+ 606 0074 2946     		mov	r1, r5
+ 607 0076 2046     		mov	r0, r4
+ 608 0078 FFF7FEFF 		bl	node_set_prev
+ 609              	.LVL83:
+ 610 007c 70BD     		pop	{r4, r5, r6, pc}
+ 611              	.LBE4:
+ 612              		.cfi_endproc
+ 613              	.LFE5:
+ 614              		.size	_lv_ll_remove, .-_lv_ll_remove
+ 615 007e 00BF     		.section	.text._lv_ll_clear,"ax",%progbits
+ 616              		.align	2
+ 617              		.global	_lv_ll_clear
+ 618              		.thumb
+ 619              		.thumb_func
+ 620              		.type	_lv_ll_clear, %function
+ 621              	_lv_ll_clear:
+ 622              	.LFB6:
+ 193:lvgl\src\lv_misc/lv_ll.c ****     void * i;
+ 623              		.loc 1 193 0
+ 624              		.cfi_startproc
+ 625              		@ args = 0, pretend = 0, frame = 0
+ 626              		@ frame_needed = 0, uses_anonymous_args = 0
+ 627              	.LVL84:
+ 628 0000 70B5     		push	{r4, r5, r6, lr}
+ 629              		.cfi_def_cfa_offset 16
+ 630              		.cfi_offset 4, -16
+ 631              		.cfi_offset 5, -12
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 21
+
+
+ 632              		.cfi_offset 6, -8
+ 633              		.cfi_offset 14, -4
+ 634 0002 0546     		mov	r5, r0
+ 197:lvgl\src\lv_misc/lv_ll.c ****     i_next = NULL;
+ 635              		.loc 1 197 0
+ 636 0004 FFF7FEFF 		bl	_lv_ll_get_head
+ 637              	.LVL85:
+ 638 0008 0446     		mov	r4, r0
+ 639              	.LVL86:
+ 200:lvgl\src\lv_misc/lv_ll.c ****         i_next = _lv_ll_get_next(ll_p, i);
+ 640              		.loc 1 200 0
+ 641 000a 0CE0     		b	.L45
+ 642              	.LVL87:
+ 643              	.L46:
+ 201:lvgl\src\lv_misc/lv_ll.c **** 
+ 644              		.loc 1 201 0
+ 645 000c 2146     		mov	r1, r4
+ 646 000e 2846     		mov	r0, r5
+ 647 0010 FFF7FEFF 		bl	_lv_ll_get_next
+ 648              	.LVL88:
+ 649 0014 0646     		mov	r6, r0
+ 650              	.LVL89:
+ 203:lvgl\src\lv_misc/lv_ll.c ****         lv_mem_free(i);
+ 651              		.loc 1 203 0
+ 652 0016 2146     		mov	r1, r4
+ 653 0018 2846     		mov	r0, r5
+ 654              	.LVL90:
+ 655 001a FFF7FEFF 		bl	_lv_ll_remove
+ 656              	.LVL91:
+ 204:lvgl\src\lv_misc/lv_ll.c **** 
+ 657              		.loc 1 204 0
+ 658 001e 2046     		mov	r0, r4
+ 659 0020 FFF7FEFF 		bl	lv_mem_free
+ 660              	.LVL92:
+ 206:lvgl\src\lv_misc/lv_ll.c ****     }
+ 661              		.loc 1 206 0
+ 662 0024 3446     		mov	r4, r6
+ 663              	.LVL93:
+ 664              	.L45:
+ 200:lvgl\src\lv_misc/lv_ll.c ****         i_next = _lv_ll_get_next(ll_p, i);
+ 665              		.loc 1 200 0
+ 666 0026 002C     		cmp	r4, #0
+ 667 0028 F0D1     		bne	.L46
+ 208:lvgl\src\lv_misc/lv_ll.c **** 
+ 668              		.loc 1 208 0
+ 669 002a 70BD     		pop	{r4, r5, r6, pc}
+ 670              		.cfi_endproc
+ 671              	.LFE6:
+ 672              		.size	_lv_ll_clear, .-_lv_ll_clear
+ 673              		.section	.text._lv_ll_chg_list,"ax",%progbits
+ 674              		.align	2
+ 675              		.global	_lv_ll_chg_list
+ 676              		.thumb
+ 677              		.thumb_func
+ 678              		.type	_lv_ll_chg_list, %function
+ 679              	_lv_ll_chg_list:
+ 680              	.LFB7:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 22
+
+
+ 219:lvgl\src\lv_misc/lv_ll.c ****     _lv_ll_remove(ll_ori_p, node);
+ 681              		.loc 1 219 0
+ 682              		.cfi_startproc
+ 683              		@ args = 0, pretend = 0, frame = 0
+ 684              		@ frame_needed = 0, uses_anonymous_args = 0
+ 685              	.LVL94:
+ 686 0000 70B5     		push	{r4, r5, r6, lr}
+ 687              		.cfi_def_cfa_offset 16
+ 688              		.cfi_offset 4, -16
+ 689              		.cfi_offset 5, -12
+ 690              		.cfi_offset 6, -8
+ 691              		.cfi_offset 14, -4
+ 692 0002 0C46     		mov	r4, r1
+ 693 0004 1546     		mov	r5, r2
+ 694 0006 1E46     		mov	r6, r3
+ 220:lvgl\src\lv_misc/lv_ll.c **** 
+ 695              		.loc 1 220 0
+ 696 0008 1146     		mov	r1, r2
+ 697              	.LVL95:
+ 698 000a FFF7FEFF 		bl	_lv_ll_remove
+ 699              	.LVL96:
+ 222:lvgl\src\lv_misc/lv_ll.c ****         /*Set node as head*/
+ 700              		.loc 1 222 0
+ 701 000e A6B1     		cbz	r6, .L49
+ 224:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_new_p, node, ll_new_p->head);
+ 702              		.loc 1 224 0
+ 703 0010 0022     		movs	r2, #0
+ 704 0012 2946     		mov	r1, r5
+ 705 0014 2046     		mov	r0, r4
+ 706 0016 FFF7FEFF 		bl	node_set_prev
+ 707              	.LVL97:
+ 225:lvgl\src\lv_misc/lv_ll.c **** 
+ 708              		.loc 1 225 0
+ 709 001a 6268     		ldr	r2, [r4, #4]
+ 710 001c 2946     		mov	r1, r5
+ 711 001e 2046     		mov	r0, r4
+ 712 0020 FFF7FEFF 		bl	node_set_next
+ 713              	.LVL98:
+ 227:lvgl\src\lv_misc/lv_ll.c ****             node_set_prev(ll_new_p, ll_new_p->head, node);
+ 714              		.loc 1 227 0
+ 715 0024 6168     		ldr	r1, [r4, #4]
+ 716 0026 19B1     		cbz	r1, .L50
+ 228:lvgl\src\lv_misc/lv_ll.c ****         }
+ 717              		.loc 1 228 0
+ 718 0028 2A46     		mov	r2, r5
+ 719 002a 2046     		mov	r0, r4
+ 720 002c FFF7FEFF 		bl	node_set_prev
+ 721              	.LVL99:
+ 722              	.L50:
+ 231:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->tail == NULL) { /*If there is no tail (first node) set the tail too*/
+ 723              		.loc 1 231 0
+ 724 0030 6560     		str	r5, [r4, #4]
+ 232:lvgl\src\lv_misc/lv_ll.c ****             ll_new_p->tail = node;
+ 725              		.loc 1 232 0
+ 726 0032 A368     		ldr	r3, [r4, #8]
+ 727 0034 ABB9     		cbnz	r3, .L48
+ 233:lvgl\src\lv_misc/lv_ll.c ****         }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 23
+
+
+ 728              		.loc 1 233 0
+ 729 0036 A560     		str	r5, [r4, #8]
+ 730 0038 70BD     		pop	{r4, r5, r6, pc}
+ 731              	.LVL100:
+ 732              	.L49:
+ 238:lvgl\src\lv_misc/lv_ll.c ****         node_set_next(ll_new_p, node, NULL);
+ 733              		.loc 1 238 0
+ 734 003a A268     		ldr	r2, [r4, #8]
+ 735 003c 2946     		mov	r1, r5
+ 736 003e 2046     		mov	r0, r4
+ 737 0040 FFF7FEFF 		bl	node_set_prev
+ 738              	.LVL101:
+ 239:lvgl\src\lv_misc/lv_ll.c **** 
+ 739              		.loc 1 239 0
+ 740 0044 0022     		movs	r2, #0
+ 741 0046 2946     		mov	r1, r5
+ 742 0048 2046     		mov	r0, r4
+ 743 004a FFF7FEFF 		bl	node_set_next
+ 744              	.LVL102:
+ 241:lvgl\src\lv_misc/lv_ll.c ****             node_set_next(ll_new_p, ll_new_p->tail, node);
+ 745              		.loc 1 241 0
+ 746 004e A168     		ldr	r1, [r4, #8]
+ 747 0050 19B1     		cbz	r1, .L52
+ 242:lvgl\src\lv_misc/lv_ll.c ****         }
+ 748              		.loc 1 242 0
+ 749 0052 2A46     		mov	r2, r5
+ 750 0054 2046     		mov	r0, r4
+ 751 0056 FFF7FEFF 		bl	node_set_next
+ 752              	.LVL103:
+ 753              	.L52:
+ 245:lvgl\src\lv_misc/lv_ll.c ****         if(ll_new_p->head == NULL) { /*If there is no head (first node) set the head too*/
+ 754              		.loc 1 245 0
+ 755 005a A560     		str	r5, [r4, #8]
+ 246:lvgl\src\lv_misc/lv_ll.c ****             ll_new_p->head = node;
+ 756              		.loc 1 246 0
+ 757 005c 6368     		ldr	r3, [r4, #4]
+ 758 005e 03B9     		cbnz	r3, .L48
+ 247:lvgl\src\lv_misc/lv_ll.c ****         }
+ 759              		.loc 1 247 0
+ 760 0060 6560     		str	r5, [r4, #4]
+ 761              	.L48:
+ 762 0062 70BD     		pop	{r4, r5, r6, pc}
+ 763              		.cfi_endproc
+ 764              	.LFE7:
+ 765              		.size	_lv_ll_chg_list, .-_lv_ll_chg_list
+ 766              		.section	.text._lv_ll_get_len,"ax",%progbits
+ 767              		.align	2
+ 768              		.global	_lv_ll_get_len
+ 769              		.thumb
+ 770              		.thumb_func
+ 771              		.type	_lv_ll_get_len, %function
+ 772              	_lv_ll_get_len:
+ 773              	.LFB12:
+ 324:lvgl\src\lv_misc/lv_ll.c ****     uint32_t len = 0;
+ 774              		.loc 1 324 0
+ 775              		.cfi_startproc
+ 776              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 24
+
+
+ 777              		@ frame_needed = 0, uses_anonymous_args = 0
+ 778              	.LVL104:
+ 779 0000 38B5     		push	{r3, r4, r5, lr}
+ 780              		.cfi_def_cfa_offset 16
+ 781              		.cfi_offset 3, -16
+ 782              		.cfi_offset 4, -12
+ 783              		.cfi_offset 5, -8
+ 784              		.cfi_offset 14, -4
+ 785 0002 0546     		mov	r5, r0
+ 786              	.LVL105:
+ 328:lvgl\src\lv_misc/lv_ll.c ****         len++;
+ 787              		.loc 1 328 0
+ 788 0004 FFF7FEFF 		bl	_lv_ll_get_head
+ 789              	.LVL106:
+ 325:lvgl\src\lv_misc/lv_ll.c ****     void * node;
+ 790              		.loc 1 325 0
+ 791 0008 0024     		movs	r4, #0
+ 328:lvgl\src\lv_misc/lv_ll.c ****         len++;
+ 792              		.loc 1 328 0
+ 793 000a 04E0     		b	.L55
+ 794              	.LVL107:
+ 795              	.L56:
+ 329:lvgl\src\lv_misc/lv_ll.c ****     }
+ 796              		.loc 1 329 0 discriminator 3
+ 797 000c 0134     		adds	r4, r4, #1
+ 798              	.LVL108:
+ 328:lvgl\src\lv_misc/lv_ll.c ****         len++;
+ 799              		.loc 1 328 0 discriminator 3
+ 800 000e 0146     		mov	r1, r0
+ 801 0010 2846     		mov	r0, r5
+ 802              	.LVL109:
+ 803 0012 FFF7FEFF 		bl	_lv_ll_get_next
+ 804              	.LVL110:
+ 805              	.L55:
+ 328:lvgl\src\lv_misc/lv_ll.c ****         len++;
+ 806              		.loc 1 328 0 is_stmt 0 discriminator 1
+ 807 0016 0028     		cmp	r0, #0
+ 808 0018 F8D1     		bne	.L56
+ 333:lvgl\src\lv_misc/lv_ll.c **** 
+ 809              		.loc 1 333 0 is_stmt 1
+ 810 001a 2046     		mov	r0, r4
+ 811              	.LVL111:
+ 812 001c 38BD     		pop	{r3, r4, r5, pc}
+ 813              		.cfi_endproc
+ 814              	.LFE12:
+ 815              		.size	_lv_ll_get_len, .-_lv_ll_get_len
+ 816 001e 00BF     		.section	.text._lv_ll_move_before,"ax",%progbits
+ 817              		.align	2
+ 818              		.global	_lv_ll_move_before
+ 819              		.thumb
+ 820              		.thumb_func
+ 821              		.type	_lv_ll_move_before, %function
+ 822              	_lv_ll_move_before:
+ 823              	.LFB13:
+ 342:lvgl\src\lv_misc/lv_ll.c ****     if(n_act == n_after) return; /*Can't move before itself*/
+ 824              		.loc 1 342 0
+ 825              		.cfi_startproc
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 25
+
+
+ 826              		@ args = 0, pretend = 0, frame = 0
+ 827              		@ frame_needed = 0, uses_anonymous_args = 0
+ 828              	.LVL112:
+ 343:lvgl\src\lv_misc/lv_ll.c **** 
+ 829              		.loc 1 343 0
+ 830 0000 9142     		cmp	r1, r2
+ 831 0002 2BD0     		beq	.L64
+ 342:lvgl\src\lv_misc/lv_ll.c ****     if(n_act == n_after) return; /*Can't move before itself*/
+ 832              		.loc 1 342 0
+ 833 0004 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 834              		.cfi_def_cfa_offset 24
+ 835              		.cfi_offset 3, -24
+ 836              		.cfi_offset 4, -20
+ 837              		.cfi_offset 5, -16
+ 838              		.cfi_offset 6, -12
+ 839              		.cfi_offset 7, -8
+ 840              		.cfi_offset 14, -4
+ 841 0006 1546     		mov	r5, r2
+ 842 0008 0C46     		mov	r4, r1
+ 843 000a 0646     		mov	r6, r0
+ 346:lvgl\src\lv_misc/lv_ll.c ****         n_before = _lv_ll_get_prev(ll_p, n_after);
+ 844              		.loc 1 346 0
+ 845 000c 22B1     		cbz	r2, .L60
+ 347:lvgl\src\lv_misc/lv_ll.c ****     else
+ 846              		.loc 1 347 0
+ 847 000e 1146     		mov	r1, r2
+ 848              	.LVL113:
+ 849 0010 FFF7FEFF 		bl	_lv_ll_get_prev
+ 850              	.LVL114:
+ 851 0014 0746     		mov	r7, r0
+ 852              	.LVL115:
+ 853 0016 02E0     		b	.L61
+ 854              	.LVL116:
+ 855              	.L60:
+ 349:lvgl\src\lv_misc/lv_ll.c **** 
+ 856              		.loc 1 349 0
+ 857 0018 FFF7FEFF 		bl	_lv_ll_get_tail
+ 858              	.LVL117:
+ 859 001c 0746     		mov	r7, r0
+ 860              	.LVL118:
+ 861              	.L61:
+ 351:lvgl\src\lv_misc/lv_ll.c **** 
+ 862              		.loc 1 351 0
+ 863 001e A742     		cmp	r7, r4
+ 864 0020 1BD0     		beq	.L58
+ 354:lvgl\src\lv_misc/lv_ll.c **** 
+ 865              		.loc 1 354 0
+ 866 0022 2146     		mov	r1, r4
+ 867 0024 3046     		mov	r0, r6
+ 868              	.LVL119:
+ 869 0026 FFF7FEFF 		bl	_lv_ll_remove
+ 870              	.LVL120:
+ 357:lvgl\src\lv_misc/lv_ll.c ****     node_set_prev(ll_p, n_act, n_before);
+ 871              		.loc 1 357 0
+ 872 002a 2246     		mov	r2, r4
+ 873 002c 3946     		mov	r1, r7
+ 874 002e 3046     		mov	r0, r6
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 26
+
+
+ 875 0030 FFF7FEFF 		bl	node_set_next
+ 876              	.LVL121:
+ 358:lvgl\src\lv_misc/lv_ll.c ****     node_set_prev(ll_p, n_after, n_act);
+ 877              		.loc 1 358 0
+ 878 0034 3A46     		mov	r2, r7
+ 879 0036 2146     		mov	r1, r4
+ 880 0038 3046     		mov	r0, r6
+ 881 003a FFF7FEFF 		bl	node_set_prev
+ 882              	.LVL122:
+ 359:lvgl\src\lv_misc/lv_ll.c ****     node_set_next(ll_p, n_act, n_after);
+ 883              		.loc 1 359 0
+ 884 003e 2246     		mov	r2, r4
+ 885 0040 2946     		mov	r1, r5
+ 886 0042 3046     		mov	r0, r6
+ 887 0044 FFF7FEFF 		bl	node_set_prev
+ 888              	.LVL123:
+ 360:lvgl\src\lv_misc/lv_ll.c **** 
+ 889              		.loc 1 360 0
+ 890 0048 2A46     		mov	r2, r5
+ 891 004a 2146     		mov	r1, r4
+ 892 004c 3046     		mov	r0, r6
+ 893 004e FFF7FEFF 		bl	node_set_next
+ 894              	.LVL124:
+ 363:lvgl\src\lv_misc/lv_ll.c **** 
+ 895              		.loc 1 363 0
+ 896 0052 05B9     		cbnz	r5, .L62
+ 363:lvgl\src\lv_misc/lv_ll.c **** 
+ 897              		.loc 1 363 0 is_stmt 0 discriminator 1
+ 898 0054 B460     		str	r4, [r6, #8]
+ 899              	.L62:
+ 366:lvgl\src\lv_misc/lv_ll.c **** }
+ 900              		.loc 1 366 0 is_stmt 1
+ 901 0056 07B9     		cbnz	r7, .L58
+ 366:lvgl\src\lv_misc/lv_ll.c **** }
+ 902              		.loc 1 366 0 is_stmt 0 discriminator 1
+ 903 0058 7460     		str	r4, [r6, #4]
+ 904              	.L58:
+ 905 005a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 906              	.LVL125:
+ 907              	.L64:
+ 908              		.cfi_def_cfa_offset 0
+ 909              		.cfi_restore 3
+ 910              		.cfi_restore 4
+ 911              		.cfi_restore 5
+ 912              		.cfi_restore 6
+ 913              		.cfi_restore 7
+ 914              		.cfi_restore 14
+ 915 005c 7047     		bx	lr
+ 916              		.cfi_endproc
+ 917              	.LFE13:
+ 918              		.size	_lv_ll_move_before, .-_lv_ll_move_before
+ 919 005e 00BF     		.section	.text._lv_ll_is_empty,"ax",%progbits
+ 920              		.align	2
+ 921              		.global	_lv_ll_is_empty
+ 922              		.thumb
+ 923              		.thumb_func
+ 924              		.type	_lv_ll_is_empty, %function
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 27
+
+
+ 925              	_lv_ll_is_empty:
+ 926              	.LFB14:
+ 375:lvgl\src\lv_misc/lv_ll.c ****     if(ll_p == NULL) return true;
+ 927              		.loc 1 375 0 is_stmt 1
+ 928              		.cfi_startproc
+ 929              		@ args = 0, pretend = 0, frame = 0
+ 930              		@ frame_needed = 0, uses_anonymous_args = 0
+ 931              		@ link register save eliminated.
+ 932              	.LVL126:
+ 376:lvgl\src\lv_misc/lv_ll.c **** 
+ 933              		.loc 1 376 0
+ 934 0000 28B1     		cbz	r0, .L67
+ 378:lvgl\src\lv_misc/lv_ll.c **** 
+ 935              		.loc 1 378 0
+ 936 0002 4268     		ldr	r2, [r0, #4]
+ 937 0004 2AB9     		cbnz	r2, .L68
+ 378:lvgl\src\lv_misc/lv_ll.c **** 
+ 938              		.loc 1 378 0 is_stmt 0 discriminator 1
+ 939 0006 8368     		ldr	r3, [r0, #8]
+ 940 0008 2BB1     		cbz	r3, .L69
+ 380:lvgl\src\lv_misc/lv_ll.c **** }
+ 941              		.loc 1 380 0 is_stmt 1
+ 942 000a 0020     		movs	r0, #0
+ 943              	.LVL127:
+ 944 000c 7047     		bx	lr
+ 945              	.LVL128:
+ 946              	.L67:
+ 376:lvgl\src\lv_misc/lv_ll.c **** 
+ 947              		.loc 1 376 0
+ 948 000e 0120     		movs	r0, #1
+ 949              	.LVL129:
+ 950 0010 7047     		bx	lr
+ 951              	.LVL130:
+ 952              	.L68:
+ 380:lvgl\src\lv_misc/lv_ll.c **** }
+ 953              		.loc 1 380 0
+ 954 0012 0020     		movs	r0, #0
+ 955              	.LVL131:
+ 956 0014 7047     		bx	lr
+ 957              	.LVL132:
+ 958              	.L69:
+ 378:lvgl\src\lv_misc/lv_ll.c **** 
+ 959              		.loc 1 378 0
+ 960 0016 0120     		movs	r0, #1
+ 961              	.LVL133:
+ 381:lvgl\src\lv_misc/lv_ll.c **** 
+ 962              		.loc 1 381 0
+ 963 0018 7047     		bx	lr
+ 964              		.cfi_endproc
+ 965              	.LFE14:
+ 966              		.size	_lv_ll_is_empty, .-_lv_ll_is_empty
+ 967 001a 00BF     		.text
+ 968              	.Letext0:
+ 969              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 970              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 971              		.file 4 "lvgl\\src\\lv_misc\\lv_ll.h"
+ 972              		.file 5 "lvgl\\src\\lv_misc\\lv_mem.h"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 28
+
+
+ 973              		.section	.debug_info,"",%progbits
+ 974              	.Ldebug_info0:
+ 975 0000 4D0A0000 		.4byte	0xa4d
+ 976 0004 0400     		.2byte	0x4
+ 977 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 978 000a 04       		.byte	0x4
+ 979 000b 01       		.uleb128 0x1
+ 980 000c 46020000 		.4byte	.LASF60
+ 981 0010 0C       		.byte	0xc
+ 982 0011 FA010000 		.4byte	.LASF61
+ 983 0015 97010000 		.4byte	.LASF62
+ 984 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 985 001d 00000000 		.4byte	0
+ 986 0021 00000000 		.4byte	.Ldebug_line0
+ 987 0025 02       		.uleb128 0x2
+ 988 0026 01       		.byte	0x1
+ 989 0027 06       		.byte	0x6
+ 990 0028 63000000 		.4byte	.LASF0
+ 991 002c 03       		.uleb128 0x3
+ 992 002d 0D000000 		.4byte	.LASF5
+ 993 0031 02       		.byte	0x2
+ 994 0032 1D       		.byte	0x1d
+ 995 0033 37000000 		.4byte	0x37
+ 996 0037 02       		.uleb128 0x2
+ 997 0038 01       		.byte	0x1
+ 998 0039 08       		.byte	0x8
+ 999 003a 19020000 		.4byte	.LASF1
+ 1000 003e 02       		.uleb128 0x2
+ 1001 003f 02       		.byte	0x2
+ 1002 0040 05       		.byte	0x5
+ 1003 0041 3C020000 		.4byte	.LASF2
+ 1004 0045 02       		.uleb128 0x2
+ 1005 0046 02       		.byte	0x2
+ 1006 0047 07       		.byte	0x7
+ 1007 0048 15010000 		.4byte	.LASF3
+ 1008 004c 02       		.uleb128 0x2
+ 1009 004d 04       		.byte	0x4
+ 1010 004e 05       		.byte	0x5
+ 1011 004f 7D000000 		.4byte	.LASF4
+ 1012 0053 03       		.uleb128 0x3
+ 1013 0054 BD000000 		.4byte	.LASF6
+ 1014 0058 02       		.byte	0x2
+ 1015 0059 41       		.byte	0x41
+ 1016 005a 5E000000 		.4byte	0x5e
+ 1017 005e 02       		.uleb128 0x2
+ 1018 005f 04       		.byte	0x4
+ 1019 0060 07       		.byte	0x7
+ 1020 0061 F5000000 		.4byte	.LASF7
+ 1021 0065 02       		.uleb128 0x2
+ 1022 0066 08       		.byte	0x8
+ 1023 0067 05       		.byte	0x5
+ 1024 0068 55000000 		.4byte	.LASF8
+ 1025 006c 02       		.uleb128 0x2
+ 1026 006d 08       		.byte	0x8
+ 1027 006e 07       		.byte	0x7
+ 1028 006f 23000000 		.4byte	.LASF9
+ 1029 0073 04       		.uleb128 0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 29
+
+
+ 1030 0074 04       		.byte	0x4
+ 1031 0075 05       		.byte	0x5
+ 1032 0076 696E7400 		.ascii	"int\000"
+ 1033 007a 02       		.uleb128 0x2
+ 1034 007b 04       		.byte	0x4
+ 1035 007c 07       		.byte	0x7
+ 1036 007d DF000000 		.4byte	.LASF10
+ 1037 0081 03       		.uleb128 0x3
+ 1038 0082 3B030000 		.4byte	.LASF11
+ 1039 0086 03       		.byte	0x3
+ 1040 0087 18       		.byte	0x18
+ 1041 0088 2C000000 		.4byte	0x2c
+ 1042 008c 03       		.uleb128 0x3
+ 1043 008d E9020000 		.4byte	.LASF12
+ 1044 0091 03       		.byte	0x3
+ 1045 0092 30       		.byte	0x30
+ 1046 0093 53000000 		.4byte	0x53
+ 1047 0097 02       		.uleb128 0x2
+ 1048 0098 08       		.byte	0x8
+ 1049 0099 04       		.byte	0x4
+ 1050 009a 78010000 		.4byte	.LASF13
+ 1051 009e 02       		.uleb128 0x2
+ 1052 009f 04       		.byte	0x4
+ 1053 00a0 07       		.byte	0x7
+ 1054 00a1 6F010000 		.4byte	.LASF14
+ 1055 00a5 05       		.uleb128 0x5
+ 1056 00a6 04       		.byte	0x4
+ 1057 00a7 02       		.uleb128 0x2
+ 1058 00a8 01       		.byte	0x1
+ 1059 00a9 08       		.byte	0x8
+ 1060 00aa FF020000 		.4byte	.LASF15
+ 1061 00ae 03       		.uleb128 0x3
+ 1062 00af F2020000 		.4byte	.LASF16
+ 1063 00b3 04       		.byte	0x4
+ 1064 00b4 1E       		.byte	0x1e
+ 1065 00b5 81000000 		.4byte	0x81
+ 1066 00b9 06       		.uleb128 0x6
+ 1067 00ba 0C       		.byte	0xc
+ 1068 00bb 04       		.byte	0x4
+ 1069 00bc 21       		.byte	0x21
+ 1070 00bd E6000000 		.4byte	0xe6
+ 1071 00c1 07       		.uleb128 0x7
+ 1072 00c2 3A000000 		.4byte	.LASF17
+ 1073 00c6 04       		.byte	0x4
+ 1074 00c7 22       		.byte	0x22
+ 1075 00c8 8C000000 		.4byte	0x8c
+ 1076 00cc 00       		.byte	0
+ 1077 00cd 07       		.uleb128 0x7
+ 1078 00ce E4020000 		.4byte	.LASF18
+ 1079 00d2 04       		.byte	0x4
+ 1080 00d3 23       		.byte	0x23
+ 1081 00d4 E6000000 		.4byte	0xe6
+ 1082 00d8 04       		.byte	0x4
+ 1083 00d9 07       		.uleb128 0x7
+ 1084 00da 6A010000 		.4byte	.LASF19
+ 1085 00de 04       		.byte	0x4
+ 1086 00df 24       		.byte	0x24
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 30
+
+
+ 1087 00e0 E6000000 		.4byte	0xe6
+ 1088 00e4 08       		.byte	0x8
+ 1089 00e5 00       		.byte	0
+ 1090 00e6 08       		.uleb128 0x8
+ 1091 00e7 04       		.byte	0x4
+ 1092 00e8 AE000000 		.4byte	0xae
+ 1093 00ec 03       		.uleb128 0x3
+ 1094 00ed 41000000 		.4byte	.LASF20
+ 1095 00f1 04       		.byte	0x4
+ 1096 00f2 25       		.byte	0x25
+ 1097 00f3 B9000000 		.4byte	0xb9
+ 1098 00f7 09       		.uleb128 0x9
+ 1099 00f8 07010000 		.4byte	.LASF26
+ 1100 00fc 01       		.byte	0x1
+ 1101 00fd 8901     		.2byte	0x189
+ 1102 00ff 00000000 		.4byte	.LFB15
+ 1103 0103 0A000000 		.4byte	.LFE15-.LFB15
+ 1104 0107 01       		.uleb128 0x1
+ 1105 0108 9C       		.byte	0x9c
+ 1106 0109 6A010000 		.4byte	0x16a
+ 1107 010d 0A       		.uleb128 0xa
+ 1108 010e 0A030000 		.4byte	.LASF21
+ 1109 0112 01       		.byte	0x1
+ 1110 0113 8901     		.2byte	0x189
+ 1111 0115 6A010000 		.4byte	0x16a
+ 1112 0119 01       		.uleb128 0x1
+ 1113 011a 50       		.byte	0x50
+ 1114 011b 0B       		.uleb128 0xb
+ 1115 011c 61637400 		.ascii	"act\000"
+ 1116 0120 01       		.byte	0x1
+ 1117 0121 8901     		.2byte	0x189
+ 1118 0123 E6000000 		.4byte	0xe6
+ 1119 0127 00000000 		.4byte	.LLST0
+ 1120 012b 0A       		.uleb128 0xa
+ 1121 012c 17000000 		.4byte	.LASF22
+ 1122 0130 01       		.byte	0x1
+ 1123 0131 8901     		.2byte	0x189
+ 1124 0133 E6000000 		.4byte	0xe6
+ 1125 0137 01       		.uleb128 0x1
+ 1126 0138 52       		.byte	0x52
+ 1127 0139 0C       		.uleb128 0xc
+ 1128 013a B8000000 		.4byte	.LASF23
+ 1129 013e 01       		.byte	0x1
+ 1130 013f 8D01     		.2byte	0x18d
+ 1131 0141 70010000 		.4byte	0x170
+ 1132 0145 1E000000 		.4byte	.LLST1
+ 1133 0149 0C       		.uleb128 0xc
+ 1134 014a 5F030000 		.4byte	.LASF24
+ 1135 014e 01       		.byte	0x1
+ 1136 014f 9101     		.2byte	0x191
+ 1137 0151 76010000 		.4byte	0x176
+ 1138 0155 41000000 		.4byte	.LLST2
+ 1139 0159 0C       		.uleb128 0xc
+ 1140 015a 6A030000 		.4byte	.LASF25
+ 1141 015e 01       		.byte	0x1
+ 1142 015f 9201     		.2byte	0x192
+ 1143 0161 76010000 		.4byte	0x176
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 31
+
+
+ 1144 0165 59000000 		.4byte	.LLST3
+ 1145 0169 00       		.byte	0
+ 1146 016a 08       		.uleb128 0x8
+ 1147 016b 04       		.byte	0x4
+ 1148 016c EC000000 		.4byte	0xec
+ 1149 0170 08       		.uleb128 0x8
+ 1150 0171 04       		.byte	0x4
+ 1151 0172 81000000 		.4byte	0x81
+ 1152 0176 08       		.uleb128 0x8
+ 1153 0177 04       		.byte	0x4
+ 1154 0178 E6000000 		.4byte	0xe6
+ 1155 017c 09       		.uleb128 0x9
+ 1156 017d 38010000 		.4byte	.LASF27
+ 1157 0181 01       		.byte	0x1
+ 1158 0182 9D01     		.2byte	0x19d
+ 1159 0184 00000000 		.4byte	.LFB16
+ 1160 0188 0E000000 		.4byte	.LFE16-.LFB16
+ 1161 018c 01       		.uleb128 0x1
+ 1162 018d 9C       		.byte	0x9c
+ 1163 018e ED010000 		.4byte	0x1ed
+ 1164 0192 0A       		.uleb128 0xa
+ 1165 0193 0A030000 		.4byte	.LASF21
+ 1166 0197 01       		.byte	0x1
+ 1167 0198 9D01     		.2byte	0x19d
+ 1168 019a 6A010000 		.4byte	0x16a
+ 1169 019e 01       		.uleb128 0x1
+ 1170 019f 50       		.byte	0x50
+ 1171 01a0 0D       		.uleb128 0xd
+ 1172 01a1 61637400 		.ascii	"act\000"
+ 1173 01a5 01       		.byte	0x1
+ 1174 01a6 9D01     		.2byte	0x19d
+ 1175 01a8 E6000000 		.4byte	0xe6
+ 1176 01ac 01       		.uleb128 0x1
+ 1177 01ad 51       		.byte	0x51
+ 1178 01ae 0A       		.uleb128 0xa
+ 1179 01af 49000000 		.4byte	.LASF28
+ 1180 01b3 01       		.byte	0x1
+ 1181 01b4 9D01     		.2byte	0x19d
+ 1182 01b6 E6000000 		.4byte	0xe6
+ 1183 01ba 01       		.uleb128 0x1
+ 1184 01bb 52       		.byte	0x52
+ 1185 01bc 0C       		.uleb128 0xc
+ 1186 01bd B8000000 		.4byte	.LASF23
+ 1187 01c1 01       		.byte	0x1
+ 1188 01c2 A001     		.2byte	0x1a0
+ 1189 01c4 70010000 		.4byte	0x170
+ 1190 01c8 71000000 		.4byte	.LLST4
+ 1191 01cc 0C       		.uleb128 0xc
+ 1192 01cd 5F030000 		.4byte	.LASF24
+ 1193 01d1 01       		.byte	0x1
+ 1194 01d2 A301     		.2byte	0x1a3
+ 1195 01d4 76010000 		.4byte	0x176
+ 1196 01d8 94000000 		.4byte	.LLST5
+ 1197 01dc 0C       		.uleb128 0xc
+ 1198 01dd 5E010000 		.4byte	.LASF29
+ 1199 01e1 01       		.byte	0x1
+ 1200 01e2 A401     		.2byte	0x1a4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 32
+
+
+ 1201 01e4 76010000 		.4byte	0x176
+ 1202 01e8 AC000000 		.4byte	.LLST6
+ 1203 01ec 00       		.byte	0
+ 1204 01ed 0E       		.uleb128 0xe
+ 1205 01ee 53030000 		.4byte	.LASF42
+ 1206 01f2 01       		.byte	0x1
+ 1207 01f3 32       		.byte	0x32
+ 1208 01f4 00000000 		.4byte	.LFB1
+ 1209 01f8 10000000 		.4byte	.LFE1-.LFB1
+ 1210 01fc 01       		.uleb128 0x1
+ 1211 01fd 9C       		.byte	0x9c
+ 1212 01fe 1F020000 		.4byte	0x21f
+ 1213 0202 0F       		.uleb128 0xf
+ 1214 0203 0A030000 		.4byte	.LASF21
+ 1215 0207 01       		.byte	0x1
+ 1216 0208 32       		.byte	0x32
+ 1217 0209 6A010000 		.4byte	0x16a
+ 1218 020d 01       		.uleb128 0x1
+ 1219 020e 50       		.byte	0x50
+ 1220 020f 10       		.uleb128 0x10
+ 1221 0210 D7010000 		.4byte	.LASF30
+ 1222 0214 01       		.byte	0x1
+ 1223 0215 32       		.byte	0x32
+ 1224 0216 8C000000 		.4byte	0x8c
+ 1225 021a C4000000 		.4byte	.LLST7
+ 1226 021e 00       		.byte	0
+ 1227 021f 11       		.uleb128 0x11
+ 1228 0220 46010000 		.4byte	.LASF32
+ 1229 0224 01       		.byte	0x1
+ 1230 0225 46       		.byte	0x46
+ 1231 0226 A5000000 		.4byte	0xa5
+ 1232 022a 00000000 		.4byte	.LFB2
+ 1233 022e 3C000000 		.4byte	.LFE2-.LFB2
+ 1234 0232 01       		.uleb128 0x1
+ 1235 0233 9C       		.byte	0x9c
+ 1236 0234 AF020000 		.4byte	0x2af
+ 1237 0238 10       		.uleb128 0x10
+ 1238 0239 0A030000 		.4byte	.LASF21
+ 1239 023d 01       		.byte	0x1
+ 1240 023e 46       		.byte	0x46
+ 1241 023f 6A010000 		.4byte	0x16a
+ 1242 0243 EF000000 		.4byte	.LLST8
+ 1243 0247 12       		.uleb128 0x12
+ 1244 0248 04030000 		.4byte	.LASF31
+ 1245 024c 01       		.byte	0x1
+ 1246 024d 48       		.byte	0x48
+ 1247 024e E6000000 		.4byte	0xe6
+ 1248 0252 0D010000 		.4byte	.LLST9
+ 1249 0256 13       		.uleb128 0x13
+ 1250 0257 0C000000 		.4byte	.LVL13
+ 1251 025b 3A0A0000 		.4byte	0xa3a
+ 1252 025f 14       		.uleb128 0x14
+ 1253 0260 1A000000 		.4byte	.LVL15
+ 1254 0264 F7000000 		.4byte	0xf7
+ 1255 0268 7E020000 		.4byte	0x27e
+ 1256 026c 15       		.uleb128 0x15
+ 1257 026d 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 33
+
+
+ 1258 026e 50       		.byte	0x50
+ 1259 026f 02       		.uleb128 0x2
+ 1260 0270 74       		.byte	0x74
+ 1261 0271 00       		.sleb128 0
+ 1262 0272 15       		.uleb128 0x15
+ 1263 0273 01       		.uleb128 0x1
+ 1264 0274 51       		.byte	0x51
+ 1265 0275 02       		.uleb128 0x2
+ 1266 0276 75       		.byte	0x75
+ 1267 0277 00       		.sleb128 0
+ 1268 0278 15       		.uleb128 0x15
+ 1269 0279 01       		.uleb128 0x1
+ 1270 027a 52       		.byte	0x52
+ 1271 027b 01       		.uleb128 0x1
+ 1272 027c 30       		.byte	0x30
+ 1273 027d 00       		.byte	0
+ 1274 027e 14       		.uleb128 0x14
+ 1275 027f 24000000 		.4byte	.LVL16
+ 1276 0283 7C010000 		.4byte	0x17c
+ 1277 0287 98020000 		.4byte	0x298
+ 1278 028b 15       		.uleb128 0x15
+ 1279 028c 01       		.uleb128 0x1
+ 1280 028d 50       		.byte	0x50
+ 1281 028e 02       		.uleb128 0x2
+ 1282 028f 74       		.byte	0x74
+ 1283 0290 00       		.sleb128 0
+ 1284 0291 15       		.uleb128 0x15
+ 1285 0292 01       		.uleb128 0x1
+ 1286 0293 51       		.byte	0x51
+ 1287 0294 02       		.uleb128 0x2
+ 1288 0295 75       		.byte	0x75
+ 1289 0296 00       		.sleb128 0
+ 1290 0297 00       		.byte	0
+ 1291 0298 16       		.uleb128 0x16
+ 1292 0299 30000000 		.4byte	.LVL17
+ 1293 029d F7000000 		.4byte	0xf7
+ 1294 02a1 15       		.uleb128 0x15
+ 1295 02a2 01       		.uleb128 0x1
+ 1296 02a3 50       		.byte	0x50
+ 1297 02a4 02       		.uleb128 0x2
+ 1298 02a5 74       		.byte	0x74
+ 1299 02a6 00       		.sleb128 0
+ 1300 02a7 15       		.uleb128 0x15
+ 1301 02a8 01       		.uleb128 0x1
+ 1302 02a9 52       		.byte	0x52
+ 1303 02aa 02       		.uleb128 0x2
+ 1304 02ab 75       		.byte	0x75
+ 1305 02ac 00       		.sleb128 0
+ 1306 02ad 00       		.byte	0
+ 1307 02ae 00       		.byte	0
+ 1308 02af 11       		.uleb128 0x11
+ 1309 02b0 43030000 		.4byte	.LASF33
+ 1310 02b4 01       		.byte	0x1
+ 1311 02b5 81       		.byte	0x81
+ 1312 02b6 A5000000 		.4byte	0xa5
+ 1313 02ba 00000000 		.4byte	.LFB4
+ 1314 02be 3C000000 		.4byte	.LFE4-.LFB4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 34
+
+
+ 1315 02c2 01       		.uleb128 0x1
+ 1316 02c3 9C       		.byte	0x9c
+ 1317 02c4 3F030000 		.4byte	0x33f
+ 1318 02c8 10       		.uleb128 0x10
+ 1319 02c9 0A030000 		.4byte	.LASF21
+ 1320 02cd 01       		.byte	0x1
+ 1321 02ce 81       		.byte	0x81
+ 1322 02cf 6A010000 		.4byte	0x16a
+ 1323 02d3 36010000 		.4byte	.LLST10
+ 1324 02d7 12       		.uleb128 0x12
+ 1325 02d8 04030000 		.4byte	.LASF31
+ 1326 02dc 01       		.byte	0x1
+ 1327 02dd 83       		.byte	0x83
+ 1328 02de E6000000 		.4byte	0xe6
+ 1329 02e2 54010000 		.4byte	.LLST11
+ 1330 02e6 13       		.uleb128 0x13
+ 1331 02e7 0C000000 		.4byte	.LVL20
+ 1332 02eb 3A0A0000 		.4byte	0xa3a
+ 1333 02ef 14       		.uleb128 0x14
+ 1334 02f0 1A000000 		.4byte	.LVL22
+ 1335 02f4 7C010000 		.4byte	0x17c
+ 1336 02f8 0E030000 		.4byte	0x30e
+ 1337 02fc 15       		.uleb128 0x15
+ 1338 02fd 01       		.uleb128 0x1
+ 1339 02fe 50       		.byte	0x50
+ 1340 02ff 02       		.uleb128 0x2
+ 1341 0300 74       		.byte	0x74
+ 1342 0301 00       		.sleb128 0
+ 1343 0302 15       		.uleb128 0x15
+ 1344 0303 01       		.uleb128 0x1
+ 1345 0304 51       		.byte	0x51
+ 1346 0305 02       		.uleb128 0x2
+ 1347 0306 75       		.byte	0x75
+ 1348 0307 00       		.sleb128 0
+ 1349 0308 15       		.uleb128 0x15
+ 1350 0309 01       		.uleb128 0x1
+ 1351 030a 52       		.byte	0x52
+ 1352 030b 01       		.uleb128 0x1
+ 1353 030c 30       		.byte	0x30
+ 1354 030d 00       		.byte	0
+ 1355 030e 14       		.uleb128 0x14
+ 1356 030f 24000000 		.4byte	.LVL23
+ 1357 0313 F7000000 		.4byte	0xf7
+ 1358 0317 28030000 		.4byte	0x328
+ 1359 031b 15       		.uleb128 0x15
+ 1360 031c 01       		.uleb128 0x1
+ 1361 031d 50       		.byte	0x50
+ 1362 031e 02       		.uleb128 0x2
+ 1363 031f 74       		.byte	0x74
+ 1364 0320 00       		.sleb128 0
+ 1365 0321 15       		.uleb128 0x15
+ 1366 0322 01       		.uleb128 0x1
+ 1367 0323 51       		.byte	0x51
+ 1368 0324 02       		.uleb128 0x2
+ 1369 0325 75       		.byte	0x75
+ 1370 0326 00       		.sleb128 0
+ 1371 0327 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 35
+
+
+ 1372 0328 16       		.uleb128 0x16
+ 1373 0329 30000000 		.4byte	.LVL24
+ 1374 032d 7C010000 		.4byte	0x17c
+ 1375 0331 15       		.uleb128 0x15
+ 1376 0332 01       		.uleb128 0x1
+ 1377 0333 50       		.byte	0x50
+ 1378 0334 02       		.uleb128 0x2
+ 1379 0335 74       		.byte	0x74
+ 1380 0336 00       		.sleb128 0
+ 1381 0337 15       		.uleb128 0x15
+ 1382 0338 01       		.uleb128 0x1
+ 1383 0339 52       		.byte	0x52
+ 1384 033a 02       		.uleb128 0x2
+ 1385 033b 75       		.byte	0x75
+ 1386 033c 00       		.sleb128 0
+ 1387 033d 00       		.byte	0
+ 1388 033e 00       		.byte	0
+ 1389 033f 17       		.uleb128 0x17
+ 1390 0340 A8000000 		.4byte	.LASF34
+ 1391 0344 01       		.byte	0x1
+ 1392 0345 0101     		.2byte	0x101
+ 1393 0347 A5000000 		.4byte	0xa5
+ 1394 034b 00000000 		.4byte	.LFB8
+ 1395 034f 0A000000 		.4byte	.LFE8-.LFB8
+ 1396 0353 01       		.uleb128 0x1
+ 1397 0354 9C       		.byte	0x9c
+ 1398 0355 7A030000 		.4byte	0x37a
+ 1399 0359 18       		.uleb128 0x18
+ 1400 035a 0A030000 		.4byte	.LASF21
+ 1401 035e 01       		.byte	0x1
+ 1402 035f 0101     		.2byte	0x101
+ 1403 0361 7A030000 		.4byte	0x37a
+ 1404 0365 7D010000 		.4byte	.LLST12
+ 1405 0369 0C       		.uleb128 0xc
+ 1406 036a E4020000 		.4byte	.LASF18
+ 1407 036e 01       		.byte	0x1
+ 1408 036f 0301     		.2byte	0x103
+ 1409 0371 A5000000 		.4byte	0xa5
+ 1410 0375 B7010000 		.4byte	.LLST13
+ 1411 0379 00       		.byte	0
+ 1412 037a 08       		.uleb128 0x8
+ 1413 037b 04       		.byte	0x4
+ 1414 037c 80030000 		.4byte	0x380
+ 1415 0380 19       		.uleb128 0x19
+ 1416 0381 EC000000 		.4byte	0xec
+ 1417 0385 17       		.uleb128 0x17
+ 1418 0386 D4020000 		.4byte	.LASF35
+ 1419 038a 01       		.byte	0x1
+ 1420 038b 1101     		.2byte	0x111
+ 1421 038d A5000000 		.4byte	0xa5
+ 1422 0391 00000000 		.4byte	.LFB9
+ 1423 0395 0A000000 		.4byte	.LFE9-.LFB9
+ 1424 0399 01       		.uleb128 0x1
+ 1425 039a 9C       		.byte	0x9c
+ 1426 039b C0030000 		.4byte	0x3c0
+ 1427 039f 18       		.uleb128 0x18
+ 1428 03a0 0A030000 		.4byte	.LASF21
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 36
+
+
+ 1429 03a4 01       		.byte	0x1
+ 1430 03a5 1101     		.2byte	0x111
+ 1431 03a7 7A030000 		.4byte	0x37a
+ 1432 03ab ED010000 		.4byte	.LLST14
+ 1433 03af 0C       		.uleb128 0xc
+ 1434 03b0 6A010000 		.4byte	.LASF19
+ 1435 03b4 01       		.byte	0x1
+ 1436 03b5 1301     		.2byte	0x113
+ 1437 03b7 A5000000 		.4byte	0xa5
+ 1438 03bb 27020000 		.4byte	.LLST15
+ 1439 03bf 00       		.byte	0
+ 1440 03c0 17       		.uleb128 0x17
+ 1441 03c1 27020000 		.4byte	.LASF36
+ 1442 03c5 01       		.byte	0x1
+ 1443 03c6 2201     		.2byte	0x122
+ 1444 03c8 A5000000 		.4byte	0xa5
+ 1445 03cc 00000000 		.4byte	.LFB10
+ 1446 03d0 0E000000 		.4byte	.LFE10-.LFB10
+ 1447 03d4 01       		.uleb128 0x1
+ 1448 03d5 9C       		.byte	0x9c
+ 1449 03d6 09040000 		.4byte	0x409
+ 1450 03da 18       		.uleb128 0x18
+ 1451 03db 0A030000 		.4byte	.LASF21
+ 1452 03df 01       		.byte	0x1
+ 1453 03e0 2201     		.2byte	0x122
+ 1454 03e2 7A030000 		.4byte	0x37a
+ 1455 03e6 5D020000 		.4byte	.LLST16
+ 1456 03ea 0A       		.uleb128 0xa
+ 1457 03eb 35030000 		.4byte	.LASF37
+ 1458 03ef 01       		.byte	0x1
+ 1459 03f0 2201     		.2byte	0x122
+ 1460 03f2 09040000 		.4byte	0x409
+ 1461 03f6 01       		.uleb128 0x1
+ 1462 03f7 51       		.byte	0x51
+ 1463 03f8 0C       		.uleb128 0xc
+ 1464 03f9 76030000 		.4byte	.LASF38
+ 1465 03fd 01       		.byte	0x1
+ 1466 03fe 2801     		.2byte	0x128
+ 1467 0400 10040000 		.4byte	0x410
+ 1468 0404 97020000 		.4byte	.LLST17
+ 1469 0408 00       		.byte	0
+ 1470 0409 08       		.uleb128 0x8
+ 1471 040a 04       		.byte	0x4
+ 1472 040b 0F040000 		.4byte	0x40f
+ 1473 040f 1A       		.uleb128 0x1a
+ 1474 0410 08       		.uleb128 0x8
+ 1475 0411 04       		.byte	0x4
+ 1476 0412 16040000 		.4byte	0x416
+ 1477 0416 19       		.uleb128 0x19
+ 1478 0417 AE000000 		.4byte	0xae
+ 1479 041b 17       		.uleb128 0x17
+ 1480 041c E1010000 		.4byte	.LASF39
+ 1481 0420 01       		.byte	0x1
+ 1482 0421 3301     		.2byte	0x133
+ 1483 0423 A5000000 		.4byte	0xa5
+ 1484 0427 00000000 		.4byte	.LFB11
+ 1485 042b 0C000000 		.4byte	.LFE11-.LFB11
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 37
+
+
+ 1486 042f 01       		.uleb128 0x1
+ 1487 0430 9C       		.byte	0x9c
+ 1488 0431 64040000 		.4byte	0x464
+ 1489 0435 18       		.uleb128 0x18
+ 1490 0436 0A030000 		.4byte	.LASF21
+ 1491 043a 01       		.byte	0x1
+ 1492 043b 3301     		.2byte	0x133
+ 1493 043d 7A030000 		.4byte	0x37a
+ 1494 0441 BA020000 		.4byte	.LLST18
+ 1495 0445 0A       		.uleb128 0xa
+ 1496 0446 35030000 		.4byte	.LASF37
+ 1497 044a 01       		.byte	0x1
+ 1498 044b 3301     		.2byte	0x133
+ 1499 044d 09040000 		.4byte	0x409
+ 1500 0451 01       		.uleb128 0x1
+ 1501 0452 51       		.byte	0x51
+ 1502 0453 0C       		.uleb128 0xc
+ 1503 0454 76030000 		.4byte	.LASF38
+ 1504 0458 01       		.byte	0x1
+ 1505 0459 3901     		.2byte	0x139
+ 1506 045b 10040000 		.4byte	0x410
+ 1507 045f F4020000 		.4byte	.LLST19
+ 1508 0463 00       		.byte	0
+ 1509 0464 11       		.uleb128 0x11
+ 1510 0465 0F030000 		.4byte	.LASF40
+ 1511 0469 01       		.byte	0x1
+ 1512 046a 63       		.byte	0x63
+ 1513 046b A5000000 		.4byte	0xa5
+ 1514 046f 00000000 		.4byte	.LFB3
+ 1515 0473 6C000000 		.4byte	.LFE3-.LFB3
+ 1516 0477 01       		.uleb128 0x1
+ 1517 0478 9C       		.byte	0x9c
+ 1518 0479 87050000 		.4byte	0x587
+ 1519 047d 10       		.uleb128 0x10
+ 1520 047e 0A030000 		.4byte	.LASF21
+ 1521 0482 01       		.byte	0x1
+ 1522 0483 63       		.byte	0x63
+ 1523 0484 6A010000 		.4byte	0x16a
+ 1524 0488 17030000 		.4byte	.LLST20
+ 1525 048c 10       		.uleb128 0x10
+ 1526 048d 35030000 		.4byte	.LASF37
+ 1527 0491 01       		.byte	0x1
+ 1528 0492 63       		.byte	0x63
+ 1529 0493 A5000000 		.4byte	0xa5
+ 1530 0497 64030000 		.4byte	.LLST21
+ 1531 049b 12       		.uleb128 0x12
+ 1532 049c 04030000 		.4byte	.LASF31
+ 1533 04a0 01       		.byte	0x1
+ 1534 04a1 65       		.byte	0x65
+ 1535 04a2 E6000000 		.4byte	0xe6
+ 1536 04a6 98030000 		.4byte	.LLST22
+ 1537 04aa 1B       		.uleb128 0x1b
+ 1538 04ab 00000000 		.4byte	.Ldebug_ranges0+0
+ 1539 04af 62050000 		.4byte	0x562
+ 1540 04b3 12       		.uleb128 0x12
+ 1541 04b4 1C000000 		.4byte	.LASF41
+ 1542 04b8 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 38
+
+
+ 1543 04b9 71       		.byte	0x71
+ 1544 04ba E6000000 		.4byte	0xe6
+ 1545 04be D7030000 		.4byte	.LLST23
+ 1546 04c2 13       		.uleb128 0x13
+ 1547 04c3 24000000 		.4byte	.LVL49
+ 1548 04c7 3A0A0000 		.4byte	0xa3a
+ 1549 04cb 14       		.uleb128 0x14
+ 1550 04cc 30000000 		.4byte	.LVL51
+ 1551 04d0 1B040000 		.4byte	0x41b
+ 1552 04d4 E5040000 		.4byte	0x4e5
+ 1553 04d8 15       		.uleb128 0x15
+ 1554 04d9 01       		.uleb128 0x1
+ 1555 04da 50       		.byte	0x50
+ 1556 04db 02       		.uleb128 0x2
+ 1557 04dc 74       		.byte	0x74
+ 1558 04dd 00       		.sleb128 0
+ 1559 04de 15       		.uleb128 0x15
+ 1560 04df 01       		.uleb128 0x1
+ 1561 04e0 51       		.byte	0x51
+ 1562 04e1 02       		.uleb128 0x2
+ 1563 04e2 75       		.byte	0x75
+ 1564 04e3 00       		.sleb128 0
+ 1565 04e4 00       		.byte	0
+ 1566 04e5 14       		.uleb128 0x14
+ 1567 04e6 3C000000 		.4byte	.LVL54
+ 1568 04ea 7C010000 		.4byte	0x17c
+ 1569 04ee 05050000 		.4byte	0x505
+ 1570 04f2 15       		.uleb128 0x15
+ 1571 04f3 01       		.uleb128 0x1
+ 1572 04f4 50       		.byte	0x50
+ 1573 04f5 02       		.uleb128 0x2
+ 1574 04f6 74       		.byte	0x74
+ 1575 04f7 00       		.sleb128 0
+ 1576 04f8 15       		.uleb128 0x15
+ 1577 04f9 01       		.uleb128 0x1
+ 1578 04fa 51       		.byte	0x51
+ 1579 04fb 02       		.uleb128 0x2
+ 1580 04fc 77       		.byte	0x77
+ 1581 04fd 00       		.sleb128 0
+ 1582 04fe 15       		.uleb128 0x15
+ 1583 04ff 01       		.uleb128 0x1
+ 1584 0500 52       		.byte	0x52
+ 1585 0501 02       		.uleb128 0x2
+ 1586 0502 76       		.byte	0x76
+ 1587 0503 00       		.sleb128 0
+ 1588 0504 00       		.byte	0
+ 1589 0505 14       		.uleb128 0x14
+ 1590 0506 46000000 		.4byte	.LVL55
+ 1591 050a F7000000 		.4byte	0xf7
+ 1592 050e 25050000 		.4byte	0x525
+ 1593 0512 15       		.uleb128 0x15
+ 1594 0513 01       		.uleb128 0x1
+ 1595 0514 50       		.byte	0x50
+ 1596 0515 02       		.uleb128 0x2
+ 1597 0516 74       		.byte	0x74
+ 1598 0517 00       		.sleb128 0
+ 1599 0518 15       		.uleb128 0x15
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 39
+
+
+ 1600 0519 01       		.uleb128 0x1
+ 1601 051a 51       		.byte	0x51
+ 1602 051b 02       		.uleb128 0x2
+ 1603 051c 76       		.byte	0x76
+ 1604 051d 00       		.sleb128 0
+ 1605 051e 15       		.uleb128 0x15
+ 1606 051f 01       		.uleb128 0x1
+ 1607 0520 52       		.byte	0x52
+ 1608 0521 02       		.uleb128 0x2
+ 1609 0522 77       		.byte	0x77
+ 1610 0523 00       		.sleb128 0
+ 1611 0524 00       		.byte	0
+ 1612 0525 14       		.uleb128 0x14
+ 1613 0526 50000000 		.4byte	.LVL56
+ 1614 052a F7000000 		.4byte	0xf7
+ 1615 052e 45050000 		.4byte	0x545
+ 1616 0532 15       		.uleb128 0x15
+ 1617 0533 01       		.uleb128 0x1
+ 1618 0534 50       		.byte	0x50
+ 1619 0535 02       		.uleb128 0x2
+ 1620 0536 74       		.byte	0x74
+ 1621 0537 00       		.sleb128 0
+ 1622 0538 15       		.uleb128 0x15
+ 1623 0539 01       		.uleb128 0x1
+ 1624 053a 51       		.byte	0x51
+ 1625 053b 02       		.uleb128 0x2
+ 1626 053c 75       		.byte	0x75
+ 1627 053d 00       		.sleb128 0
+ 1628 053e 15       		.uleb128 0x15
+ 1629 053f 01       		.uleb128 0x1
+ 1630 0540 52       		.byte	0x52
+ 1631 0541 02       		.uleb128 0x2
+ 1632 0542 76       		.byte	0x76
+ 1633 0543 00       		.sleb128 0
+ 1634 0544 00       		.byte	0
+ 1635 0545 16       		.uleb128 0x16
+ 1636 0546 5A000000 		.4byte	.LVL57
+ 1637 054a 7C010000 		.4byte	0x17c
+ 1638 054e 15       		.uleb128 0x15
+ 1639 054f 01       		.uleb128 0x1
+ 1640 0550 50       		.byte	0x50
+ 1641 0551 02       		.uleb128 0x2
+ 1642 0552 74       		.byte	0x74
+ 1643 0553 00       		.sleb128 0
+ 1644 0554 15       		.uleb128 0x15
+ 1645 0555 01       		.uleb128 0x1
+ 1646 0556 51       		.byte	0x51
+ 1647 0557 02       		.uleb128 0x2
+ 1648 0558 76       		.byte	0x76
+ 1649 0559 00       		.sleb128 0
+ 1650 055a 15       		.uleb128 0x15
+ 1651 055b 01       		.uleb128 0x1
+ 1652 055c 52       		.byte	0x52
+ 1653 055d 02       		.uleb128 0x2
+ 1654 055e 75       		.byte	0x75
+ 1655 055f 00       		.sleb128 0
+ 1656 0560 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 40
+
+
+ 1657 0561 00       		.byte	0
+ 1658 0562 14       		.uleb128 0x14
+ 1659 0563 0E000000 		.4byte	.LVL46
+ 1660 0567 3F030000 		.4byte	0x33f
+ 1661 056b 76050000 		.4byte	0x576
+ 1662 056f 15       		.uleb128 0x15
+ 1663 0570 01       		.uleb128 0x1
+ 1664 0571 50       		.byte	0x50
+ 1665 0572 02       		.uleb128 0x2
+ 1666 0573 74       		.byte	0x74
+ 1667 0574 00       		.sleb128 0
+ 1668 0575 00       		.byte	0
+ 1669 0576 16       		.uleb128 0x16
+ 1670 0577 18000000 		.4byte	.LVL47
+ 1671 057b 1F020000 		.4byte	0x21f
+ 1672 057f 15       		.uleb128 0x15
+ 1673 0580 01       		.uleb128 0x1
+ 1674 0581 50       		.byte	0x50
+ 1675 0582 02       		.uleb128 0x2
+ 1676 0583 74       		.byte	0x74
+ 1677 0584 00       		.sleb128 0
+ 1678 0585 00       		.byte	0
+ 1679 0586 00       		.byte	0
+ 1680 0587 0E       		.uleb128 0xe
+ 1681 0588 6F000000 		.4byte	.LASF43
+ 1682 058c 01       		.byte	0x1
+ 1683 058d 9D       		.byte	0x9d
+ 1684 058e 00000000 		.4byte	.LFB5
+ 1685 0592 7E000000 		.4byte	.LFE5-.LFB5
+ 1686 0596 01       		.uleb128 0x1
+ 1687 0597 9C       		.byte	0x9c
+ 1688 0598 E1060000 		.4byte	0x6e1
+ 1689 059c 10       		.uleb128 0x10
+ 1690 059d 0A030000 		.4byte	.LASF21
+ 1691 05a1 01       		.byte	0x1
+ 1692 05a2 9D       		.byte	0x9d
+ 1693 05a3 6A010000 		.4byte	0x16a
+ 1694 05a7 00040000 		.4byte	.LLST24
+ 1695 05ab 10       		.uleb128 0x10
+ 1696 05ac C8000000 		.4byte	.LASF44
+ 1697 05b0 01       		.byte	0x1
+ 1698 05b1 9D       		.byte	0x9d
+ 1699 05b2 A5000000 		.4byte	0xa5
+ 1700 05b6 1E040000 		.4byte	.LLST25
+ 1701 05ba 1C       		.uleb128 0x1c
+ 1702 05bb 54000000 		.4byte	.LBB4
+ 1703 05bf 2A000000 		.4byte	.LBE4-.LBB4
+ 1704 05c3 56060000 		.4byte	0x656
+ 1705 05c7 12       		.uleb128 0x12
+ 1706 05c8 1C000000 		.4byte	.LASF41
+ 1707 05cc 01       		.byte	0x1
+ 1708 05cd B4       		.byte	0xb4
+ 1709 05ce E6000000 		.4byte	0xe6
+ 1710 05d2 4A040000 		.4byte	.LLST26
+ 1711 05d6 12       		.uleb128 0x12
+ 1712 05d7 4E000000 		.4byte	.LASF45
+ 1713 05db 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 41
+
+
+ 1714 05dc B5       		.byte	0xb5
+ 1715 05dd E6000000 		.4byte	0xe6
+ 1716 05e1 68040000 		.4byte	.LLST27
+ 1717 05e5 14       		.uleb128 0x14
+ 1718 05e6 5C000000 		.4byte	.LVL76
+ 1719 05ea 1B040000 		.4byte	0x41b
+ 1720 05ee FF050000 		.4byte	0x5ff
+ 1721 05f2 15       		.uleb128 0x15
+ 1722 05f3 01       		.uleb128 0x1
+ 1723 05f4 50       		.byte	0x50
+ 1724 05f5 02       		.uleb128 0x2
+ 1725 05f6 74       		.byte	0x74
+ 1726 05f7 00       		.sleb128 0
+ 1727 05f8 15       		.uleb128 0x15
+ 1728 05f9 01       		.uleb128 0x1
+ 1729 05fa 51       		.byte	0x51
+ 1730 05fb 02       		.uleb128 0x2
+ 1731 05fc 75       		.byte	0x75
+ 1732 05fd 00       		.sleb128 0
+ 1733 05fe 00       		.byte	0
+ 1734 05ff 14       		.uleb128 0x14
+ 1735 0600 66000000 		.4byte	.LVL79
+ 1736 0604 C0030000 		.4byte	0x3c0
+ 1737 0608 19060000 		.4byte	0x619
+ 1738 060c 15       		.uleb128 0x15
+ 1739 060d 01       		.uleb128 0x1
+ 1740 060e 50       		.byte	0x50
+ 1741 060f 02       		.uleb128 0x2
+ 1742 0610 74       		.byte	0x74
+ 1743 0611 00       		.sleb128 0
+ 1744 0612 15       		.uleb128 0x15
+ 1745 0613 01       		.uleb128 0x1
+ 1746 0614 51       		.byte	0x51
+ 1747 0615 02       		.uleb128 0x2
+ 1748 0616 75       		.byte	0x75
+ 1749 0617 00       		.sleb128 0
+ 1750 0618 00       		.byte	0
+ 1751 0619 14       		.uleb128 0x14
+ 1752 061a 72000000 		.4byte	.LVL82
+ 1753 061e 7C010000 		.4byte	0x17c
+ 1754 0622 39060000 		.4byte	0x639
+ 1755 0626 15       		.uleb128 0x15
+ 1756 0627 01       		.uleb128 0x1
+ 1757 0628 50       		.byte	0x50
+ 1758 0629 02       		.uleb128 0x2
+ 1759 062a 74       		.byte	0x74
+ 1760 062b 00       		.sleb128 0
+ 1761 062c 15       		.uleb128 0x15
+ 1762 062d 01       		.uleb128 0x1
+ 1763 062e 51       		.byte	0x51
+ 1764 062f 02       		.uleb128 0x2
+ 1765 0630 76       		.byte	0x76
+ 1766 0631 00       		.sleb128 0
+ 1767 0632 15       		.uleb128 0x15
+ 1768 0633 01       		.uleb128 0x1
+ 1769 0634 52       		.byte	0x52
+ 1770 0635 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 42
+
+
+ 1771 0636 75       		.byte	0x75
+ 1772 0637 00       		.sleb128 0
+ 1773 0638 00       		.byte	0
+ 1774 0639 16       		.uleb128 0x16
+ 1775 063a 7C000000 		.4byte	.LVL83
+ 1776 063e F7000000 		.4byte	0xf7
+ 1777 0642 15       		.uleb128 0x15
+ 1778 0643 01       		.uleb128 0x1
+ 1779 0644 50       		.byte	0x50
+ 1780 0645 02       		.uleb128 0x2
+ 1781 0646 74       		.byte	0x74
+ 1782 0647 00       		.sleb128 0
+ 1783 0648 15       		.uleb128 0x15
+ 1784 0649 01       		.uleb128 0x1
+ 1785 064a 51       		.byte	0x51
+ 1786 064b 02       		.uleb128 0x2
+ 1787 064c 75       		.byte	0x75
+ 1788 064d 00       		.sleb128 0
+ 1789 064e 15       		.uleb128 0x15
+ 1790 064f 01       		.uleb128 0x1
+ 1791 0650 52       		.byte	0x52
+ 1792 0651 02       		.uleb128 0x2
+ 1793 0652 76       		.byte	0x76
+ 1794 0653 00       		.sleb128 0
+ 1795 0654 00       		.byte	0
+ 1796 0655 00       		.byte	0
+ 1797 0656 14       		.uleb128 0x14
+ 1798 0657 0A000000 		.4byte	.LVL66
+ 1799 065b 3F030000 		.4byte	0x33f
+ 1800 065f 6A060000 		.4byte	0x66a
+ 1801 0663 15       		.uleb128 0x15
+ 1802 0664 01       		.uleb128 0x1
+ 1803 0665 50       		.byte	0x50
+ 1804 0666 02       		.uleb128 0x2
+ 1805 0667 74       		.byte	0x74
+ 1806 0668 00       		.sleb128 0
+ 1807 0669 00       		.byte	0
+ 1808 066a 14       		.uleb128 0x14
+ 1809 066b 16000000 		.4byte	.LVL67
+ 1810 066f C0030000 		.4byte	0x3c0
+ 1811 0673 84060000 		.4byte	0x684
+ 1812 0677 15       		.uleb128 0x15
+ 1813 0678 01       		.uleb128 0x1
+ 1814 0679 50       		.byte	0x50
+ 1815 067a 02       		.uleb128 0x2
+ 1816 067b 74       		.byte	0x74
+ 1817 067c 00       		.sleb128 0
+ 1818 067d 15       		.uleb128 0x15
+ 1819 067e 01       		.uleb128 0x1
+ 1820 067f 51       		.byte	0x51
+ 1821 0680 02       		.uleb128 0x2
+ 1822 0681 75       		.byte	0x75
+ 1823 0682 00       		.sleb128 0
+ 1824 0683 00       		.byte	0
+ 1825 0684 14       		.uleb128 0x14
+ 1826 0685 2A000000 		.4byte	.LVL69
+ 1827 0689 F7000000 		.4byte	0xf7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 43
+
+
+ 1828 068d 9D060000 		.4byte	0x69d
+ 1829 0691 15       		.uleb128 0x15
+ 1830 0692 01       		.uleb128 0x1
+ 1831 0693 50       		.byte	0x50
+ 1832 0694 02       		.uleb128 0x2
+ 1833 0695 74       		.byte	0x74
+ 1834 0696 00       		.sleb128 0
+ 1835 0697 15       		.uleb128 0x15
+ 1836 0698 01       		.uleb128 0x1
+ 1837 0699 52       		.byte	0x52
+ 1838 069a 01       		.uleb128 0x1
+ 1839 069b 30       		.byte	0x30
+ 1840 069c 00       		.byte	0
+ 1841 069d 14       		.uleb128 0x14
+ 1842 069e 32000000 		.4byte	.LVL71
+ 1843 06a2 85030000 		.4byte	0x385
+ 1844 06a6 B1060000 		.4byte	0x6b1
+ 1845 06aa 15       		.uleb128 0x15
+ 1846 06ab 01       		.uleb128 0x1
+ 1847 06ac 50       		.byte	0x50
+ 1848 06ad 02       		.uleb128 0x2
+ 1849 06ae 74       		.byte	0x74
+ 1850 06af 00       		.sleb128 0
+ 1851 06b0 00       		.byte	0
+ 1852 06b1 14       		.uleb128 0x14
+ 1853 06b2 3E000000 		.4byte	.LVL72
+ 1854 06b6 1B040000 		.4byte	0x41b
+ 1855 06ba CB060000 		.4byte	0x6cb
+ 1856 06be 15       		.uleb128 0x15
+ 1857 06bf 01       		.uleb128 0x1
+ 1858 06c0 50       		.byte	0x50
+ 1859 06c1 02       		.uleb128 0x2
+ 1860 06c2 74       		.byte	0x74
+ 1861 06c3 00       		.sleb128 0
+ 1862 06c4 15       		.uleb128 0x15
+ 1863 06c5 01       		.uleb128 0x1
+ 1864 06c6 51       		.byte	0x51
+ 1865 06c7 02       		.uleb128 0x2
+ 1866 06c8 75       		.byte	0x75
+ 1867 06c9 00       		.sleb128 0
+ 1868 06ca 00       		.byte	0
+ 1869 06cb 16       		.uleb128 0x16
+ 1870 06cc 52000000 		.4byte	.LVL74
+ 1871 06d0 7C010000 		.4byte	0x17c
+ 1872 06d4 15       		.uleb128 0x15
+ 1873 06d5 01       		.uleb128 0x1
+ 1874 06d6 50       		.byte	0x50
+ 1875 06d7 02       		.uleb128 0x2
+ 1876 06d8 74       		.byte	0x74
+ 1877 06d9 00       		.sleb128 0
+ 1878 06da 15       		.uleb128 0x15
+ 1879 06db 01       		.uleb128 0x1
+ 1880 06dc 52       		.byte	0x52
+ 1881 06dd 01       		.uleb128 0x1
+ 1882 06de 30       		.byte	0x30
+ 1883 06df 00       		.byte	0
+ 1884 06e0 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 44
+
+
+ 1885 06e1 0E       		.uleb128 0xe
+ 1886 06e2 1F030000 		.4byte	.LASF46
+ 1887 06e6 01       		.byte	0x1
+ 1888 06e7 C0       		.byte	0xc0
+ 1889 06e8 00000000 		.4byte	.LFB6
+ 1890 06ec 2C000000 		.4byte	.LFE6-.LFB6
+ 1891 06f0 01       		.uleb128 0x1
+ 1892 06f1 9C       		.byte	0x9c
+ 1893 06f2 7A070000 		.4byte	0x77a
+ 1894 06f6 10       		.uleb128 0x10
+ 1895 06f7 0A030000 		.4byte	.LASF21
+ 1896 06fb 01       		.byte	0x1
+ 1897 06fc C0       		.byte	0xc0
+ 1898 06fd 6A010000 		.4byte	0x16a
+ 1899 0701 91040000 		.4byte	.LLST28
+ 1900 0705 1D       		.uleb128 0x1d
+ 1901 0706 6900     		.ascii	"i\000"
+ 1902 0708 01       		.byte	0x1
+ 1903 0709 C2       		.byte	0xc2
+ 1904 070a A5000000 		.4byte	0xa5
+ 1905 070e AF040000 		.4byte	.LLST29
+ 1906 0712 12       		.uleb128 0x12
+ 1907 0713 95000000 		.4byte	.LASF47
+ 1908 0717 01       		.byte	0x1
+ 1909 0718 C3       		.byte	0xc3
+ 1910 0719 A5000000 		.4byte	0xa5
+ 1911 071d E3040000 		.4byte	.LLST30
+ 1912 0721 14       		.uleb128 0x14
+ 1913 0722 08000000 		.4byte	.LVL85
+ 1914 0726 3F030000 		.4byte	0x33f
+ 1915 072a 35070000 		.4byte	0x735
+ 1916 072e 15       		.uleb128 0x15
+ 1917 072f 01       		.uleb128 0x1
+ 1918 0730 50       		.byte	0x50
+ 1919 0731 02       		.uleb128 0x2
+ 1920 0732 75       		.byte	0x75
+ 1921 0733 00       		.sleb128 0
+ 1922 0734 00       		.byte	0
+ 1923 0735 14       		.uleb128 0x14
+ 1924 0736 14000000 		.4byte	.LVL88
+ 1925 073a C0030000 		.4byte	0x3c0
+ 1926 073e 4F070000 		.4byte	0x74f
+ 1927 0742 15       		.uleb128 0x15
+ 1928 0743 01       		.uleb128 0x1
+ 1929 0744 50       		.byte	0x50
+ 1930 0745 02       		.uleb128 0x2
+ 1931 0746 75       		.byte	0x75
+ 1932 0747 00       		.sleb128 0
+ 1933 0748 15       		.uleb128 0x15
+ 1934 0749 01       		.uleb128 0x1
+ 1935 074a 51       		.byte	0x51
+ 1936 074b 02       		.uleb128 0x2
+ 1937 074c 74       		.byte	0x74
+ 1938 074d 00       		.sleb128 0
+ 1939 074e 00       		.byte	0
+ 1940 074f 14       		.uleb128 0x14
+ 1941 0750 1E000000 		.4byte	.LVL91
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 45
+
+
+ 1942 0754 87050000 		.4byte	0x587
+ 1943 0758 69070000 		.4byte	0x769
+ 1944 075c 15       		.uleb128 0x15
+ 1945 075d 01       		.uleb128 0x1
+ 1946 075e 50       		.byte	0x50
+ 1947 075f 02       		.uleb128 0x2
+ 1948 0760 75       		.byte	0x75
+ 1949 0761 00       		.sleb128 0
+ 1950 0762 15       		.uleb128 0x15
+ 1951 0763 01       		.uleb128 0x1
+ 1952 0764 51       		.byte	0x51
+ 1953 0765 02       		.uleb128 0x2
+ 1954 0766 74       		.byte	0x74
+ 1955 0767 00       		.sleb128 0
+ 1956 0768 00       		.byte	0
+ 1957 0769 16       		.uleb128 0x16
+ 1958 076a 24000000 		.4byte	.LVL92
+ 1959 076e 450A0000 		.4byte	0xa45
+ 1960 0772 15       		.uleb128 0x15
+ 1961 0773 01       		.uleb128 0x1
+ 1962 0774 50       		.byte	0x50
+ 1963 0775 02       		.uleb128 0x2
+ 1964 0776 74       		.byte	0x74
+ 1965 0777 00       		.sleb128 0
+ 1966 0778 00       		.byte	0
+ 1967 0779 00       		.byte	0
+ 1968 077a 0E       		.uleb128 0xe
+ 1969 077b 28010000 		.4byte	.LASF48
+ 1970 077f 01       		.byte	0x1
+ 1971 0780 DA       		.byte	0xda
+ 1972 0781 00000000 		.4byte	.LFB7
+ 1973 0785 64000000 		.4byte	.LFE7-.LFB7
+ 1974 0789 01       		.uleb128 0x1
+ 1975 078a 9C       		.byte	0x9c
+ 1976 078b 89080000 		.4byte	0x889
+ 1977 078f 10       		.uleb128 0x10
+ 1978 0790 EC000000 		.4byte	.LASF49
+ 1979 0794 01       		.byte	0x1
+ 1980 0795 DA       		.byte	0xda
+ 1981 0796 6A010000 		.4byte	0x16a
+ 1982 079a 0D050000 		.4byte	.LLST31
+ 1983 079e 10       		.uleb128 0x10
+ 1984 079f F1010000 		.4byte	.LASF50
+ 1985 07a3 01       		.byte	0x1
+ 1986 07a4 DA       		.byte	0xda
+ 1987 07a5 6A010000 		.4byte	0x16a
+ 1988 07a9 2E050000 		.4byte	.LLST32
+ 1989 07ad 10       		.uleb128 0x10
+ 1990 07ae 37020000 		.4byte	.LASF51
+ 1991 07b2 01       		.byte	0x1
+ 1992 07b3 DA       		.byte	0xda
+ 1993 07b4 A5000000 		.4byte	0xa5
+ 1994 07b8 4C050000 		.4byte	.LLST33
+ 1995 07bc 10       		.uleb128 0x10
+ 1996 07bd E4020000 		.4byte	.LASF18
+ 1997 07c1 01       		.byte	0x1
+ 1998 07c2 DA       		.byte	0xda
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 46
+
+
+ 1999 07c3 89080000 		.4byte	0x889
+ 2000 07c7 6A050000 		.4byte	.LLST34
+ 2001 07cb 14       		.uleb128 0x14
+ 2002 07cc 0E000000 		.4byte	.LVL96
+ 2003 07d0 87050000 		.4byte	0x587
+ 2004 07d4 E6070000 		.4byte	0x7e6
+ 2005 07d8 15       		.uleb128 0x15
+ 2006 07d9 01       		.uleb128 0x1
+ 2007 07da 50       		.byte	0x50
+ 2008 07db 03       		.uleb128 0x3
+ 2009 07dc F3       		.byte	0xf3
+ 2010 07dd 01       		.uleb128 0x1
+ 2011 07de 50       		.byte	0x50
+ 2012 07df 15       		.uleb128 0x15
+ 2013 07e0 01       		.uleb128 0x1
+ 2014 07e1 51       		.byte	0x51
+ 2015 07e2 02       		.uleb128 0x2
+ 2016 07e3 75       		.byte	0x75
+ 2017 07e4 00       		.sleb128 0
+ 2018 07e5 00       		.byte	0
+ 2019 07e6 14       		.uleb128 0x14
+ 2020 07e7 1A000000 		.4byte	.LVL97
+ 2021 07eb F7000000 		.4byte	0xf7
+ 2022 07ef 05080000 		.4byte	0x805
+ 2023 07f3 15       		.uleb128 0x15
+ 2024 07f4 01       		.uleb128 0x1
+ 2025 07f5 50       		.byte	0x50
+ 2026 07f6 02       		.uleb128 0x2
+ 2027 07f7 74       		.byte	0x74
+ 2028 07f8 00       		.sleb128 0
+ 2029 07f9 15       		.uleb128 0x15
+ 2030 07fa 01       		.uleb128 0x1
+ 2031 07fb 51       		.byte	0x51
+ 2032 07fc 02       		.uleb128 0x2
+ 2033 07fd 75       		.byte	0x75
+ 2034 07fe 00       		.sleb128 0
+ 2035 07ff 15       		.uleb128 0x15
+ 2036 0800 01       		.uleb128 0x1
+ 2037 0801 52       		.byte	0x52
+ 2038 0802 01       		.uleb128 0x1
+ 2039 0803 30       		.byte	0x30
+ 2040 0804 00       		.byte	0
+ 2041 0805 14       		.uleb128 0x14
+ 2042 0806 24000000 		.4byte	.LVL98
+ 2043 080a 7C010000 		.4byte	0x17c
+ 2044 080e 1F080000 		.4byte	0x81f
+ 2045 0812 15       		.uleb128 0x15
+ 2046 0813 01       		.uleb128 0x1
+ 2047 0814 50       		.byte	0x50
+ 2048 0815 02       		.uleb128 0x2
+ 2049 0816 74       		.byte	0x74
+ 2050 0817 00       		.sleb128 0
+ 2051 0818 15       		.uleb128 0x15
+ 2052 0819 01       		.uleb128 0x1
+ 2053 081a 51       		.byte	0x51
+ 2054 081b 02       		.uleb128 0x2
+ 2055 081c 75       		.byte	0x75
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 47
+
+
+ 2056 081d 00       		.sleb128 0
+ 2057 081e 00       		.byte	0
+ 2058 081f 14       		.uleb128 0x14
+ 2059 0820 30000000 		.4byte	.LVL99
+ 2060 0824 F7000000 		.4byte	0xf7
+ 2061 0828 39080000 		.4byte	0x839
+ 2062 082c 15       		.uleb128 0x15
+ 2063 082d 01       		.uleb128 0x1
+ 2064 082e 50       		.byte	0x50
+ 2065 082f 02       		.uleb128 0x2
+ 2066 0830 74       		.byte	0x74
+ 2067 0831 00       		.sleb128 0
+ 2068 0832 15       		.uleb128 0x15
+ 2069 0833 01       		.uleb128 0x1
+ 2070 0834 52       		.byte	0x52
+ 2071 0835 02       		.uleb128 0x2
+ 2072 0836 75       		.byte	0x75
+ 2073 0837 00       		.sleb128 0
+ 2074 0838 00       		.byte	0
+ 2075 0839 14       		.uleb128 0x14
+ 2076 083a 44000000 		.4byte	.LVL101
+ 2077 083e F7000000 		.4byte	0xf7
+ 2078 0842 53080000 		.4byte	0x853
+ 2079 0846 15       		.uleb128 0x15
+ 2080 0847 01       		.uleb128 0x1
+ 2081 0848 50       		.byte	0x50
+ 2082 0849 02       		.uleb128 0x2
+ 2083 084a 74       		.byte	0x74
+ 2084 084b 00       		.sleb128 0
+ 2085 084c 15       		.uleb128 0x15
+ 2086 084d 01       		.uleb128 0x1
+ 2087 084e 51       		.byte	0x51
+ 2088 084f 02       		.uleb128 0x2
+ 2089 0850 75       		.byte	0x75
+ 2090 0851 00       		.sleb128 0
+ 2091 0852 00       		.byte	0
+ 2092 0853 14       		.uleb128 0x14
+ 2093 0854 4E000000 		.4byte	.LVL102
+ 2094 0858 7C010000 		.4byte	0x17c
+ 2095 085c 72080000 		.4byte	0x872
+ 2096 0860 15       		.uleb128 0x15
+ 2097 0861 01       		.uleb128 0x1
+ 2098 0862 50       		.byte	0x50
+ 2099 0863 02       		.uleb128 0x2
+ 2100 0864 74       		.byte	0x74
+ 2101 0865 00       		.sleb128 0
+ 2102 0866 15       		.uleb128 0x15
+ 2103 0867 01       		.uleb128 0x1
+ 2104 0868 51       		.byte	0x51
+ 2105 0869 02       		.uleb128 0x2
+ 2106 086a 75       		.byte	0x75
+ 2107 086b 00       		.sleb128 0
+ 2108 086c 15       		.uleb128 0x15
+ 2109 086d 01       		.uleb128 0x1
+ 2110 086e 52       		.byte	0x52
+ 2111 086f 01       		.uleb128 0x1
+ 2112 0870 30       		.byte	0x30
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 48
+
+
+ 2113 0871 00       		.byte	0
+ 2114 0872 16       		.uleb128 0x16
+ 2115 0873 5A000000 		.4byte	.LVL103
+ 2116 0877 7C010000 		.4byte	0x17c
+ 2117 087b 15       		.uleb128 0x15
+ 2118 087c 01       		.uleb128 0x1
+ 2119 087d 50       		.byte	0x50
+ 2120 087e 02       		.uleb128 0x2
+ 2121 087f 74       		.byte	0x74
+ 2122 0880 00       		.sleb128 0
+ 2123 0881 15       		.uleb128 0x15
+ 2124 0882 01       		.uleb128 0x1
+ 2125 0883 52       		.byte	0x52
+ 2126 0884 02       		.uleb128 0x2
+ 2127 0885 75       		.byte	0x75
+ 2128 0886 00       		.sleb128 0
+ 2129 0887 00       		.byte	0
+ 2130 0888 00       		.byte	0
+ 2131 0889 02       		.uleb128 0x2
+ 2132 088a 01       		.byte	0x1
+ 2133 088b 02       		.byte	0x2
+ 2134 088c 13020000 		.4byte	.LASF52
+ 2135 0890 17       		.uleb128 0x17
+ 2136 0891 86000000 		.4byte	.LASF53
+ 2137 0895 01       		.byte	0x1
+ 2138 0896 4301     		.2byte	0x143
+ 2139 0898 8C000000 		.4byte	0x8c
+ 2140 089c 00000000 		.4byte	.LFB12
+ 2141 08a0 1E000000 		.4byte	.LFE12-.LFB12
+ 2142 08a4 01       		.uleb128 0x1
+ 2143 08a5 9C       		.byte	0x9c
+ 2144 08a6 FF080000 		.4byte	0x8ff
+ 2145 08aa 18       		.uleb128 0x18
+ 2146 08ab 0A030000 		.4byte	.LASF21
+ 2147 08af 01       		.byte	0x1
+ 2148 08b0 4301     		.2byte	0x143
+ 2149 08b2 7A030000 		.4byte	0x37a
+ 2150 08b6 8B050000 		.4byte	.LLST35
+ 2151 08ba 1E       		.uleb128 0x1e
+ 2152 08bb 6C656E00 		.ascii	"len\000"
+ 2153 08bf 01       		.byte	0x1
+ 2154 08c0 4501     		.2byte	0x145
+ 2155 08c2 8C000000 		.4byte	0x8c
+ 2156 08c6 A9050000 		.4byte	.LLST36
+ 2157 08ca 0C       		.uleb128 0xc
+ 2158 08cb 37020000 		.4byte	.LASF51
+ 2159 08cf 01       		.byte	0x1
+ 2160 08d0 4601     		.2byte	0x146
+ 2161 08d2 A5000000 		.4byte	0xa5
+ 2162 08d6 C8050000 		.4byte	.LLST37
+ 2163 08da 14       		.uleb128 0x14
+ 2164 08db 08000000 		.4byte	.LVL106
+ 2165 08df 3F030000 		.4byte	0x33f
+ 2166 08e3 EE080000 		.4byte	0x8ee
+ 2167 08e7 15       		.uleb128 0x15
+ 2168 08e8 01       		.uleb128 0x1
+ 2169 08e9 50       		.byte	0x50
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 49
+
+
+ 2170 08ea 02       		.uleb128 0x2
+ 2171 08eb 75       		.byte	0x75
+ 2172 08ec 00       		.sleb128 0
+ 2173 08ed 00       		.byte	0
+ 2174 08ee 16       		.uleb128 0x16
+ 2175 08ef 16000000 		.4byte	.LVL110
+ 2176 08f3 C0030000 		.4byte	0x3c0
+ 2177 08f7 15       		.uleb128 0x15
+ 2178 08f8 01       		.uleb128 0x1
+ 2179 08f9 50       		.byte	0x50
+ 2180 08fa 02       		.uleb128 0x2
+ 2181 08fb 75       		.byte	0x75
+ 2182 08fc 00       		.sleb128 0
+ 2183 08fd 00       		.byte	0
+ 2184 08fe 00       		.byte	0
+ 2185 08ff 1F       		.uleb128 0x1f
+ 2186 0900 84010000 		.4byte	.LASF54
+ 2187 0904 01       		.byte	0x1
+ 2188 0905 5501     		.2byte	0x155
+ 2189 0907 00000000 		.4byte	.LFB13
+ 2190 090b 5E000000 		.4byte	.LFE13-.LFB13
+ 2191 090f 01       		.uleb128 0x1
+ 2192 0910 9C       		.byte	0x9c
+ 2193 0911 0F0A0000 		.4byte	0xa0f
+ 2194 0915 18       		.uleb128 0x18
+ 2195 0916 0A030000 		.4byte	.LASF21
+ 2196 091a 01       		.byte	0x1
+ 2197 091b 5501     		.2byte	0x155
+ 2198 091d 6A010000 		.4byte	0x16a
+ 2199 0921 F1050000 		.4byte	.LLST38
+ 2200 0925 18       		.uleb128 0x18
+ 2201 0926 35030000 		.4byte	.LASF37
+ 2202 092a 01       		.byte	0x1
+ 2203 092b 5501     		.2byte	0x155
+ 2204 092d A5000000 		.4byte	0xa5
+ 2205 0931 30060000 		.4byte	.LLST39
+ 2206 0935 18       		.uleb128 0x18
+ 2207 0936 56010000 		.4byte	.LASF55
+ 2208 093a 01       		.byte	0x1
+ 2209 093b 5501     		.2byte	0x155
+ 2210 093d A5000000 		.4byte	0xa5
+ 2211 0941 6F060000 		.4byte	.LLST40
+ 2212 0945 0C       		.uleb128 0xc
+ 2213 0946 2C030000 		.4byte	.LASF56
+ 2214 094a 01       		.byte	0x1
+ 2215 094b 5901     		.2byte	0x159
+ 2216 094d A5000000 		.4byte	0xa5
+ 2217 0951 AE060000 		.4byte	.LLST41
+ 2218 0955 14       		.uleb128 0x14
+ 2219 0956 14000000 		.4byte	.LVL114
+ 2220 095a 1B040000 		.4byte	0x41b
+ 2221 095e 6F090000 		.4byte	0x96f
+ 2222 0962 15       		.uleb128 0x15
+ 2223 0963 01       		.uleb128 0x1
+ 2224 0964 50       		.byte	0x50
+ 2225 0965 02       		.uleb128 0x2
+ 2226 0966 76       		.byte	0x76
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 50
+
+
+ 2227 0967 00       		.sleb128 0
+ 2228 0968 15       		.uleb128 0x15
+ 2229 0969 01       		.uleb128 0x1
+ 2230 096a 51       		.byte	0x51
+ 2231 096b 02       		.uleb128 0x2
+ 2232 096c 75       		.byte	0x75
+ 2233 096d 00       		.sleb128 0
+ 2234 096e 00       		.byte	0
+ 2235 096f 13       		.uleb128 0x13
+ 2236 0970 1C000000 		.4byte	.LVL117
+ 2237 0974 85030000 		.4byte	0x385
+ 2238 0978 14       		.uleb128 0x14
+ 2239 0979 2A000000 		.4byte	.LVL120
+ 2240 097d 87050000 		.4byte	0x587
+ 2241 0981 92090000 		.4byte	0x992
+ 2242 0985 15       		.uleb128 0x15
+ 2243 0986 01       		.uleb128 0x1
+ 2244 0987 50       		.byte	0x50
+ 2245 0988 02       		.uleb128 0x2
+ 2246 0989 76       		.byte	0x76
+ 2247 098a 00       		.sleb128 0
+ 2248 098b 15       		.uleb128 0x15
+ 2249 098c 01       		.uleb128 0x1
+ 2250 098d 51       		.byte	0x51
+ 2251 098e 02       		.uleb128 0x2
+ 2252 098f 74       		.byte	0x74
+ 2253 0990 00       		.sleb128 0
+ 2254 0991 00       		.byte	0
+ 2255 0992 14       		.uleb128 0x14
+ 2256 0993 34000000 		.4byte	.LVL121
+ 2257 0997 7C010000 		.4byte	0x17c
+ 2258 099b B2090000 		.4byte	0x9b2
+ 2259 099f 15       		.uleb128 0x15
+ 2260 09a0 01       		.uleb128 0x1
+ 2261 09a1 50       		.byte	0x50
+ 2262 09a2 02       		.uleb128 0x2
+ 2263 09a3 76       		.byte	0x76
+ 2264 09a4 00       		.sleb128 0
+ 2265 09a5 15       		.uleb128 0x15
+ 2266 09a6 01       		.uleb128 0x1
+ 2267 09a7 51       		.byte	0x51
+ 2268 09a8 02       		.uleb128 0x2
+ 2269 09a9 77       		.byte	0x77
+ 2270 09aa 00       		.sleb128 0
+ 2271 09ab 15       		.uleb128 0x15
+ 2272 09ac 01       		.uleb128 0x1
+ 2273 09ad 52       		.byte	0x52
+ 2274 09ae 02       		.uleb128 0x2
+ 2275 09af 74       		.byte	0x74
+ 2276 09b0 00       		.sleb128 0
+ 2277 09b1 00       		.byte	0
+ 2278 09b2 14       		.uleb128 0x14
+ 2279 09b3 3E000000 		.4byte	.LVL122
+ 2280 09b7 F7000000 		.4byte	0xf7
+ 2281 09bb D2090000 		.4byte	0x9d2
+ 2282 09bf 15       		.uleb128 0x15
+ 2283 09c0 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 51
+
+
+ 2284 09c1 50       		.byte	0x50
+ 2285 09c2 02       		.uleb128 0x2
+ 2286 09c3 76       		.byte	0x76
+ 2287 09c4 00       		.sleb128 0
+ 2288 09c5 15       		.uleb128 0x15
+ 2289 09c6 01       		.uleb128 0x1
+ 2290 09c7 51       		.byte	0x51
+ 2291 09c8 02       		.uleb128 0x2
+ 2292 09c9 74       		.byte	0x74
+ 2293 09ca 00       		.sleb128 0
+ 2294 09cb 15       		.uleb128 0x15
+ 2295 09cc 01       		.uleb128 0x1
+ 2296 09cd 52       		.byte	0x52
+ 2297 09ce 02       		.uleb128 0x2
+ 2298 09cf 77       		.byte	0x77
+ 2299 09d0 00       		.sleb128 0
+ 2300 09d1 00       		.byte	0
+ 2301 09d2 14       		.uleb128 0x14
+ 2302 09d3 48000000 		.4byte	.LVL123
+ 2303 09d7 F7000000 		.4byte	0xf7
+ 2304 09db F2090000 		.4byte	0x9f2
+ 2305 09df 15       		.uleb128 0x15
+ 2306 09e0 01       		.uleb128 0x1
+ 2307 09e1 50       		.byte	0x50
+ 2308 09e2 02       		.uleb128 0x2
+ 2309 09e3 76       		.byte	0x76
+ 2310 09e4 00       		.sleb128 0
+ 2311 09e5 15       		.uleb128 0x15
+ 2312 09e6 01       		.uleb128 0x1
+ 2313 09e7 51       		.byte	0x51
+ 2314 09e8 02       		.uleb128 0x2
+ 2315 09e9 75       		.byte	0x75
+ 2316 09ea 00       		.sleb128 0
+ 2317 09eb 15       		.uleb128 0x15
+ 2318 09ec 01       		.uleb128 0x1
+ 2319 09ed 52       		.byte	0x52
+ 2320 09ee 02       		.uleb128 0x2
+ 2321 09ef 74       		.byte	0x74
+ 2322 09f0 00       		.sleb128 0
+ 2323 09f1 00       		.byte	0
+ 2324 09f2 16       		.uleb128 0x16
+ 2325 09f3 52000000 		.4byte	.LVL124
+ 2326 09f7 7C010000 		.4byte	0x17c
+ 2327 09fb 15       		.uleb128 0x15
+ 2328 09fc 01       		.uleb128 0x1
+ 2329 09fd 50       		.byte	0x50
+ 2330 09fe 02       		.uleb128 0x2
+ 2331 09ff 76       		.byte	0x76
+ 2332 0a00 00       		.sleb128 0
+ 2333 0a01 15       		.uleb128 0x15
+ 2334 0a02 01       		.uleb128 0x1
+ 2335 0a03 51       		.byte	0x51
+ 2336 0a04 02       		.uleb128 0x2
+ 2337 0a05 74       		.byte	0x74
+ 2338 0a06 00       		.sleb128 0
+ 2339 0a07 15       		.uleb128 0x15
+ 2340 0a08 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 52
+
+
+ 2341 0a09 52       		.byte	0x52
+ 2342 0a0a 02       		.uleb128 0x2
+ 2343 0a0b 75       		.byte	0x75
+ 2344 0a0c 00       		.sleb128 0
+ 2345 0a0d 00       		.byte	0
+ 2346 0a0e 00       		.byte	0
+ 2347 0a0f 17       		.uleb128 0x17
+ 2348 0a10 CF000000 		.4byte	.LASF57
+ 2349 0a14 01       		.byte	0x1
+ 2350 0a15 7601     		.2byte	0x176
+ 2351 0a17 89080000 		.4byte	0x889
+ 2352 0a1b 00000000 		.4byte	.LFB14
+ 2353 0a1f 1A000000 		.4byte	.LFE14-.LFB14
+ 2354 0a23 01       		.uleb128 0x1
+ 2355 0a24 9C       		.byte	0x9c
+ 2356 0a25 3A0A0000 		.4byte	0xa3a
+ 2357 0a29 18       		.uleb128 0x18
+ 2358 0a2a 0A030000 		.4byte	.LASF21
+ 2359 0a2e 01       		.byte	0x1
+ 2360 0a2f 7601     		.2byte	0x176
+ 2361 0a31 6A010000 		.4byte	0x16a
+ 2362 0a35 D7060000 		.4byte	.LLST42
+ 2363 0a39 00       		.byte	0
+ 2364 0a3a 20       		.uleb128 0x20
+ 2365 0a3b 00000000 		.4byte	.LASF58
+ 2366 0a3f 00000000 		.4byte	.LASF58
+ 2367 0a43 05       		.byte	0x5
+ 2368 0a44 52       		.byte	0x52
+ 2369 0a45 20       		.uleb128 0x20
+ 2370 0a46 9C000000 		.4byte	.LASF59
+ 2371 0a4a 9C000000 		.4byte	.LASF59
+ 2372 0a4e 05       		.byte	0x5
+ 2373 0a4f 58       		.byte	0x58
+ 2374 0a50 00       		.byte	0
+ 2375              		.section	.debug_abbrev,"",%progbits
+ 2376              	.Ldebug_abbrev0:
+ 2377 0000 01       		.uleb128 0x1
+ 2378 0001 11       		.uleb128 0x11
+ 2379 0002 01       		.byte	0x1
+ 2380 0003 25       		.uleb128 0x25
+ 2381 0004 0E       		.uleb128 0xe
+ 2382 0005 13       		.uleb128 0x13
+ 2383 0006 0B       		.uleb128 0xb
+ 2384 0007 03       		.uleb128 0x3
+ 2385 0008 0E       		.uleb128 0xe
+ 2386 0009 1B       		.uleb128 0x1b
+ 2387 000a 0E       		.uleb128 0xe
+ 2388 000b 55       		.uleb128 0x55
+ 2389 000c 17       		.uleb128 0x17
+ 2390 000d 11       		.uleb128 0x11
+ 2391 000e 01       		.uleb128 0x1
+ 2392 000f 10       		.uleb128 0x10
+ 2393 0010 17       		.uleb128 0x17
+ 2394 0011 00       		.byte	0
+ 2395 0012 00       		.byte	0
+ 2396 0013 02       		.uleb128 0x2
+ 2397 0014 24       		.uleb128 0x24
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 53
+
+
+ 2398 0015 00       		.byte	0
+ 2399 0016 0B       		.uleb128 0xb
+ 2400 0017 0B       		.uleb128 0xb
+ 2401 0018 3E       		.uleb128 0x3e
+ 2402 0019 0B       		.uleb128 0xb
+ 2403 001a 03       		.uleb128 0x3
+ 2404 001b 0E       		.uleb128 0xe
+ 2405 001c 00       		.byte	0
+ 2406 001d 00       		.byte	0
+ 2407 001e 03       		.uleb128 0x3
+ 2408 001f 16       		.uleb128 0x16
+ 2409 0020 00       		.byte	0
+ 2410 0021 03       		.uleb128 0x3
+ 2411 0022 0E       		.uleb128 0xe
+ 2412 0023 3A       		.uleb128 0x3a
+ 2413 0024 0B       		.uleb128 0xb
+ 2414 0025 3B       		.uleb128 0x3b
+ 2415 0026 0B       		.uleb128 0xb
+ 2416 0027 49       		.uleb128 0x49
+ 2417 0028 13       		.uleb128 0x13
+ 2418 0029 00       		.byte	0
+ 2419 002a 00       		.byte	0
+ 2420 002b 04       		.uleb128 0x4
+ 2421 002c 24       		.uleb128 0x24
+ 2422 002d 00       		.byte	0
+ 2423 002e 0B       		.uleb128 0xb
+ 2424 002f 0B       		.uleb128 0xb
+ 2425 0030 3E       		.uleb128 0x3e
+ 2426 0031 0B       		.uleb128 0xb
+ 2427 0032 03       		.uleb128 0x3
+ 2428 0033 08       		.uleb128 0x8
+ 2429 0034 00       		.byte	0
+ 2430 0035 00       		.byte	0
+ 2431 0036 05       		.uleb128 0x5
+ 2432 0037 0F       		.uleb128 0xf
+ 2433 0038 00       		.byte	0
+ 2434 0039 0B       		.uleb128 0xb
+ 2435 003a 0B       		.uleb128 0xb
+ 2436 003b 00       		.byte	0
+ 2437 003c 00       		.byte	0
+ 2438 003d 06       		.uleb128 0x6
+ 2439 003e 13       		.uleb128 0x13
+ 2440 003f 01       		.byte	0x1
+ 2441 0040 0B       		.uleb128 0xb
+ 2442 0041 0B       		.uleb128 0xb
+ 2443 0042 3A       		.uleb128 0x3a
+ 2444 0043 0B       		.uleb128 0xb
+ 2445 0044 3B       		.uleb128 0x3b
+ 2446 0045 0B       		.uleb128 0xb
+ 2447 0046 01       		.uleb128 0x1
+ 2448 0047 13       		.uleb128 0x13
+ 2449 0048 00       		.byte	0
+ 2450 0049 00       		.byte	0
+ 2451 004a 07       		.uleb128 0x7
+ 2452 004b 0D       		.uleb128 0xd
+ 2453 004c 00       		.byte	0
+ 2454 004d 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 54
+
+
+ 2455 004e 0E       		.uleb128 0xe
+ 2456 004f 3A       		.uleb128 0x3a
+ 2457 0050 0B       		.uleb128 0xb
+ 2458 0051 3B       		.uleb128 0x3b
+ 2459 0052 0B       		.uleb128 0xb
+ 2460 0053 49       		.uleb128 0x49
+ 2461 0054 13       		.uleb128 0x13
+ 2462 0055 38       		.uleb128 0x38
+ 2463 0056 0B       		.uleb128 0xb
+ 2464 0057 00       		.byte	0
+ 2465 0058 00       		.byte	0
+ 2466 0059 08       		.uleb128 0x8
+ 2467 005a 0F       		.uleb128 0xf
+ 2468 005b 00       		.byte	0
+ 2469 005c 0B       		.uleb128 0xb
+ 2470 005d 0B       		.uleb128 0xb
+ 2471 005e 49       		.uleb128 0x49
+ 2472 005f 13       		.uleb128 0x13
+ 2473 0060 00       		.byte	0
+ 2474 0061 00       		.byte	0
+ 2475 0062 09       		.uleb128 0x9
+ 2476 0063 2E       		.uleb128 0x2e
+ 2477 0064 01       		.byte	0x1
+ 2478 0065 03       		.uleb128 0x3
+ 2479 0066 0E       		.uleb128 0xe
+ 2480 0067 3A       		.uleb128 0x3a
+ 2481 0068 0B       		.uleb128 0xb
+ 2482 0069 3B       		.uleb128 0x3b
+ 2483 006a 05       		.uleb128 0x5
+ 2484 006b 27       		.uleb128 0x27
+ 2485 006c 19       		.uleb128 0x19
+ 2486 006d 11       		.uleb128 0x11
+ 2487 006e 01       		.uleb128 0x1
+ 2488 006f 12       		.uleb128 0x12
+ 2489 0070 06       		.uleb128 0x6
+ 2490 0071 40       		.uleb128 0x40
+ 2491 0072 18       		.uleb128 0x18
+ 2492 0073 9742     		.uleb128 0x2117
+ 2493 0075 19       		.uleb128 0x19
+ 2494 0076 01       		.uleb128 0x1
+ 2495 0077 13       		.uleb128 0x13
+ 2496 0078 00       		.byte	0
+ 2497 0079 00       		.byte	0
+ 2498 007a 0A       		.uleb128 0xa
+ 2499 007b 05       		.uleb128 0x5
+ 2500 007c 00       		.byte	0
+ 2501 007d 03       		.uleb128 0x3
+ 2502 007e 0E       		.uleb128 0xe
+ 2503 007f 3A       		.uleb128 0x3a
+ 2504 0080 0B       		.uleb128 0xb
+ 2505 0081 3B       		.uleb128 0x3b
+ 2506 0082 05       		.uleb128 0x5
+ 2507 0083 49       		.uleb128 0x49
+ 2508 0084 13       		.uleb128 0x13
+ 2509 0085 02       		.uleb128 0x2
+ 2510 0086 18       		.uleb128 0x18
+ 2511 0087 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 55
+
+
+ 2512 0088 00       		.byte	0
+ 2513 0089 0B       		.uleb128 0xb
+ 2514 008a 05       		.uleb128 0x5
+ 2515 008b 00       		.byte	0
+ 2516 008c 03       		.uleb128 0x3
+ 2517 008d 08       		.uleb128 0x8
+ 2518 008e 3A       		.uleb128 0x3a
+ 2519 008f 0B       		.uleb128 0xb
+ 2520 0090 3B       		.uleb128 0x3b
+ 2521 0091 05       		.uleb128 0x5
+ 2522 0092 49       		.uleb128 0x49
+ 2523 0093 13       		.uleb128 0x13
+ 2524 0094 02       		.uleb128 0x2
+ 2525 0095 17       		.uleb128 0x17
+ 2526 0096 00       		.byte	0
+ 2527 0097 00       		.byte	0
+ 2528 0098 0C       		.uleb128 0xc
+ 2529 0099 34       		.uleb128 0x34
+ 2530 009a 00       		.byte	0
+ 2531 009b 03       		.uleb128 0x3
+ 2532 009c 0E       		.uleb128 0xe
+ 2533 009d 3A       		.uleb128 0x3a
+ 2534 009e 0B       		.uleb128 0xb
+ 2535 009f 3B       		.uleb128 0x3b
+ 2536 00a0 05       		.uleb128 0x5
+ 2537 00a1 49       		.uleb128 0x49
+ 2538 00a2 13       		.uleb128 0x13
+ 2539 00a3 02       		.uleb128 0x2
+ 2540 00a4 17       		.uleb128 0x17
+ 2541 00a5 00       		.byte	0
+ 2542 00a6 00       		.byte	0
+ 2543 00a7 0D       		.uleb128 0xd
+ 2544 00a8 05       		.uleb128 0x5
+ 2545 00a9 00       		.byte	0
+ 2546 00aa 03       		.uleb128 0x3
+ 2547 00ab 08       		.uleb128 0x8
+ 2548 00ac 3A       		.uleb128 0x3a
+ 2549 00ad 0B       		.uleb128 0xb
+ 2550 00ae 3B       		.uleb128 0x3b
+ 2551 00af 05       		.uleb128 0x5
+ 2552 00b0 49       		.uleb128 0x49
+ 2553 00b1 13       		.uleb128 0x13
+ 2554 00b2 02       		.uleb128 0x2
+ 2555 00b3 18       		.uleb128 0x18
+ 2556 00b4 00       		.byte	0
+ 2557 00b5 00       		.byte	0
+ 2558 00b6 0E       		.uleb128 0xe
+ 2559 00b7 2E       		.uleb128 0x2e
+ 2560 00b8 01       		.byte	0x1
+ 2561 00b9 3F       		.uleb128 0x3f
+ 2562 00ba 19       		.uleb128 0x19
+ 2563 00bb 03       		.uleb128 0x3
+ 2564 00bc 0E       		.uleb128 0xe
+ 2565 00bd 3A       		.uleb128 0x3a
+ 2566 00be 0B       		.uleb128 0xb
+ 2567 00bf 3B       		.uleb128 0x3b
+ 2568 00c0 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 56
+
+
+ 2569 00c1 27       		.uleb128 0x27
+ 2570 00c2 19       		.uleb128 0x19
+ 2571 00c3 11       		.uleb128 0x11
+ 2572 00c4 01       		.uleb128 0x1
+ 2573 00c5 12       		.uleb128 0x12
+ 2574 00c6 06       		.uleb128 0x6
+ 2575 00c7 40       		.uleb128 0x40
+ 2576 00c8 18       		.uleb128 0x18
+ 2577 00c9 9742     		.uleb128 0x2117
+ 2578 00cb 19       		.uleb128 0x19
+ 2579 00cc 01       		.uleb128 0x1
+ 2580 00cd 13       		.uleb128 0x13
+ 2581 00ce 00       		.byte	0
+ 2582 00cf 00       		.byte	0
+ 2583 00d0 0F       		.uleb128 0xf
+ 2584 00d1 05       		.uleb128 0x5
+ 2585 00d2 00       		.byte	0
+ 2586 00d3 03       		.uleb128 0x3
+ 2587 00d4 0E       		.uleb128 0xe
+ 2588 00d5 3A       		.uleb128 0x3a
+ 2589 00d6 0B       		.uleb128 0xb
+ 2590 00d7 3B       		.uleb128 0x3b
+ 2591 00d8 0B       		.uleb128 0xb
+ 2592 00d9 49       		.uleb128 0x49
+ 2593 00da 13       		.uleb128 0x13
+ 2594 00db 02       		.uleb128 0x2
+ 2595 00dc 18       		.uleb128 0x18
+ 2596 00dd 00       		.byte	0
+ 2597 00de 00       		.byte	0
+ 2598 00df 10       		.uleb128 0x10
+ 2599 00e0 05       		.uleb128 0x5
+ 2600 00e1 00       		.byte	0
+ 2601 00e2 03       		.uleb128 0x3
+ 2602 00e3 0E       		.uleb128 0xe
+ 2603 00e4 3A       		.uleb128 0x3a
+ 2604 00e5 0B       		.uleb128 0xb
+ 2605 00e6 3B       		.uleb128 0x3b
+ 2606 00e7 0B       		.uleb128 0xb
+ 2607 00e8 49       		.uleb128 0x49
+ 2608 00e9 13       		.uleb128 0x13
+ 2609 00ea 02       		.uleb128 0x2
+ 2610 00eb 17       		.uleb128 0x17
+ 2611 00ec 00       		.byte	0
+ 2612 00ed 00       		.byte	0
+ 2613 00ee 11       		.uleb128 0x11
+ 2614 00ef 2E       		.uleb128 0x2e
+ 2615 00f0 01       		.byte	0x1
+ 2616 00f1 3F       		.uleb128 0x3f
+ 2617 00f2 19       		.uleb128 0x19
+ 2618 00f3 03       		.uleb128 0x3
+ 2619 00f4 0E       		.uleb128 0xe
+ 2620 00f5 3A       		.uleb128 0x3a
+ 2621 00f6 0B       		.uleb128 0xb
+ 2622 00f7 3B       		.uleb128 0x3b
+ 2623 00f8 0B       		.uleb128 0xb
+ 2624 00f9 27       		.uleb128 0x27
+ 2625 00fa 19       		.uleb128 0x19
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 57
+
+
+ 2626 00fb 49       		.uleb128 0x49
+ 2627 00fc 13       		.uleb128 0x13
+ 2628 00fd 11       		.uleb128 0x11
+ 2629 00fe 01       		.uleb128 0x1
+ 2630 00ff 12       		.uleb128 0x12
+ 2631 0100 06       		.uleb128 0x6
+ 2632 0101 40       		.uleb128 0x40
+ 2633 0102 18       		.uleb128 0x18
+ 2634 0103 9742     		.uleb128 0x2117
+ 2635 0105 19       		.uleb128 0x19
+ 2636 0106 01       		.uleb128 0x1
+ 2637 0107 13       		.uleb128 0x13
+ 2638 0108 00       		.byte	0
+ 2639 0109 00       		.byte	0
+ 2640 010a 12       		.uleb128 0x12
+ 2641 010b 34       		.uleb128 0x34
+ 2642 010c 00       		.byte	0
+ 2643 010d 03       		.uleb128 0x3
+ 2644 010e 0E       		.uleb128 0xe
+ 2645 010f 3A       		.uleb128 0x3a
+ 2646 0110 0B       		.uleb128 0xb
+ 2647 0111 3B       		.uleb128 0x3b
+ 2648 0112 0B       		.uleb128 0xb
+ 2649 0113 49       		.uleb128 0x49
+ 2650 0114 13       		.uleb128 0x13
+ 2651 0115 02       		.uleb128 0x2
+ 2652 0116 17       		.uleb128 0x17
+ 2653 0117 00       		.byte	0
+ 2654 0118 00       		.byte	0
+ 2655 0119 13       		.uleb128 0x13
+ 2656 011a 898201   		.uleb128 0x4109
+ 2657 011d 00       		.byte	0
+ 2658 011e 11       		.uleb128 0x11
+ 2659 011f 01       		.uleb128 0x1
+ 2660 0120 31       		.uleb128 0x31
+ 2661 0121 13       		.uleb128 0x13
+ 2662 0122 00       		.byte	0
+ 2663 0123 00       		.byte	0
+ 2664 0124 14       		.uleb128 0x14
+ 2665 0125 898201   		.uleb128 0x4109
+ 2666 0128 01       		.byte	0x1
+ 2667 0129 11       		.uleb128 0x11
+ 2668 012a 01       		.uleb128 0x1
+ 2669 012b 31       		.uleb128 0x31
+ 2670 012c 13       		.uleb128 0x13
+ 2671 012d 01       		.uleb128 0x1
+ 2672 012e 13       		.uleb128 0x13
+ 2673 012f 00       		.byte	0
+ 2674 0130 00       		.byte	0
+ 2675 0131 15       		.uleb128 0x15
+ 2676 0132 8A8201   		.uleb128 0x410a
+ 2677 0135 00       		.byte	0
+ 2678 0136 02       		.uleb128 0x2
+ 2679 0137 18       		.uleb128 0x18
+ 2680 0138 9142     		.uleb128 0x2111
+ 2681 013a 18       		.uleb128 0x18
+ 2682 013b 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 58
+
+
+ 2683 013c 00       		.byte	0
+ 2684 013d 16       		.uleb128 0x16
+ 2685 013e 898201   		.uleb128 0x4109
+ 2686 0141 01       		.byte	0x1
+ 2687 0142 11       		.uleb128 0x11
+ 2688 0143 01       		.uleb128 0x1
+ 2689 0144 31       		.uleb128 0x31
+ 2690 0145 13       		.uleb128 0x13
+ 2691 0146 00       		.byte	0
+ 2692 0147 00       		.byte	0
+ 2693 0148 17       		.uleb128 0x17
+ 2694 0149 2E       		.uleb128 0x2e
+ 2695 014a 01       		.byte	0x1
+ 2696 014b 3F       		.uleb128 0x3f
+ 2697 014c 19       		.uleb128 0x19
+ 2698 014d 03       		.uleb128 0x3
+ 2699 014e 0E       		.uleb128 0xe
+ 2700 014f 3A       		.uleb128 0x3a
+ 2701 0150 0B       		.uleb128 0xb
+ 2702 0151 3B       		.uleb128 0x3b
+ 2703 0152 05       		.uleb128 0x5
+ 2704 0153 27       		.uleb128 0x27
+ 2705 0154 19       		.uleb128 0x19
+ 2706 0155 49       		.uleb128 0x49
+ 2707 0156 13       		.uleb128 0x13
+ 2708 0157 11       		.uleb128 0x11
+ 2709 0158 01       		.uleb128 0x1
+ 2710 0159 12       		.uleb128 0x12
+ 2711 015a 06       		.uleb128 0x6
+ 2712 015b 40       		.uleb128 0x40
+ 2713 015c 18       		.uleb128 0x18
+ 2714 015d 9742     		.uleb128 0x2117
+ 2715 015f 19       		.uleb128 0x19
+ 2716 0160 01       		.uleb128 0x1
+ 2717 0161 13       		.uleb128 0x13
+ 2718 0162 00       		.byte	0
+ 2719 0163 00       		.byte	0
+ 2720 0164 18       		.uleb128 0x18
+ 2721 0165 05       		.uleb128 0x5
+ 2722 0166 00       		.byte	0
+ 2723 0167 03       		.uleb128 0x3
+ 2724 0168 0E       		.uleb128 0xe
+ 2725 0169 3A       		.uleb128 0x3a
+ 2726 016a 0B       		.uleb128 0xb
+ 2727 016b 3B       		.uleb128 0x3b
+ 2728 016c 05       		.uleb128 0x5
+ 2729 016d 49       		.uleb128 0x49
+ 2730 016e 13       		.uleb128 0x13
+ 2731 016f 02       		.uleb128 0x2
+ 2732 0170 17       		.uleb128 0x17
+ 2733 0171 00       		.byte	0
+ 2734 0172 00       		.byte	0
+ 2735 0173 19       		.uleb128 0x19
+ 2736 0174 26       		.uleb128 0x26
+ 2737 0175 00       		.byte	0
+ 2738 0176 49       		.uleb128 0x49
+ 2739 0177 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 59
+
+
+ 2740 0178 00       		.byte	0
+ 2741 0179 00       		.byte	0
+ 2742 017a 1A       		.uleb128 0x1a
+ 2743 017b 26       		.uleb128 0x26
+ 2744 017c 00       		.byte	0
+ 2745 017d 00       		.byte	0
+ 2746 017e 00       		.byte	0
+ 2747 017f 1B       		.uleb128 0x1b
+ 2748 0180 0B       		.uleb128 0xb
+ 2749 0181 01       		.byte	0x1
+ 2750 0182 55       		.uleb128 0x55
+ 2751 0183 17       		.uleb128 0x17
+ 2752 0184 01       		.uleb128 0x1
+ 2753 0185 13       		.uleb128 0x13
+ 2754 0186 00       		.byte	0
+ 2755 0187 00       		.byte	0
+ 2756 0188 1C       		.uleb128 0x1c
+ 2757 0189 0B       		.uleb128 0xb
+ 2758 018a 01       		.byte	0x1
+ 2759 018b 11       		.uleb128 0x11
+ 2760 018c 01       		.uleb128 0x1
+ 2761 018d 12       		.uleb128 0x12
+ 2762 018e 06       		.uleb128 0x6
+ 2763 018f 01       		.uleb128 0x1
+ 2764 0190 13       		.uleb128 0x13
+ 2765 0191 00       		.byte	0
+ 2766 0192 00       		.byte	0
+ 2767 0193 1D       		.uleb128 0x1d
+ 2768 0194 34       		.uleb128 0x34
+ 2769 0195 00       		.byte	0
+ 2770 0196 03       		.uleb128 0x3
+ 2771 0197 08       		.uleb128 0x8
+ 2772 0198 3A       		.uleb128 0x3a
+ 2773 0199 0B       		.uleb128 0xb
+ 2774 019a 3B       		.uleb128 0x3b
+ 2775 019b 0B       		.uleb128 0xb
+ 2776 019c 49       		.uleb128 0x49
+ 2777 019d 13       		.uleb128 0x13
+ 2778 019e 02       		.uleb128 0x2
+ 2779 019f 17       		.uleb128 0x17
+ 2780 01a0 00       		.byte	0
+ 2781 01a1 00       		.byte	0
+ 2782 01a2 1E       		.uleb128 0x1e
+ 2783 01a3 34       		.uleb128 0x34
+ 2784 01a4 00       		.byte	0
+ 2785 01a5 03       		.uleb128 0x3
+ 2786 01a6 08       		.uleb128 0x8
+ 2787 01a7 3A       		.uleb128 0x3a
+ 2788 01a8 0B       		.uleb128 0xb
+ 2789 01a9 3B       		.uleb128 0x3b
+ 2790 01aa 05       		.uleb128 0x5
+ 2791 01ab 49       		.uleb128 0x49
+ 2792 01ac 13       		.uleb128 0x13
+ 2793 01ad 02       		.uleb128 0x2
+ 2794 01ae 17       		.uleb128 0x17
+ 2795 01af 00       		.byte	0
+ 2796 01b0 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 60
+
+
+ 2797 01b1 1F       		.uleb128 0x1f
+ 2798 01b2 2E       		.uleb128 0x2e
+ 2799 01b3 01       		.byte	0x1
+ 2800 01b4 3F       		.uleb128 0x3f
+ 2801 01b5 19       		.uleb128 0x19
+ 2802 01b6 03       		.uleb128 0x3
+ 2803 01b7 0E       		.uleb128 0xe
+ 2804 01b8 3A       		.uleb128 0x3a
+ 2805 01b9 0B       		.uleb128 0xb
+ 2806 01ba 3B       		.uleb128 0x3b
+ 2807 01bb 05       		.uleb128 0x5
+ 2808 01bc 27       		.uleb128 0x27
+ 2809 01bd 19       		.uleb128 0x19
+ 2810 01be 11       		.uleb128 0x11
+ 2811 01bf 01       		.uleb128 0x1
+ 2812 01c0 12       		.uleb128 0x12
+ 2813 01c1 06       		.uleb128 0x6
+ 2814 01c2 40       		.uleb128 0x40
+ 2815 01c3 18       		.uleb128 0x18
+ 2816 01c4 9742     		.uleb128 0x2117
+ 2817 01c6 19       		.uleb128 0x19
+ 2818 01c7 01       		.uleb128 0x1
+ 2819 01c8 13       		.uleb128 0x13
+ 2820 01c9 00       		.byte	0
+ 2821 01ca 00       		.byte	0
+ 2822 01cb 20       		.uleb128 0x20
+ 2823 01cc 2E       		.uleb128 0x2e
+ 2824 01cd 00       		.byte	0
+ 2825 01ce 3F       		.uleb128 0x3f
+ 2826 01cf 19       		.uleb128 0x19
+ 2827 01d0 3C       		.uleb128 0x3c
+ 2828 01d1 19       		.uleb128 0x19
+ 2829 01d2 6E       		.uleb128 0x6e
+ 2830 01d3 0E       		.uleb128 0xe
+ 2831 01d4 03       		.uleb128 0x3
+ 2832 01d5 0E       		.uleb128 0xe
+ 2833 01d6 3A       		.uleb128 0x3a
+ 2834 01d7 0B       		.uleb128 0xb
+ 2835 01d8 3B       		.uleb128 0x3b
+ 2836 01d9 0B       		.uleb128 0xb
+ 2837 01da 00       		.byte	0
+ 2838 01db 00       		.byte	0
+ 2839 01dc 00       		.byte	0
+ 2840              		.section	.debug_loc,"",%progbits
+ 2841              	.Ldebug_loc0:
+ 2842              	.LLST0:
+ 2843 0000 00000000 		.4byte	.LVL0
+ 2844 0004 06000000 		.4byte	.LVL2
+ 2845 0008 0100     		.2byte	0x1
+ 2846 000a 51       		.byte	0x51
+ 2847 000b 06000000 		.4byte	.LVL2
+ 2848 000f 0A000000 		.4byte	.LFE15
+ 2849 0013 0100     		.2byte	0x1
+ 2850 0015 53       		.byte	0x53
+ 2851 0016 00000000 		.4byte	0
+ 2852 001a 00000000 		.4byte	0
+ 2853              	.LLST1:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 61
+
+
+ 2854 001e 04000000 		.4byte	.LVL1
+ 2855 0022 06000000 		.4byte	.LVL2
+ 2856 0026 0100     		.2byte	0x1
+ 2857 0028 51       		.byte	0x51
+ 2858 0029 06000000 		.4byte	.LVL2
+ 2859 002d 08000000 		.4byte	.LVL3
+ 2860 0031 0600     		.2byte	0x6
+ 2861 0033 73       		.byte	0x73
+ 2862 0034 00       		.sleb128 0
+ 2863 0035 71       		.byte	0x71
+ 2864 0036 00       		.sleb128 0
+ 2865 0037 22       		.byte	0x22
+ 2866 0038 9F       		.byte	0x9f
+ 2867 0039 00000000 		.4byte	0
+ 2868 003d 00000000 		.4byte	0
+ 2869              	.LLST2:
+ 2870 0041 06000000 		.4byte	.LVL2
+ 2871 0045 08000000 		.4byte	.LVL3
+ 2872 0049 0600     		.2byte	0x6
+ 2873 004b 73       		.byte	0x73
+ 2874 004c 00       		.sleb128 0
+ 2875 004d 71       		.byte	0x71
+ 2876 004e 00       		.sleb128 0
+ 2877 004f 22       		.byte	0x22
+ 2878 0050 9F       		.byte	0x9f
+ 2879 0051 00000000 		.4byte	0
+ 2880 0055 00000000 		.4byte	0
+ 2881              	.LLST3:
+ 2882 0059 06000000 		.4byte	.LVL2
+ 2883 005d 08000000 		.4byte	.LVL3
+ 2884 0061 0600     		.2byte	0x6
+ 2885 0063 F2       		.byte	0xf2
+ 2886 0064 2B010000 		.4byte	.Ldebug_info0+299
+ 2887 0068 00       		.sleb128 0
+ 2888 0069 00000000 		.4byte	0
+ 2889 006d 00000000 		.4byte	0
+ 2890              	.LLST4:
+ 2891 0071 04000000 		.4byte	.LVL5
+ 2892 0075 08000000 		.4byte	.LVL6
+ 2893 0079 0100     		.2byte	0x1
+ 2894 007b 51       		.byte	0x51
+ 2895 007c 08000000 		.4byte	.LVL6
+ 2896 0080 0C000000 		.4byte	.LVL7
+ 2897 0084 0600     		.2byte	0x6
+ 2898 0086 71       		.byte	0x71
+ 2899 0087 00       		.sleb128 0
+ 2900 0088 73       		.byte	0x73
+ 2901 0089 00       		.sleb128 0
+ 2902 008a 22       		.byte	0x22
+ 2903 008b 9F       		.byte	0x9f
+ 2904 008c 00000000 		.4byte	0
+ 2905 0090 00000000 		.4byte	0
+ 2906              	.LLST5:
+ 2907 0094 08000000 		.4byte	.LVL6
+ 2908 0098 0C000000 		.4byte	.LVL7
+ 2909 009c 0600     		.2byte	0x6
+ 2910 009e 71       		.byte	0x71
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 62
+
+
+ 2911 009f 00       		.sleb128 0
+ 2912 00a0 73       		.byte	0x73
+ 2913 00a1 00       		.sleb128 0
+ 2914 00a2 22       		.byte	0x22
+ 2915 00a3 9F       		.byte	0x9f
+ 2916 00a4 00000000 		.4byte	0
+ 2917 00a8 00000000 		.4byte	0
+ 2918              	.LLST6:
+ 2919 00ac 08000000 		.4byte	.LVL6
+ 2920 00b0 0C000000 		.4byte	.LVL7
+ 2921 00b4 0600     		.2byte	0x6
+ 2922 00b6 F2       		.byte	0xf2
+ 2923 00b7 AE010000 		.4byte	.Ldebug_info0+430
+ 2924 00bb 00       		.sleb128 0
+ 2925 00bc 00000000 		.4byte	0
+ 2926 00c0 00000000 		.4byte	0
+ 2927              	.LLST7:
+ 2928 00c4 00000000 		.4byte	.LVL8
+ 2929 00c8 08000000 		.4byte	.LVL9
+ 2930 00cc 0100     		.2byte	0x1
+ 2931 00ce 51       		.byte	0x51
+ 2932 00cf 08000000 		.4byte	.LVL9
+ 2933 00d3 0C000000 		.4byte	.LVL10
+ 2934 00d7 0300     		.2byte	0x3
+ 2935 00d9 71       		.byte	0x71
+ 2936 00da 7D       		.sleb128 -3
+ 2937 00db 9F       		.byte	0x9f
+ 2938 00dc 0C000000 		.4byte	.LVL10
+ 2939 00e0 10000000 		.4byte	.LFE1
+ 2940 00e4 0100     		.2byte	0x1
+ 2941 00e6 51       		.byte	0x51
+ 2942 00e7 00000000 		.4byte	0
+ 2943 00eb 00000000 		.4byte	0
+ 2944              	.LLST8:
+ 2945 00ef 00000000 		.4byte	.LVL11
+ 2946 00f3 06000000 		.4byte	.LVL12
+ 2947 00f7 0100     		.2byte	0x1
+ 2948 00f9 50       		.byte	0x50
+ 2949 00fa 06000000 		.4byte	.LVL12
+ 2950 00fe 3C000000 		.4byte	.LFE2
+ 2951 0102 0100     		.2byte	0x1
+ 2952 0104 54       		.byte	0x54
+ 2953 0105 00000000 		.4byte	0
+ 2954 0109 00000000 		.4byte	0
+ 2955              	.LLST9:
+ 2956 010d 0C000000 		.4byte	.LVL13
+ 2957 0111 16000000 		.4byte	.LVL14
+ 2958 0115 0100     		.2byte	0x1
+ 2959 0117 50       		.byte	0x50
+ 2960 0118 16000000 		.4byte	.LVL14
+ 2961 011c 19000000 		.4byte	.LVL15-1
+ 2962 0120 0100     		.2byte	0x1
+ 2963 0122 51       		.byte	0x51
+ 2964 0123 19000000 		.4byte	.LVL15-1
+ 2965 0127 3C000000 		.4byte	.LFE2
+ 2966 012b 0100     		.2byte	0x1
+ 2967 012d 55       		.byte	0x55
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 63
+
+
+ 2968 012e 00000000 		.4byte	0
+ 2969 0132 00000000 		.4byte	0
+ 2970              	.LLST10:
+ 2971 0136 00000000 		.4byte	.LVL18
+ 2972 013a 06000000 		.4byte	.LVL19
+ 2973 013e 0100     		.2byte	0x1
+ 2974 0140 50       		.byte	0x50
+ 2975 0141 06000000 		.4byte	.LVL19
+ 2976 0145 3C000000 		.4byte	.LFE4
+ 2977 0149 0100     		.2byte	0x1
+ 2978 014b 54       		.byte	0x54
+ 2979 014c 00000000 		.4byte	0
+ 2980 0150 00000000 		.4byte	0
+ 2981              	.LLST11:
+ 2982 0154 0C000000 		.4byte	.LVL20
+ 2983 0158 16000000 		.4byte	.LVL21
+ 2984 015c 0100     		.2byte	0x1
+ 2985 015e 50       		.byte	0x50
+ 2986 015f 16000000 		.4byte	.LVL21
+ 2987 0163 19000000 		.4byte	.LVL22-1
+ 2988 0167 0100     		.2byte	0x1
+ 2989 0169 51       		.byte	0x51
+ 2990 016a 19000000 		.4byte	.LVL22-1
+ 2991 016e 3C000000 		.4byte	.LFE4
+ 2992 0172 0100     		.2byte	0x1
+ 2993 0174 55       		.byte	0x55
+ 2994 0175 00000000 		.4byte	0
+ 2995 0179 00000000 		.4byte	0
+ 2996              	.LLST12:
+ 2997 017d 00000000 		.4byte	.LVL25
+ 2998 0181 04000000 		.4byte	.LVL26
+ 2999 0185 0100     		.2byte	0x1
+ 3000 0187 50       		.byte	0x50
+ 3001 0188 04000000 		.4byte	.LVL26
+ 3002 018c 06000000 		.4byte	.LVL27
+ 3003 0190 0400     		.2byte	0x4
+ 3004 0192 F3       		.byte	0xf3
+ 3005 0193 01       		.uleb128 0x1
+ 3006 0194 50       		.byte	0x50
+ 3007 0195 9F       		.byte	0x9f
+ 3008 0196 06000000 		.4byte	.LVL27
+ 3009 019a 08000000 		.4byte	.LVL28
+ 3010 019e 0100     		.2byte	0x1
+ 3011 01a0 50       		.byte	0x50
+ 3012 01a1 08000000 		.4byte	.LVL28
+ 3013 01a5 0A000000 		.4byte	.LFE8
+ 3014 01a9 0400     		.2byte	0x4
+ 3015 01ab F3       		.byte	0xf3
+ 3016 01ac 01       		.uleb128 0x1
+ 3017 01ad 50       		.byte	0x50
+ 3018 01ae 9F       		.byte	0x9f
+ 3019 01af 00000000 		.4byte	0
+ 3020 01b3 00000000 		.4byte	0
+ 3021              	.LLST13:
+ 3022 01b7 00000000 		.4byte	.LVL25
+ 3023 01bb 04000000 		.4byte	.LVL26
+ 3024 01bf 0200     		.2byte	0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 64
+
+
+ 3025 01c1 30       		.byte	0x30
+ 3026 01c2 9F       		.byte	0x9f
+ 3027 01c3 04000000 		.4byte	.LVL26
+ 3028 01c7 06000000 		.4byte	.LVL27
+ 3029 01cb 0100     		.2byte	0x1
+ 3030 01cd 50       		.byte	0x50
+ 3031 01ce 06000000 		.4byte	.LVL27
+ 3032 01d2 08000000 		.4byte	.LVL28
+ 3033 01d6 0200     		.2byte	0x2
+ 3034 01d8 30       		.byte	0x30
+ 3035 01d9 9F       		.byte	0x9f
+ 3036 01da 08000000 		.4byte	.LVL28
+ 3037 01de 0A000000 		.4byte	.LFE8
+ 3038 01e2 0100     		.2byte	0x1
+ 3039 01e4 50       		.byte	0x50
+ 3040 01e5 00000000 		.4byte	0
+ 3041 01e9 00000000 		.4byte	0
+ 3042              	.LLST14:
+ 3043 01ed 00000000 		.4byte	.LVL29
+ 3044 01f1 04000000 		.4byte	.LVL30
+ 3045 01f5 0100     		.2byte	0x1
+ 3046 01f7 50       		.byte	0x50
+ 3047 01f8 04000000 		.4byte	.LVL30
+ 3048 01fc 06000000 		.4byte	.LVL31
+ 3049 0200 0400     		.2byte	0x4
+ 3050 0202 F3       		.byte	0xf3
+ 3051 0203 01       		.uleb128 0x1
+ 3052 0204 50       		.byte	0x50
+ 3053 0205 9F       		.byte	0x9f
+ 3054 0206 06000000 		.4byte	.LVL31
+ 3055 020a 08000000 		.4byte	.LVL32
+ 3056 020e 0100     		.2byte	0x1
+ 3057 0210 50       		.byte	0x50
+ 3058 0211 08000000 		.4byte	.LVL32
+ 3059 0215 0A000000 		.4byte	.LFE9
+ 3060 0219 0400     		.2byte	0x4
+ 3061 021b F3       		.byte	0xf3
+ 3062 021c 01       		.uleb128 0x1
+ 3063 021d 50       		.byte	0x50
+ 3064 021e 9F       		.byte	0x9f
+ 3065 021f 00000000 		.4byte	0
+ 3066 0223 00000000 		.4byte	0
+ 3067              	.LLST15:
+ 3068 0227 00000000 		.4byte	.LVL29
+ 3069 022b 04000000 		.4byte	.LVL30
+ 3070 022f 0200     		.2byte	0x2
+ 3071 0231 30       		.byte	0x30
+ 3072 0232 9F       		.byte	0x9f
+ 3073 0233 04000000 		.4byte	.LVL30
+ 3074 0237 06000000 		.4byte	.LVL31
+ 3075 023b 0100     		.2byte	0x1
+ 3076 023d 50       		.byte	0x50
+ 3077 023e 06000000 		.4byte	.LVL31
+ 3078 0242 08000000 		.4byte	.LVL32
+ 3079 0246 0200     		.2byte	0x2
+ 3080 0248 30       		.byte	0x30
+ 3081 0249 9F       		.byte	0x9f
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 65
+
+
+ 3082 024a 08000000 		.4byte	.LVL32
+ 3083 024e 0A000000 		.4byte	.LFE9
+ 3084 0252 0100     		.2byte	0x1
+ 3085 0254 50       		.byte	0x50
+ 3086 0255 00000000 		.4byte	0
+ 3087 0259 00000000 		.4byte	0
+ 3088              	.LLST16:
+ 3089 025d 00000000 		.4byte	.LVL33
+ 3090 0261 08000000 		.4byte	.LVL36
+ 3091 0265 0100     		.2byte	0x1
+ 3092 0267 50       		.byte	0x50
+ 3093 0268 08000000 		.4byte	.LVL36
+ 3094 026c 0A000000 		.4byte	.LVL37
+ 3095 0270 0400     		.2byte	0x4
+ 3096 0272 F3       		.byte	0xf3
+ 3097 0273 01       		.uleb128 0x1
+ 3098 0274 50       		.byte	0x50
+ 3099 0275 9F       		.byte	0x9f
+ 3100 0276 0A000000 		.4byte	.LVL37
+ 3101 027a 0C000000 		.4byte	.LVL38
+ 3102 027e 0100     		.2byte	0x1
+ 3103 0280 50       		.byte	0x50
+ 3104 0281 0C000000 		.4byte	.LVL38
+ 3105 0285 0E000000 		.4byte	.LFE10
+ 3106 0289 0400     		.2byte	0x4
+ 3107 028b F3       		.byte	0xf3
+ 3108 028c 01       		.uleb128 0x1
+ 3109 028d 50       		.byte	0x50
+ 3110 028e 9F       		.byte	0x9f
+ 3111 028f 00000000 		.4byte	0
+ 3112 0293 00000000 		.4byte	0
+ 3113              	.LLST17:
+ 3114 0297 02000000 		.4byte	.LVL34
+ 3115 029b 06000000 		.4byte	.LVL35
+ 3116 029f 0100     		.2byte	0x1
+ 3117 02a1 51       		.byte	0x51
+ 3118 02a2 06000000 		.4byte	.LVL35
+ 3119 02a6 0A000000 		.4byte	.LVL37
+ 3120 02aa 0600     		.2byte	0x6
+ 3121 02ac 71       		.byte	0x71
+ 3122 02ad 00       		.sleb128 0
+ 3123 02ae 73       		.byte	0x73
+ 3124 02af 00       		.sleb128 0
+ 3125 02b0 22       		.byte	0x22
+ 3126 02b1 9F       		.byte	0x9f
+ 3127 02b2 00000000 		.4byte	0
+ 3128 02b6 00000000 		.4byte	0
+ 3129              	.LLST18:
+ 3130 02ba 00000000 		.4byte	.LVL39
+ 3131 02be 06000000 		.4byte	.LVL42
+ 3132 02c2 0100     		.2byte	0x1
+ 3133 02c4 50       		.byte	0x50
+ 3134 02c5 06000000 		.4byte	.LVL42
+ 3135 02c9 08000000 		.4byte	.LVL43
+ 3136 02cd 0400     		.2byte	0x4
+ 3137 02cf F3       		.byte	0xf3
+ 3138 02d0 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 66
+
+
+ 3139 02d1 50       		.byte	0x50
+ 3140 02d2 9F       		.byte	0x9f
+ 3141 02d3 08000000 		.4byte	.LVL43
+ 3142 02d7 0A000000 		.4byte	.LVL44
+ 3143 02db 0100     		.2byte	0x1
+ 3144 02dd 50       		.byte	0x50
+ 3145 02de 0A000000 		.4byte	.LVL44
+ 3146 02e2 0C000000 		.4byte	.LFE11
+ 3147 02e6 0400     		.2byte	0x4
+ 3148 02e8 F3       		.byte	0xf3
+ 3149 02e9 01       		.uleb128 0x1
+ 3150 02ea 50       		.byte	0x50
+ 3151 02eb 9F       		.byte	0x9f
+ 3152 02ec 00000000 		.4byte	0
+ 3153 02f0 00000000 		.4byte	0
+ 3154              	.LLST19:
+ 3155 02f4 02000000 		.4byte	.LVL40
+ 3156 02f8 04000000 		.4byte	.LVL41
+ 3157 02fc 0100     		.2byte	0x1
+ 3158 02fe 51       		.byte	0x51
+ 3159 02ff 04000000 		.4byte	.LVL41
+ 3160 0303 08000000 		.4byte	.LVL43
+ 3161 0307 0600     		.2byte	0x6
+ 3162 0309 71       		.byte	0x71
+ 3163 030a 00       		.sleb128 0
+ 3164 030b 73       		.byte	0x73
+ 3165 030c 00       		.sleb128 0
+ 3166 030d 22       		.byte	0x22
+ 3167 030e 9F       		.byte	0x9f
+ 3168 030f 00000000 		.4byte	0
+ 3169 0313 00000000 		.4byte	0
+ 3170              	.LLST20:
+ 3171 0317 00000000 		.4byte	.LVL45
+ 3172 031b 0D000000 		.4byte	.LVL46-1
+ 3173 031f 0100     		.2byte	0x1
+ 3174 0321 50       		.byte	0x50
+ 3175 0322 0D000000 		.4byte	.LVL46-1
+ 3176 0326 5E000000 		.4byte	.LVL58
+ 3177 032a 0100     		.2byte	0x1
+ 3178 032c 54       		.byte	0x54
+ 3179 032d 5E000000 		.4byte	.LVL58
+ 3180 0331 60000000 		.4byte	.LVL59
+ 3181 0335 0100     		.2byte	0x1
+ 3182 0337 50       		.byte	0x50
+ 3183 0338 60000000 		.4byte	.LVL59
+ 3184 033c 62000000 		.4byte	.LVL60
+ 3185 0340 0400     		.2byte	0x4
+ 3186 0342 F3       		.byte	0xf3
+ 3187 0343 01       		.uleb128 0x1
+ 3188 0344 50       		.byte	0x50
+ 3189 0345 9F       		.byte	0x9f
+ 3190 0346 62000000 		.4byte	.LVL60
+ 3191 034a 64000000 		.4byte	.LVL61
+ 3192 034e 0100     		.2byte	0x1
+ 3193 0350 50       		.byte	0x50
+ 3194 0351 64000000 		.4byte	.LVL61
+ 3195 0355 6C000000 		.4byte	.LFE3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 67
+
+
+ 3196 0359 0100     		.2byte	0x1
+ 3197 035b 54       		.byte	0x54
+ 3198 035c 00000000 		.4byte	0
+ 3199 0360 00000000 		.4byte	0
+ 3200              	.LLST21:
+ 3201 0364 00000000 		.4byte	.LVL45
+ 3202 0368 0D000000 		.4byte	.LVL46-1
+ 3203 036c 0100     		.2byte	0x1
+ 3204 036e 51       		.byte	0x51
+ 3205 036f 0D000000 		.4byte	.LVL46-1
+ 3206 0373 5E000000 		.4byte	.LVL58
+ 3207 0377 0100     		.2byte	0x1
+ 3208 0379 55       		.byte	0x55
+ 3209 037a 5E000000 		.4byte	.LVL58
+ 3210 037e 66000000 		.4byte	.LVL62
+ 3211 0382 0100     		.2byte	0x1
+ 3212 0384 51       		.byte	0x51
+ 3213 0385 66000000 		.4byte	.LVL62
+ 3214 0389 6C000000 		.4byte	.LFE3
+ 3215 038d 0100     		.2byte	0x1
+ 3216 038f 55       		.byte	0x55
+ 3217 0390 00000000 		.4byte	0
+ 3218 0394 00000000 		.4byte	0
+ 3219              	.LLST22:
+ 3220 0398 18000000 		.4byte	.LVL47
+ 3221 039c 1C000000 		.4byte	.LVL48
+ 3222 03a0 0100     		.2byte	0x1
+ 3223 03a2 50       		.byte	0x50
+ 3224 03a3 24000000 		.4byte	.LVL49
+ 3225 03a7 2C000000 		.4byte	.LVL50
+ 3226 03ab 0100     		.2byte	0x1
+ 3227 03ad 50       		.byte	0x50
+ 3228 03ae 2C000000 		.4byte	.LVL50
+ 3229 03b2 5E000000 		.4byte	.LVL58
+ 3230 03b6 0100     		.2byte	0x1
+ 3231 03b8 56       		.byte	0x56
+ 3232 03b9 66000000 		.4byte	.LVL62
+ 3233 03bd 6A000000 		.4byte	.LVL64
+ 3234 03c1 0100     		.2byte	0x1
+ 3235 03c3 50       		.byte	0x50
+ 3236 03c4 6A000000 		.4byte	.LVL64
+ 3237 03c8 6C000000 		.4byte	.LFE3
+ 3238 03cc 0100     		.2byte	0x1
+ 3239 03ce 56       		.byte	0x56
+ 3240 03cf 00000000 		.4byte	0
+ 3241 03d3 00000000 		.4byte	0
+ 3242              	.LLST23:
+ 3243 03d7 32000000 		.4byte	.LVL52
+ 3244 03db 38000000 		.4byte	.LVL53
+ 3245 03df 0100     		.2byte	0x1
+ 3246 03e1 50       		.byte	0x50
+ 3247 03e2 38000000 		.4byte	.LVL53
+ 3248 03e6 3B000000 		.4byte	.LVL54-1
+ 3249 03ea 0100     		.2byte	0x1
+ 3250 03ec 51       		.byte	0x51
+ 3251 03ed 3B000000 		.4byte	.LVL54-1
+ 3252 03f1 5E000000 		.4byte	.LVL58
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 68
+
+
+ 3253 03f5 0100     		.2byte	0x1
+ 3254 03f7 57       		.byte	0x57
+ 3255 03f8 00000000 		.4byte	0
+ 3256 03fc 00000000 		.4byte	0
+ 3257              	.LLST24:
+ 3258 0400 00000000 		.4byte	.LVL65
+ 3259 0404 09000000 		.4byte	.LVL66-1
+ 3260 0408 0100     		.2byte	0x1
+ 3261 040a 50       		.byte	0x50
+ 3262 040b 09000000 		.4byte	.LVL66-1
+ 3263 040f 7E000000 		.4byte	.LFE5
+ 3264 0413 0100     		.2byte	0x1
+ 3265 0415 54       		.byte	0x54
+ 3266 0416 00000000 		.4byte	0
+ 3267 041a 00000000 		.4byte	0
+ 3268              	.LLST25:
+ 3269 041e 00000000 		.4byte	.LVL65
+ 3270 0422 09000000 		.4byte	.LVL66-1
+ 3271 0426 0100     		.2byte	0x1
+ 3272 0428 51       		.byte	0x51
+ 3273 0429 09000000 		.4byte	.LVL66-1
+ 3274 042d 68000000 		.4byte	.LVL80
+ 3275 0431 0100     		.2byte	0x1
+ 3276 0433 55       		.byte	0x55
+ 3277 0434 68000000 		.4byte	.LVL80
+ 3278 0438 7E000000 		.4byte	.LFE5
+ 3279 043c 0400     		.2byte	0x4
+ 3280 043e F3       		.byte	0xf3
+ 3281 043f 01       		.uleb128 0x1
+ 3282 0440 51       		.byte	0x51
+ 3283 0441 9F       		.byte	0x9f
+ 3284 0442 00000000 		.4byte	0
+ 3285 0446 00000000 		.4byte	0
+ 3286              	.LLST26:
+ 3287 044a 5E000000 		.4byte	.LVL77
+ 3288 044e 62000000 		.4byte	.LVL78
+ 3289 0452 0100     		.2byte	0x1
+ 3290 0454 50       		.byte	0x50
+ 3291 0455 62000000 		.4byte	.LVL78
+ 3292 0459 7E000000 		.4byte	.LFE5
+ 3293 045d 0100     		.2byte	0x1
+ 3294 045f 56       		.byte	0x56
+ 3295 0460 00000000 		.4byte	0
+ 3296 0464 00000000 		.4byte	0
+ 3297              	.LLST27:
+ 3298 0468 68000000 		.4byte	.LVL80
+ 3299 046c 6E000000 		.4byte	.LVL81
+ 3300 0470 0100     		.2byte	0x1
+ 3301 0472 50       		.byte	0x50
+ 3302 0473 6E000000 		.4byte	.LVL81
+ 3303 0477 71000000 		.4byte	.LVL82-1
+ 3304 047b 0100     		.2byte	0x1
+ 3305 047d 52       		.byte	0x52
+ 3306 047e 71000000 		.4byte	.LVL82-1
+ 3307 0482 7E000000 		.4byte	.LFE5
+ 3308 0486 0100     		.2byte	0x1
+ 3309 0488 55       		.byte	0x55
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 69
+
+
+ 3310 0489 00000000 		.4byte	0
+ 3311 048d 00000000 		.4byte	0
+ 3312              	.LLST28:
+ 3313 0491 00000000 		.4byte	.LVL84
+ 3314 0495 07000000 		.4byte	.LVL85-1
+ 3315 0499 0100     		.2byte	0x1
+ 3316 049b 50       		.byte	0x50
+ 3317 049c 07000000 		.4byte	.LVL85-1
+ 3318 04a0 2C000000 		.4byte	.LFE6
+ 3319 04a4 0100     		.2byte	0x1
+ 3320 04a6 55       		.byte	0x55
+ 3321 04a7 00000000 		.4byte	0
+ 3322 04ab 00000000 		.4byte	0
+ 3323              	.LLST29:
+ 3324 04af 0A000000 		.4byte	.LVL86
+ 3325 04b3 0C000000 		.4byte	.LVL87
+ 3326 04b7 0100     		.2byte	0x1
+ 3327 04b9 50       		.byte	0x50
+ 3328 04ba 0C000000 		.4byte	.LVL87
+ 3329 04be 24000000 		.4byte	.LVL92
+ 3330 04c2 0100     		.2byte	0x1
+ 3331 04c4 54       		.byte	0x54
+ 3332 04c5 24000000 		.4byte	.LVL92
+ 3333 04c9 26000000 		.4byte	.LVL93
+ 3334 04cd 0100     		.2byte	0x1
+ 3335 04cf 56       		.byte	0x56
+ 3336 04d0 26000000 		.4byte	.LVL93
+ 3337 04d4 2C000000 		.4byte	.LFE6
+ 3338 04d8 0100     		.2byte	0x1
+ 3339 04da 54       		.byte	0x54
+ 3340 04db 00000000 		.4byte	0
+ 3341 04df 00000000 		.4byte	0
+ 3342              	.LLST30:
+ 3343 04e3 0A000000 		.4byte	.LVL86
+ 3344 04e7 0C000000 		.4byte	.LVL87
+ 3345 04eb 0200     		.2byte	0x2
+ 3346 04ed 30       		.byte	0x30
+ 3347 04ee 9F       		.byte	0x9f
+ 3348 04ef 16000000 		.4byte	.LVL89
+ 3349 04f3 1A000000 		.4byte	.LVL90
+ 3350 04f7 0100     		.2byte	0x1
+ 3351 04f9 50       		.byte	0x50
+ 3352 04fa 1A000000 		.4byte	.LVL90
+ 3353 04fe 26000000 		.4byte	.LVL93
+ 3354 0502 0100     		.2byte	0x1
+ 3355 0504 56       		.byte	0x56
+ 3356 0505 00000000 		.4byte	0
+ 3357 0509 00000000 		.4byte	0
+ 3358              	.LLST31:
+ 3359 050d 00000000 		.4byte	.LVL94
+ 3360 0511 0D000000 		.4byte	.LVL96-1
+ 3361 0515 0100     		.2byte	0x1
+ 3362 0517 50       		.byte	0x50
+ 3363 0518 0D000000 		.4byte	.LVL96-1
+ 3364 051c 64000000 		.4byte	.LFE7
+ 3365 0520 0400     		.2byte	0x4
+ 3366 0522 F3       		.byte	0xf3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 70
+
+
+ 3367 0523 01       		.uleb128 0x1
+ 3368 0524 50       		.byte	0x50
+ 3369 0525 9F       		.byte	0x9f
+ 3370 0526 00000000 		.4byte	0
+ 3371 052a 00000000 		.4byte	0
+ 3372              	.LLST32:
+ 3373 052e 00000000 		.4byte	.LVL94
+ 3374 0532 0A000000 		.4byte	.LVL95
+ 3375 0536 0100     		.2byte	0x1
+ 3376 0538 51       		.byte	0x51
+ 3377 0539 0A000000 		.4byte	.LVL95
+ 3378 053d 64000000 		.4byte	.LFE7
+ 3379 0541 0100     		.2byte	0x1
+ 3380 0543 54       		.byte	0x54
+ 3381 0544 00000000 		.4byte	0
+ 3382 0548 00000000 		.4byte	0
+ 3383              	.LLST33:
+ 3384 054c 00000000 		.4byte	.LVL94
+ 3385 0550 0D000000 		.4byte	.LVL96-1
+ 3386 0554 0100     		.2byte	0x1
+ 3387 0556 52       		.byte	0x52
+ 3388 0557 0D000000 		.4byte	.LVL96-1
+ 3389 055b 64000000 		.4byte	.LFE7
+ 3390 055f 0100     		.2byte	0x1
+ 3391 0561 55       		.byte	0x55
+ 3392 0562 00000000 		.4byte	0
+ 3393 0566 00000000 		.4byte	0
+ 3394              	.LLST34:
+ 3395 056a 00000000 		.4byte	.LVL94
+ 3396 056e 0D000000 		.4byte	.LVL96-1
+ 3397 0572 0100     		.2byte	0x1
+ 3398 0574 53       		.byte	0x53
+ 3399 0575 0D000000 		.4byte	.LVL96-1
+ 3400 0579 64000000 		.4byte	.LFE7
+ 3401 057d 0400     		.2byte	0x4
+ 3402 057f F3       		.byte	0xf3
+ 3403 0580 01       		.uleb128 0x1
+ 3404 0581 53       		.byte	0x53
+ 3405 0582 9F       		.byte	0x9f
+ 3406 0583 00000000 		.4byte	0
+ 3407 0587 00000000 		.4byte	0
+ 3408              	.LLST35:
+ 3409 058b 00000000 		.4byte	.LVL104
+ 3410 058f 07000000 		.4byte	.LVL106-1
+ 3411 0593 0100     		.2byte	0x1
+ 3412 0595 50       		.byte	0x50
+ 3413 0596 07000000 		.4byte	.LVL106-1
+ 3414 059a 1E000000 		.4byte	.LFE12
+ 3415 059e 0100     		.2byte	0x1
+ 3416 05a0 55       		.byte	0x55
+ 3417 05a1 00000000 		.4byte	0
+ 3418 05a5 00000000 		.4byte	0
+ 3419              	.LLST36:
+ 3420 05a9 04000000 		.4byte	.LVL105
+ 3421 05ad 0C000000 		.4byte	.LVL107
+ 3422 05b1 0200     		.2byte	0x2
+ 3423 05b3 30       		.byte	0x30
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 71
+
+
+ 3424 05b4 9F       		.byte	0x9f
+ 3425 05b5 0C000000 		.4byte	.LVL107
+ 3426 05b9 1E000000 		.4byte	.LFE12
+ 3427 05bd 0100     		.2byte	0x1
+ 3428 05bf 54       		.byte	0x54
+ 3429 05c0 00000000 		.4byte	0
+ 3430 05c4 00000000 		.4byte	0
+ 3431              	.LLST37:
+ 3432 05c8 08000000 		.4byte	.LVL106
+ 3433 05cc 12000000 		.4byte	.LVL109
+ 3434 05d0 0100     		.2byte	0x1
+ 3435 05d2 50       		.byte	0x50
+ 3436 05d3 12000000 		.4byte	.LVL109
+ 3437 05d7 15000000 		.4byte	.LVL110-1
+ 3438 05db 0100     		.2byte	0x1
+ 3439 05dd 51       		.byte	0x51
+ 3440 05de 16000000 		.4byte	.LVL110
+ 3441 05e2 1C000000 		.4byte	.LVL111
+ 3442 05e6 0100     		.2byte	0x1
+ 3443 05e8 50       		.byte	0x50
+ 3444 05e9 00000000 		.4byte	0
+ 3445 05ed 00000000 		.4byte	0
+ 3446              	.LLST38:
+ 3447 05f1 00000000 		.4byte	.LVL112
+ 3448 05f5 13000000 		.4byte	.LVL114-1
+ 3449 05f9 0100     		.2byte	0x1
+ 3450 05fb 50       		.byte	0x50
+ 3451 05fc 13000000 		.4byte	.LVL114-1
+ 3452 0600 18000000 		.4byte	.LVL116
+ 3453 0604 0100     		.2byte	0x1
+ 3454 0606 56       		.byte	0x56
+ 3455 0607 18000000 		.4byte	.LVL116
+ 3456 060b 1B000000 		.4byte	.LVL117-1
+ 3457 060f 0100     		.2byte	0x1
+ 3458 0611 50       		.byte	0x50
+ 3459 0612 1B000000 		.4byte	.LVL117-1
+ 3460 0616 5C000000 		.4byte	.LVL125
+ 3461 061a 0100     		.2byte	0x1
+ 3462 061c 56       		.byte	0x56
+ 3463 061d 5C000000 		.4byte	.LVL125
+ 3464 0621 5E000000 		.4byte	.LFE13
+ 3465 0625 0100     		.2byte	0x1
+ 3466 0627 50       		.byte	0x50
+ 3467 0628 00000000 		.4byte	0
+ 3468 062c 00000000 		.4byte	0
+ 3469              	.LLST39:
+ 3470 0630 00000000 		.4byte	.LVL112
+ 3471 0634 10000000 		.4byte	.LVL113
+ 3472 0638 0100     		.2byte	0x1
+ 3473 063a 51       		.byte	0x51
+ 3474 063b 10000000 		.4byte	.LVL113
+ 3475 063f 18000000 		.4byte	.LVL116
+ 3476 0643 0100     		.2byte	0x1
+ 3477 0645 54       		.byte	0x54
+ 3478 0646 18000000 		.4byte	.LVL116
+ 3479 064a 1B000000 		.4byte	.LVL117-1
+ 3480 064e 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 72
+
+
+ 3481 0650 51       		.byte	0x51
+ 3482 0651 1B000000 		.4byte	.LVL117-1
+ 3483 0655 5C000000 		.4byte	.LVL125
+ 3484 0659 0100     		.2byte	0x1
+ 3485 065b 54       		.byte	0x54
+ 3486 065c 5C000000 		.4byte	.LVL125
+ 3487 0660 5E000000 		.4byte	.LFE13
+ 3488 0664 0100     		.2byte	0x1
+ 3489 0666 51       		.byte	0x51
+ 3490 0667 00000000 		.4byte	0
+ 3491 066b 00000000 		.4byte	0
+ 3492              	.LLST40:
+ 3493 066f 00000000 		.4byte	.LVL112
+ 3494 0673 13000000 		.4byte	.LVL114-1
+ 3495 0677 0100     		.2byte	0x1
+ 3496 0679 52       		.byte	0x52
+ 3497 067a 13000000 		.4byte	.LVL114-1
+ 3498 067e 18000000 		.4byte	.LVL116
+ 3499 0682 0100     		.2byte	0x1
+ 3500 0684 55       		.byte	0x55
+ 3501 0685 18000000 		.4byte	.LVL116
+ 3502 0689 1B000000 		.4byte	.LVL117-1
+ 3503 068d 0100     		.2byte	0x1
+ 3504 068f 52       		.byte	0x52
+ 3505 0690 1B000000 		.4byte	.LVL117-1
+ 3506 0694 5C000000 		.4byte	.LVL125
+ 3507 0698 0100     		.2byte	0x1
+ 3508 069a 55       		.byte	0x55
+ 3509 069b 5C000000 		.4byte	.LVL125
+ 3510 069f 5E000000 		.4byte	.LFE13
+ 3511 06a3 0100     		.2byte	0x1
+ 3512 06a5 52       		.byte	0x52
+ 3513 06a6 00000000 		.4byte	0
+ 3514 06aa 00000000 		.4byte	0
+ 3515              	.LLST41:
+ 3516 06ae 16000000 		.4byte	.LVL115
+ 3517 06b2 18000000 		.4byte	.LVL116
+ 3518 06b6 0100     		.2byte	0x1
+ 3519 06b8 50       		.byte	0x50
+ 3520 06b9 1E000000 		.4byte	.LVL118
+ 3521 06bd 26000000 		.4byte	.LVL119
+ 3522 06c1 0100     		.2byte	0x1
+ 3523 06c3 50       		.byte	0x50
+ 3524 06c4 26000000 		.4byte	.LVL119
+ 3525 06c8 5C000000 		.4byte	.LVL125
+ 3526 06cc 0100     		.2byte	0x1
+ 3527 06ce 57       		.byte	0x57
+ 3528 06cf 00000000 		.4byte	0
+ 3529 06d3 00000000 		.4byte	0
+ 3530              	.LLST42:
+ 3531 06d7 00000000 		.4byte	.LVL126
+ 3532 06db 0C000000 		.4byte	.LVL127
+ 3533 06df 0100     		.2byte	0x1
+ 3534 06e1 50       		.byte	0x50
+ 3535 06e2 0C000000 		.4byte	.LVL127
+ 3536 06e6 0E000000 		.4byte	.LVL128
+ 3537 06ea 0400     		.2byte	0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 73
+
+
+ 3538 06ec F3       		.byte	0xf3
+ 3539 06ed 01       		.uleb128 0x1
+ 3540 06ee 50       		.byte	0x50
+ 3541 06ef 9F       		.byte	0x9f
+ 3542 06f0 0E000000 		.4byte	.LVL128
+ 3543 06f4 10000000 		.4byte	.LVL129
+ 3544 06f8 0100     		.2byte	0x1
+ 3545 06fa 50       		.byte	0x50
+ 3546 06fb 10000000 		.4byte	.LVL129
+ 3547 06ff 12000000 		.4byte	.LVL130
+ 3548 0703 0400     		.2byte	0x4
+ 3549 0705 F3       		.byte	0xf3
+ 3550 0706 01       		.uleb128 0x1
+ 3551 0707 50       		.byte	0x50
+ 3552 0708 9F       		.byte	0x9f
+ 3553 0709 12000000 		.4byte	.LVL130
+ 3554 070d 14000000 		.4byte	.LVL131
+ 3555 0711 0100     		.2byte	0x1
+ 3556 0713 50       		.byte	0x50
+ 3557 0714 14000000 		.4byte	.LVL131
+ 3558 0718 16000000 		.4byte	.LVL132
+ 3559 071c 0400     		.2byte	0x4
+ 3560 071e F3       		.byte	0xf3
+ 3561 071f 01       		.uleb128 0x1
+ 3562 0720 50       		.byte	0x50
+ 3563 0721 9F       		.byte	0x9f
+ 3564 0722 16000000 		.4byte	.LVL132
+ 3565 0726 18000000 		.4byte	.LVL133
+ 3566 072a 0100     		.2byte	0x1
+ 3567 072c 50       		.byte	0x50
+ 3568 072d 18000000 		.4byte	.LVL133
+ 3569 0731 1A000000 		.4byte	.LFE14
+ 3570 0735 0400     		.2byte	0x4
+ 3571 0737 F3       		.byte	0xf3
+ 3572 0738 01       		.uleb128 0x1
+ 3573 0739 50       		.byte	0x50
+ 3574 073a 9F       		.byte	0x9f
+ 3575 073b 00000000 		.4byte	0
+ 3576 073f 00000000 		.4byte	0
+ 3577              		.section	.debug_aranges,"",%progbits
+ 3578 0000 94000000 		.4byte	0x94
+ 3579 0004 0200     		.2byte	0x2
+ 3580 0006 00000000 		.4byte	.Ldebug_info0
+ 3581 000a 04       		.byte	0x4
+ 3582 000b 00       		.byte	0
+ 3583 000c 0000     		.2byte	0
+ 3584 000e 0000     		.2byte	0
+ 3585 0010 00000000 		.4byte	.LFB15
+ 3586 0014 0A000000 		.4byte	.LFE15-.LFB15
+ 3587 0018 00000000 		.4byte	.LFB16
+ 3588 001c 0E000000 		.4byte	.LFE16-.LFB16
+ 3589 0020 00000000 		.4byte	.LFB1
+ 3590 0024 10000000 		.4byte	.LFE1-.LFB1
+ 3591 0028 00000000 		.4byte	.LFB2
+ 3592 002c 3C000000 		.4byte	.LFE2-.LFB2
+ 3593 0030 00000000 		.4byte	.LFB4
+ 3594 0034 3C000000 		.4byte	.LFE4-.LFB4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 74
+
+
+ 3595 0038 00000000 		.4byte	.LFB8
+ 3596 003c 0A000000 		.4byte	.LFE8-.LFB8
+ 3597 0040 00000000 		.4byte	.LFB9
+ 3598 0044 0A000000 		.4byte	.LFE9-.LFB9
+ 3599 0048 00000000 		.4byte	.LFB10
+ 3600 004c 0E000000 		.4byte	.LFE10-.LFB10
+ 3601 0050 00000000 		.4byte	.LFB11
+ 3602 0054 0C000000 		.4byte	.LFE11-.LFB11
+ 3603 0058 00000000 		.4byte	.LFB3
+ 3604 005c 6C000000 		.4byte	.LFE3-.LFB3
+ 3605 0060 00000000 		.4byte	.LFB5
+ 3606 0064 7E000000 		.4byte	.LFE5-.LFB5
+ 3607 0068 00000000 		.4byte	.LFB6
+ 3608 006c 2C000000 		.4byte	.LFE6-.LFB6
+ 3609 0070 00000000 		.4byte	.LFB7
+ 3610 0074 64000000 		.4byte	.LFE7-.LFB7
+ 3611 0078 00000000 		.4byte	.LFB12
+ 3612 007c 1E000000 		.4byte	.LFE12-.LFB12
+ 3613 0080 00000000 		.4byte	.LFB13
+ 3614 0084 5E000000 		.4byte	.LFE13-.LFB13
+ 3615 0088 00000000 		.4byte	.LFB14
+ 3616 008c 1A000000 		.4byte	.LFE14-.LFB14
+ 3617 0090 00000000 		.4byte	0
+ 3618 0094 00000000 		.4byte	0
+ 3619              		.section	.debug_ranges,"",%progbits
+ 3620              	.Ldebug_ranges0:
+ 3621 0000 1C000000 		.4byte	.LBB2
+ 3622 0004 5E000000 		.4byte	.LBE2
+ 3623 0008 68000000 		.4byte	.LBB3
+ 3624 000c 6A000000 		.4byte	.LBE3
+ 3625 0010 00000000 		.4byte	0
+ 3626 0014 00000000 		.4byte	0
+ 3627 0018 00000000 		.4byte	.LFB15
+ 3628 001c 0A000000 		.4byte	.LFE15
+ 3629 0020 00000000 		.4byte	.LFB16
+ 3630 0024 0E000000 		.4byte	.LFE16
+ 3631 0028 00000000 		.4byte	.LFB1
+ 3632 002c 10000000 		.4byte	.LFE1
+ 3633 0030 00000000 		.4byte	.LFB2
+ 3634 0034 3C000000 		.4byte	.LFE2
+ 3635 0038 00000000 		.4byte	.LFB4
+ 3636 003c 3C000000 		.4byte	.LFE4
+ 3637 0040 00000000 		.4byte	.LFB8
+ 3638 0044 0A000000 		.4byte	.LFE8
+ 3639 0048 00000000 		.4byte	.LFB9
+ 3640 004c 0A000000 		.4byte	.LFE9
+ 3641 0050 00000000 		.4byte	.LFB10
+ 3642 0054 0E000000 		.4byte	.LFE10
+ 3643 0058 00000000 		.4byte	.LFB11
+ 3644 005c 0C000000 		.4byte	.LFE11
+ 3645 0060 00000000 		.4byte	.LFB3
+ 3646 0064 6C000000 		.4byte	.LFE3
+ 3647 0068 00000000 		.4byte	.LFB5
+ 3648 006c 7E000000 		.4byte	.LFE5
+ 3649 0070 00000000 		.4byte	.LFB6
+ 3650 0074 2C000000 		.4byte	.LFE6
+ 3651 0078 00000000 		.4byte	.LFB7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 75
+
+
+ 3652 007c 64000000 		.4byte	.LFE7
+ 3653 0080 00000000 		.4byte	.LFB12
+ 3654 0084 1E000000 		.4byte	.LFE12
+ 3655 0088 00000000 		.4byte	.LFB13
+ 3656 008c 5E000000 		.4byte	.LFE13
+ 3657 0090 00000000 		.4byte	.LFB14
+ 3658 0094 1A000000 		.4byte	.LFE14
+ 3659 0098 00000000 		.4byte	0
+ 3660 009c 00000000 		.4byte	0
+ 3661              		.section	.debug_line,"",%progbits
+ 3662              	.Ldebug_line0:
+ 3663 0000 08030000 		.section	.debug_str,"MS",%progbits,1
+ 3663      02004301 
+ 3663      00000201 
+ 3663      FB0E0D00 
+ 3663      01010101 
+ 3664              	.LASF58:
+ 3665 0000 6C765F6D 		.ascii	"lv_mem_alloc\000"
+ 3665      656D5F61 
+ 3665      6C6C6F63 
+ 3665      00
+ 3666              	.LASF5:
+ 3667 000d 5F5F7569 		.ascii	"__uint8_t\000"
+ 3667      6E74385F 
+ 3667      7400
+ 3668              	.LASF22:
+ 3669 0017 70726576 		.ascii	"prev\000"
+ 3669      00
+ 3670              	.LASF41:
+ 3671 001c 6E5F7072 		.ascii	"n_prev\000"
+ 3671      657600
+ 3672              	.LASF9:
+ 3673 0023 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3673      206C6F6E 
+ 3673      6720756E 
+ 3673      7369676E 
+ 3673      65642069 
+ 3674              	.LASF17:
+ 3675 003a 6E5F7369 		.ascii	"n_size\000"
+ 3675      7A6500
+ 3676              	.LASF20:
+ 3677 0041 6C765F6C 		.ascii	"lv_ll_t\000"
+ 3677      6C5F7400 
+ 3678              	.LASF28:
+ 3679 0049 6E657874 		.ascii	"next\000"
+ 3679      00
+ 3680              	.LASF45:
+ 3681 004e 6E5F6E65 		.ascii	"n_next\000"
+ 3681      787400
+ 3682              	.LASF8:
+ 3683 0055 6C6F6E67 		.ascii	"long long int\000"
+ 3683      206C6F6E 
+ 3683      6720696E 
+ 3683      7400
+ 3684              	.LASF0:
+ 3685 0063 7369676E 		.ascii	"signed char\000"
+ 3685      65642063 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 76
+
+
+ 3685      68617200 
+ 3686              	.LASF43:
+ 3687 006f 5F6C765F 		.ascii	"_lv_ll_remove\000"
+ 3687      6C6C5F72 
+ 3687      656D6F76 
+ 3687      6500
+ 3688              	.LASF4:
+ 3689 007d 6C6F6E67 		.ascii	"long int\000"
+ 3689      20696E74 
+ 3689      00
+ 3690              	.LASF53:
+ 3691 0086 5F6C765F 		.ascii	"_lv_ll_get_len\000"
+ 3691      6C6C5F67 
+ 3691      65745F6C 
+ 3691      656E00
+ 3692              	.LASF47:
+ 3693 0095 695F6E65 		.ascii	"i_next\000"
+ 3693      787400
+ 3694              	.LASF59:
+ 3695 009c 6C765F6D 		.ascii	"lv_mem_free\000"
+ 3695      656D5F66 
+ 3695      72656500 
+ 3696              	.LASF34:
+ 3697 00a8 5F6C765F 		.ascii	"_lv_ll_get_head\000"
+ 3697      6C6C5F67 
+ 3697      65745F68 
+ 3697      65616400 
+ 3698              	.LASF23:
+ 3699 00b8 61637438 		.ascii	"act8\000"
+ 3699      00
+ 3700              	.LASF6:
+ 3701 00bd 5F5F7569 		.ascii	"__uint32_t\000"
+ 3701      6E743332 
+ 3701      5F7400
+ 3702              	.LASF44:
+ 3703 00c8 6E6F6465 		.ascii	"node_p\000"
+ 3703      5F7000
+ 3704              	.LASF57:
+ 3705 00cf 5F6C765F 		.ascii	"_lv_ll_is_empty\000"
+ 3705      6C6C5F69 
+ 3705      735F656D 
+ 3705      70747900 
+ 3706              	.LASF10:
+ 3707 00df 756E7369 		.ascii	"unsigned int\000"
+ 3707      676E6564 
+ 3707      20696E74 
+ 3707      00
+ 3708              	.LASF49:
+ 3709 00ec 6C6C5F6F 		.ascii	"ll_ori_p\000"
+ 3709      72695F70 
+ 3709      00
+ 3710              	.LASF7:
+ 3711 00f5 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3711      20756E73 
+ 3711      69676E65 
+ 3711      6420696E 
+ 3711      7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 77
+
+
+ 3712              	.LASF26:
+ 3713 0107 6E6F6465 		.ascii	"node_set_prev\000"
+ 3713      5F736574 
+ 3713      5F707265 
+ 3713      7600
+ 3714              	.LASF3:
+ 3715 0115 73686F72 		.ascii	"short unsigned int\000"
+ 3715      7420756E 
+ 3715      7369676E 
+ 3715      65642069 
+ 3715      6E7400
+ 3716              	.LASF48:
+ 3717 0128 5F6C765F 		.ascii	"_lv_ll_chg_list\000"
+ 3717      6C6C5F63 
+ 3717      68675F6C 
+ 3717      69737400 
+ 3718              	.LASF27:
+ 3719 0138 6E6F6465 		.ascii	"node_set_next\000"
+ 3719      5F736574 
+ 3719      5F6E6578 
+ 3719      7400
+ 3720              	.LASF32:
+ 3721 0146 5F6C765F 		.ascii	"_lv_ll_ins_head\000"
+ 3721      6C6C5F69 
+ 3721      6E735F68 
+ 3721      65616400 
+ 3722              	.LASF55:
+ 3723 0156 6E5F6166 		.ascii	"n_after\000"
+ 3723      74657200 
+ 3724              	.LASF29:
+ 3725 015e 6E657874 		.ascii	"next_node_p\000"
+ 3725      5F6E6F64 
+ 3725      655F7000 
+ 3726              	.LASF19:
+ 3727 016a 7461696C 		.ascii	"tail\000"
+ 3727      00
+ 3728              	.LASF14:
+ 3729 016f 73697A65 		.ascii	"sizetype\000"
+ 3729      74797065 
+ 3729      00
+ 3730              	.LASF13:
+ 3731 0178 6C6F6E67 		.ascii	"long double\000"
+ 3731      20646F75 
+ 3731      626C6500 
+ 3732              	.LASF54:
+ 3733 0184 5F6C765F 		.ascii	"_lv_ll_move_before\000"
+ 3733      6C6C5F6D 
+ 3733      6F76655F 
+ 3733      6265666F 
+ 3733      726500
+ 3734              	.LASF62:
+ 3735 0197 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 3735      73657273 
+ 3735      5C737472 
+ 3735      61705C44 
+ 3735      6F63756D 
+ 3736 01c4 69393334 		.ascii	"i9341_master.cydsn\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 78
+
+
+ 3736      315F6D61 
+ 3736      73746572 
+ 3736      2E637964 
+ 3736      736E00
+ 3737              	.LASF30:
+ 3738 01d7 6E6F6465 		.ascii	"node_size\000"
+ 3738      5F73697A 
+ 3738      6500
+ 3739              	.LASF39:
+ 3740 01e1 5F6C765F 		.ascii	"_lv_ll_get_prev\000"
+ 3740      6C6C5F67 
+ 3740      65745F70 
+ 3740      72657600 
+ 3741              	.LASF50:
+ 3742 01f1 6C6C5F6E 		.ascii	"ll_new_p\000"
+ 3742      65775F70 
+ 3742      00
+ 3743              	.LASF61:
+ 3744 01fa 6C76676C 		.ascii	"lvgl\\src\\lv_misc\\lv_ll.c\000"
+ 3744      5C737263 
+ 3744      5C6C765F 
+ 3744      6D697363 
+ 3744      5C6C765F 
+ 3745              	.LASF52:
+ 3746 0213 5F426F6F 		.ascii	"_Bool\000"
+ 3746      6C00
+ 3747              	.LASF1:
+ 3748 0219 756E7369 		.ascii	"unsigned char\000"
+ 3748      676E6564 
+ 3748      20636861 
+ 3748      7200
+ 3749              	.LASF36:
+ 3750 0227 5F6C765F 		.ascii	"_lv_ll_get_next\000"
+ 3750      6C6C5F67 
+ 3750      65745F6E 
+ 3750      65787400 
+ 3751              	.LASF51:
+ 3752 0237 6E6F6465 		.ascii	"node\000"
+ 3752      00
+ 3753              	.LASF2:
+ 3754 023c 73686F72 		.ascii	"short int\000"
+ 3754      7420696E 
+ 3754      7400
+ 3755              	.LASF60:
+ 3756 0246 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3756      43313120 
+ 3756      352E342E 
+ 3756      31203230 
+ 3756      31363036 
+ 3757 0279 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3757      20726576 
+ 3757      6973696F 
+ 3757      6E203233 
+ 3757      37373135 
+ 3758 02ac 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 3758      66756E63 
+ 3758      74696F6E 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 79
+
+
+ 3758      2D736563 
+ 3758      74696F6E 
+ 3759              	.LASF35:
+ 3760 02d4 5F6C765F 		.ascii	"_lv_ll_get_tail\000"
+ 3760      6C6C5F67 
+ 3760      65745F74 
+ 3760      61696C00 
+ 3761              	.LASF18:
+ 3762 02e4 68656164 		.ascii	"head\000"
+ 3762      00
+ 3763              	.LASF12:
+ 3764 02e9 75696E74 		.ascii	"uint32_t\000"
+ 3764      33325F74 
+ 3764      00
+ 3765              	.LASF16:
+ 3766 02f2 6C765F6C 		.ascii	"lv_ll_node_t\000"
+ 3766      6C5F6E6F 
+ 3766      64655F74 
+ 3766      00
+ 3767              	.LASF15:
+ 3768 02ff 63686172 		.ascii	"char\000"
+ 3768      00
+ 3769              	.LASF31:
+ 3770 0304 6E5F6E65 		.ascii	"n_new\000"
+ 3770      7700
+ 3771              	.LASF21:
+ 3772 030a 6C6C5F70 		.ascii	"ll_p\000"
+ 3772      00
+ 3773              	.LASF40:
+ 3774 030f 5F6C765F 		.ascii	"_lv_ll_ins_prev\000"
+ 3774      6C6C5F69 
+ 3774      6E735F70 
+ 3774      72657600 
+ 3775              	.LASF46:
+ 3776 031f 5F6C765F 		.ascii	"_lv_ll_clear\000"
+ 3776      6C6C5F63 
+ 3776      6C656172 
+ 3776      00
+ 3777              	.LASF56:
+ 3778 032c 6E5F6265 		.ascii	"n_before\000"
+ 3778      666F7265 
+ 3778      00
+ 3779              	.LASF37:
+ 3780 0335 6E5F6163 		.ascii	"n_act\000"
+ 3780      7400
+ 3781              	.LASF11:
+ 3782 033b 75696E74 		.ascii	"uint8_t\000"
+ 3782      385F7400 
+ 3783              	.LASF33:
+ 3784 0343 5F6C765F 		.ascii	"_lv_ll_ins_tail\000"
+ 3784      6C6C5F69 
+ 3784      6E735F74 
+ 3784      61696C00 
+ 3785              	.LASF42:
+ 3786 0353 5F6C765F 		.ascii	"_lv_ll_init\000"
+ 3786      6C6C5F69 
+ 3786      6E697400 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccO1095g.s 			page 80
+
+
+ 3787              	.LASF24:
+ 3788 035f 6163745F 		.ascii	"act_node_p\000"
+ 3788      6E6F6465 
+ 3788      5F7000
+ 3789              	.LASF25:
+ 3790 036a 70726576 		.ascii	"prev_node_p\000"
+ 3790      5F6E6F64 
+ 3790      655F7000 
+ 3791              	.LASF38:
+ 3792 0376 6E5F6163 		.ascii	"n_act_d\000"
+ 3792      745F6400 
+ 3793              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

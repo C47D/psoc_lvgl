@@ -1,0 +1,2332 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"cymetadata.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	cy_metadata
+  20              		.global	cy_meta_flashprotect
+  21              		.global	cy_meta_wonvl
+  22              		.global	cy_meta_custnvl
+  23              		.global	cy_meta_configecc
+  24              		.section	.cyconfigecc,"a",%progbits
+  25              		.align	2
+  26              		.type	cy_meta_configecc, %object
+  27              		.size	cy_meta_configecc, 1736
+  28              	cy_meta_configecc:
+  29 0000 05       		.byte	5
+  30 0001 52       		.byte	82
+  31 0002 00       		.byte	0
+  32 0003 40       		.byte	64
+  33 0004 03       		.byte	3
+  34 0005 64       		.byte	100
+  35 0006 00       		.byte	0
+  36 0007 40       		.byte	64
+  37 0008 02       		.byte	2
+  38 0009 65       		.byte	101
+  39 000a 00       		.byte	0
+  40 000b 40       		.byte	64
+  41 000c 3E       		.byte	62
+  42 000d 02       		.byte	2
+  43 000e 01       		.byte	1
+  44 000f 40       		.byte	64
+  45 0010 38       		.byte	56
+  46 0011 03       		.byte	3
+  47 0012 01       		.byte	1
+  48 0013 40       		.byte	64
+  49 0014 1D       		.byte	29
+  50 0015 04       		.byte	4
+  51 0016 01       		.byte	1
+  52 0017 40       		.byte	64
+  53 0018 49       		.byte	73
+  54 0019 05       		.byte	5
+  55 001a 01       		.byte	1
+  56 001b 40       		.byte	64
+  57 001c 5E       		.byte	94
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 2
+
+
+  58 001d 06       		.byte	6
+  59 001e 01       		.byte	1
+  60 001f 40       		.byte	64
+  61 0020 45       		.byte	69
+  62 0021 07       		.byte	7
+  63 0022 01       		.byte	1
+  64 0023 40       		.byte	64
+  65 0024 01       		.byte	1
+  66 0025 0B       		.byte	11
+  67 0026 01       		.byte	1
+  68 0027 40       		.byte	64
+  69 0028 01       		.byte	1
+  70 0029 0D       		.byte	13
+  71 002a 01       		.byte	1
+  72 002b 40       		.byte	64
+  73 002c 05       		.byte	5
+  74 002d 14       		.byte	20
+  75 002e 01       		.byte	1
+  76 002f 40       		.byte	64
+  77 0030 4A       		.byte	74
+  78 0031 15       		.byte	21
+  79 0032 01       		.byte	1
+  80 0033 40       		.byte	64
+  81 0034 48       		.byte	72
+  82 0035 16       		.byte	22
+  83 0036 01       		.byte	1
+  84 0037 40       		.byte	64
+  85 0038 49       		.byte	73
+  86 0039 17       		.byte	23
+  87 003a 01       		.byte	1
+  88 003b 40       		.byte	64
+  89 003c 09       		.byte	9
+  90 003d 40       		.byte	64
+  91 003e 01       		.byte	1
+  92 003f 40       		.byte	64
+  93 0040 07       		.byte	7
+  94 0041 41       		.byte	65
+  95 0042 01       		.byte	1
+  96 0043 40       		.byte	64
+  97 0044 05       		.byte	5
+  98 0045 42       		.byte	66
+  99 0046 01       		.byte	1
+ 100 0047 40       		.byte	64
+ 101 0048 03       		.byte	3
+ 102 0049 43       		.byte	67
+ 103 004a 01       		.byte	1
+ 104 004b 40       		.byte	64
+ 105 004c 02       		.byte	2
+ 106 004d 44       		.byte	68
+ 107 004e 01       		.byte	1
+ 108 004f 40       		.byte	64
+ 109 0050 05       		.byte	5
+ 110 0051 45       		.byte	69
+ 111 0052 01       		.byte	1
+ 112 0053 40       		.byte	64
+ 113 0054 01       		.byte	1
+ 114 0055 46       		.byte	70
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 3
+
+
+ 115 0056 01       		.byte	1
+ 116 0057 40       		.byte	64
+ 117 0058 01       		.byte	1
+ 118 0059 48       		.byte	72
+ 119 005a 01       		.byte	1
+ 120 005b 40       		.byte	64
+ 121 005c 09       		.byte	9
+ 122 005d 49       		.byte	73
+ 123 005e 01       		.byte	1
+ 124 005f 40       		.byte	64
+ 125 0060 05       		.byte	5
+ 126 0061 50       		.byte	80
+ 127 0062 01       		.byte	1
+ 128 0063 40       		.byte	64
+ 129 0064 02       		.byte	2
+ 130 0065 51       		.byte	81
+ 131 0066 01       		.byte	1
+ 132 0067 40       		.byte	64
+ 133 0068 00       		.byte	0
+ 134 0069 02       		.byte	2
+ 135 006a 01       		.byte	1
+ 136 006b 01       		.byte	1
+ 137 006c 05       		.byte	5
+ 138 006d 03       		.byte	3
+ 139 006e 60       		.byte	96
+ 140 006f 02       		.byte	2
+ 141 0070 61       		.byte	97
+ 142 0071 04       		.byte	4
+ 143 0072 82       		.byte	-126
+ 144 0073 6F       		.byte	111
+ 145 0074 85       		.byte	-123
+ 146 0075 0D       		.byte	13
+ 147 0076 87       		.byte	-121
+ 148 0077 0F       		.byte	15
+ 149 0078 85       		.byte	-123
+ 150 0079 0F       		.byte	15
+ 151 007a 87       		.byte	-121
+ 152 007b 0D       		.byte	13
+ 153 007c 02       		.byte	2
+ 154 007d 02       		.byte	2
+ 155 007e 05       		.byte	5
+ 156 007f 13       		.byte	19
+ 157 0080 07       		.byte	7
+ 158 0081 04       		.byte	4
+ 159 0082 0D       		.byte	13
+ 160 0083 0E       		.byte	14
+ 161 0084 11       		.byte	17
+ 162 0085 05       		.byte	5
+ 163 0086 13       		.byte	19
+ 164 0087 3A       		.byte	58
+ 165 0088 17       		.byte	23
+ 166 0089 20       		.byte	32
+ 167 008a 18       		.byte	24
+ 168 008b 02       		.byte	2
+ 169 008c 25       		.byte	37
+ 170 008d 04       		.byte	4
+ 171 008e 27       		.byte	39
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 4
+
+
+ 172 008f 39       		.byte	57
+ 173 0090 2A       		.byte	42
+ 174 0091 03       		.byte	3
+ 175 0092 32       		.byte	50
+ 176 0093 02       		.byte	2
+ 177 0094 34       		.byte	52
+ 178 0095 01       		.byte	1
+ 179 0096 35       		.byte	53
+ 180 0097 30       		.byte	48
+ 181 0098 37       		.byte	55
+ 182 0099 0F       		.byte	15
+ 183 009a 39       		.byte	57
+ 184 009b 80       		.byte	-128
+ 185 009c 3E       		.byte	62
+ 186 009d 04       		.byte	4
+ 187 009e 54       		.byte	84
+ 188 009f 0F       		.byte	15
+ 189 00a0 58       		.byte	88
+ 190 00a1 04       		.byte	4
+ 191 00a2 59       		.byte	89
+ 192 00a3 04       		.byte	4
+ 193 00a4 5B       		.byte	91
+ 194 00a5 04       		.byte	4
+ 195 00a6 5C       		.byte	92
+ 196 00a7 12       		.byte	18
+ 197 00a8 5D       		.byte	93
+ 198 00a9 20       		.byte	32
+ 199 00aa 5F       		.byte	95
+ 200 00ab 05       		.byte	5
+ 201 00ac 84       		.byte	-124
+ 202 00ad 0C       		.byte	12
+ 203 00ae 85       		.byte	-123
+ 204 00af 27       		.byte	39
+ 205 00b0 87       		.byte	-121
+ 206 00b1 08       		.byte	8
+ 207 00b2 89       		.byte	-119
+ 208 00b3 1E       		.byte	30
+ 209 00b4 8A       		.byte	-118
+ 210 00b5 20       		.byte	32
+ 211 00b6 8B       		.byte	-117
+ 212 00b7 21       		.byte	33
+ 213 00b8 90       		.byte	-112
+ 214 00b9 01       		.byte	1
+ 215 00ba 97       		.byte	-105
+ 216 00bb 01       		.byte	1
+ 217 00bc 98       		.byte	-104
+ 218 00bd 10       		.byte	16
+ 219 00be 99       		.byte	-103
+ 220 00bf 25       		.byte	37
+ 221 00c0 9B       		.byte	-101
+ 222 00c1 12       		.byte	18
+ 223 00c2 9C       		.byte	-100
+ 224 00c3 07       		.byte	7
+ 225 00c4 9F       		.byte	-97
+ 226 00c5 40       		.byte	64
+ 227 00c6 A0       		.byte	-96
+ 228 00c7 01       		.byte	1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 5
+
+
+ 229 00c8 A1       		.byte	-95
+ 230 00c9 02       		.byte	2
+ 231 00ca A2       		.byte	-94
+ 232 00cb 10       		.byte	16
+ 233 00cc A3       		.byte	-93
+ 234 00cd 3C       		.byte	60
+ 235 00ce A4       		.byte	-92
+ 236 00cf 0C       		.byte	12
+ 237 00d0 A5       		.byte	-91
+ 238 00d1 06       		.byte	6
+ 239 00d2 A7       		.byte	-89
+ 240 00d3 08       		.byte	8
+ 241 00d4 A8       		.byte	-88
+ 242 00d5 0A       		.byte	10
+ 243 00d6 AD       		.byte	-83
+ 244 00d7 3B       		.byte	59
+ 245 00d8 B0       		.byte	-80
+ 246 00d9 10       		.byte	16
+ 247 00da B2       		.byte	-78
+ 248 00db 20       		.byte	32
+ 249 00dc B3       		.byte	-77
+ 250 00dd 07       		.byte	7
+ 251 00de B4       		.byte	-76
+ 252 00df 01       		.byte	1
+ 253 00e0 B5       		.byte	-75
+ 254 00e1 3C       		.byte	60
+ 255 00e2 B6       		.byte	-74
+ 256 00e3 0E       		.byte	14
+ 257 00e4 B7       		.byte	-73
+ 258 00e5 40       		.byte	64
+ 259 00e6 B8       		.byte	-72
+ 260 00e7 A0       		.byte	-96
+ 261 00e8 BE       		.byte	-66
+ 262 00e9 11       		.byte	17
+ 263 00ea D2       		.byte	-46
+ 264 00eb 80       		.byte	-128
+ 265 00ec D6       		.byte	-42
+ 266 00ed 08       		.byte	8
+ 267 00ee D8       		.byte	-40
+ 268 00ef 04       		.byte	4
+ 269 00f0 D9       		.byte	-39
+ 270 00f1 04       		.byte	4
+ 271 00f2 DB       		.byte	-37
+ 272 00f3 0B       		.byte	11
+ 273 00f4 DC       		.byte	-36
+ 274 00f5 22       		.byte	34
+ 275 00f6 DF       		.byte	-33
+ 276 00f7 01       		.byte	1
+ 277 00f8 02       		.byte	2
+ 278 00f9 20       		.byte	32
+ 279 00fa 03       		.byte	3
+ 280 00fb 08       		.byte	8
+ 281 00fc 07       		.byte	7
+ 282 00fd 40       		.byte	64
+ 283 00fe 09       		.byte	9
+ 284 00ff 10       		.byte	16
+ 285 0100 0A       		.byte	10
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 6
+
+
+ 286 0101 81       		.byte	-127
+ 287 0102 0E       		.byte	14
+ 288 0103 04       		.byte	4
+ 289 0104 11       		.byte	17
+ 290 0105 06       		.byte	6
+ 291 0106 13       		.byte	19
+ 292 0107 10       		.byte	16
+ 293 0108 17       		.byte	23
+ 294 0109 20       		.byte	32
+ 295 010a 19       		.byte	25
+ 296 010b 88       		.byte	-120
+ 297 010c 1A       		.byte	26
+ 298 010d 0B       		.byte	11
+ 299 010e 1B       		.byte	27
+ 300 010f 01       		.byte	1
+ 301 0110 1D       		.byte	29
+ 302 0111 08       		.byte	8
+ 303 0112 1E       		.byte	30
+ 304 0113 04       		.byte	4
+ 305 0114 21       		.byte	33
+ 306 0115 40       		.byte	64
+ 307 0116 22       		.byte	34
+ 308 0117 28       		.byte	40
+ 309 0118 23       		.byte	35
+ 310 0119 20       		.byte	32
+ 311 011a 25       		.byte	37
+ 312 011b 40       		.byte	64
+ 313 011c 27       		.byte	39
+ 314 011d 04       		.byte	4
+ 315 011e 29       		.byte	41
+ 316 011f 82       		.byte	-126
+ 317 0120 2A       		.byte	42
+ 318 0121 04       		.byte	4
+ 319 0122 2C       		.byte	44
+ 320 0123 10       		.byte	16
+ 321 0124 30       		.byte	48
+ 322 0125 80       		.byte	-128
+ 323 0126 32       		.byte	50
+ 324 0127 28       		.byte	40
+ 325 0128 37       		.byte	55
+ 326 0129 05       		.byte	5
+ 327 012a 38       		.byte	56
+ 328 012b 04       		.byte	4
+ 329 012c 39       		.byte	57
+ 330 012d 04       		.byte	4
+ 331 012e 3B       		.byte	59
+ 332 012f 10       		.byte	16
+ 333 0130 3D       		.byte	61
+ 334 0131 88       		.byte	-120
+ 335 0132 5A       		.byte	90
+ 336 0133 50       		.byte	80
+ 337 0134 5C       		.byte	92
+ 338 0135 08       		.byte	8
+ 339 0136 5D       		.byte	93
+ 340 0137 20       		.byte	32
+ 341 0138 5E       		.byte	94
+ 342 0139 02       		.byte	2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 7
+
+
+ 343 013a 5F       		.byte	95
+ 344 013b 40       		.byte	64
+ 345 013c 60       		.byte	96
+ 346 013d 02       		.byte	2
+ 347 013e 63       		.byte	99
+ 348 013f 08       		.byte	8
+ 349 0140 66       		.byte	102
+ 350 0141 08       		.byte	8
+ 351 0142 67       		.byte	103
+ 352 0143 04       		.byte	4
+ 353 0144 70       		.byte	112
+ 354 0145 02       		.byte	2
+ 355 0146 7B       		.byte	123
+ 356 0147 80       		.byte	-128
+ 357 0148 7E       		.byte	126
+ 358 0149 01       		.byte	1
+ 359 014a 81       		.byte	-127
+ 360 014b 20       		.byte	32
+ 361 014c 82       		.byte	-126
+ 362 014d 40       		.byte	64
+ 363 014e 83       		.byte	-125
+ 364 014f 04       		.byte	4
+ 365 0150 88       		.byte	-120
+ 366 0151 80       		.byte	-128
+ 367 0152 8F       		.byte	-113
+ 368 0153 04       		.byte	4
+ 369 0154 C0       		.byte	-64
+ 370 0155 16       		.byte	22
+ 371 0156 C2       		.byte	-62
+ 372 0157 4B       		.byte	75
+ 373 0158 C4       		.byte	-60
+ 374 0159 4E       		.byte	78
+ 375 015a CA       		.byte	-54
+ 376 015b 4B       		.byte	75
+ 377 015c CC       		.byte	-52
+ 378 015d CE       		.byte	-50
+ 379 015e CE       		.byte	-50
+ 380 015f 56       		.byte	86
+ 381 0160 D6       		.byte	-42
+ 382 0161 FC       		.byte	-4
+ 383 0162 D8       		.byte	-40
+ 384 0163 6C       		.byte	108
+ 385 0164 DE       		.byte	-34
+ 386 0165 11       		.byte	17
+ 387 0166 E6       		.byte	-26
+ 388 0167 10       		.byte	16
+ 389 0168 00       		.byte	0
+ 390 0169 02       		.byte	2
+ 391 016a 02       		.byte	2
+ 392 016b 01       		.byte	1
+ 393 016c 04       		.byte	4
+ 394 016d 01       		.byte	1
+ 395 016e 05       		.byte	5
+ 396 016f CC       		.byte	-52
+ 397 0170 06       		.byte	6
+ 398 0171 0A       		.byte	10
+ 399 0172 07       		.byte	7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 8
+
+
+ 400 0173 32       		.byte	50
+ 401 0174 09       		.byte	9
+ 402 0175 FB       		.byte	-5
+ 403 0176 0B       		.byte	11
+ 404 0177 04       		.byte	4
+ 405 0178 18       		.byte	24
+ 406 0179 01       		.byte	1
+ 407 017a 19       		.byte	25
+ 408 017b AC       		.byte	-84
+ 409 017c 1A       		.byte	26
+ 410 017d 02       		.byte	2
+ 411 017e 1B       		.byte	27
+ 412 017f 51       		.byte	81
+ 413 0180 1C       		.byte	28
+ 414 0181 01       		.byte	1
+ 415 0182 1E       		.byte	30
+ 416 0183 06       		.byte	6
+ 417 0184 21       		.byte	33
+ 418 0185 58       		.byte	88
+ 419 0186 23       		.byte	35
+ 420 0187 A1       		.byte	-95
+ 421 0188 25       		.byte	37
+ 422 0189 30       		.byte	48
+ 423 018a 27       		.byte	39
+ 424 018b CF       		.byte	-49
+ 425 018c 2D       		.byte	45
+ 426 018d 77       		.byte	119
+ 427 018e 30       		.byte	48
+ 428 018f 03       		.byte	3
+ 429 0190 33       		.byte	51
+ 430 0191 F0       		.byte	-16
+ 431 0192 34       		.byte	52
+ 432 0193 04       		.byte	4
+ 433 0194 35       		.byte	53
+ 434 0195 0F       		.byte	15
+ 435 0196 36       		.byte	54
+ 436 0197 08       		.byte	8
+ 437 0198 3A       		.byte	58
+ 438 0199 02       		.byte	2
+ 439 019a 58       		.byte	88
+ 440 019b 04       		.byte	4
+ 441 019c 59       		.byte	89
+ 442 019d 04       		.byte	4
+ 443 019e 5C       		.byte	92
+ 444 019f 22       		.byte	34
+ 445 01a0 5F       		.byte	95
+ 446 01a1 01       		.byte	1
+ 447 01a2 01       		.byte	1
+ 448 01a3 0A       		.byte	10
+ 449 01a4 04       		.byte	4
+ 450 01a5 02       		.byte	2
+ 451 01a6 06       		.byte	6
+ 452 01a7 01       		.byte	1
+ 453 01a8 07       		.byte	7
+ 454 01a9 04       		.byte	4
+ 455 01aa 0A       		.byte	10
+ 456 01ab 06       		.byte	6
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 9
+
+
+ 457 01ac 0C       		.byte	12
+ 458 01ad 10       		.byte	16
+ 459 01ae 0D       		.byte	13
+ 460 01af 01       		.byte	1
+ 461 01b0 0E       		.byte	14
+ 462 01b1 21       		.byte	33
+ 463 01b2 11       		.byte	17
+ 464 01b3 0C       		.byte	12
+ 465 01b4 15       		.byte	21
+ 466 01b5 05       		.byte	5
+ 467 01b6 16       		.byte	22
+ 468 01b7 02       		.byte	2
+ 469 01b8 17       		.byte	23
+ 470 01b9 10       		.byte	16
+ 471 01ba 19       		.byte	25
+ 472 01bb 02       		.byte	2
+ 473 01bc 1A       		.byte	26
+ 474 01bd 06       		.byte	6
+ 475 01be 1E       		.byte	30
+ 476 01bf 21       		.byte	33
+ 477 01c0 1F       		.byte	31
+ 478 01c1 10       		.byte	16
+ 479 01c2 20       		.byte	32
+ 480 01c3 0C       		.byte	12
+ 481 01c4 23       		.byte	35
+ 482 01c5 10       		.byte	16
+ 483 01c6 24       		.byte	36
+ 484 01c7 40       		.byte	64
+ 485 01c8 26       		.byte	38
+ 486 01c9 08       		.byte	8
+ 487 01ca 27       		.byte	39
+ 488 01cb 0A       		.byte	10
+ 489 01cc 29       		.byte	41
+ 490 01cd 82       		.byte	-126
+ 491 01ce 2A       		.byte	42
+ 492 01cf 04       		.byte	4
+ 493 01d0 2D       		.byte	45
+ 494 01d1 40       		.byte	64
+ 495 01d2 2F       		.byte	47
+ 496 01d3 88       		.byte	-120
+ 497 01d4 32       		.byte	50
+ 498 01d5 20       		.byte	32
+ 499 01d6 34       		.byte	52
+ 500 01d7 02       		.byte	2
+ 501 01d8 36       		.byte	54
+ 502 01d9 08       		.byte	8
+ 503 01da 38       		.byte	56
+ 504 01db 04       		.byte	4
+ 505 01dc 3B       		.byte	59
+ 506 01dd 10       		.byte	16
+ 507 01de 3E       		.byte	62
+ 508 01df A0       		.byte	-96
+ 509 01e0 41       		.byte	65
+ 510 01e1 01       		.byte	1
+ 511 01e2 43       		.byte	67
+ 512 01e3 01       		.byte	1
+ 513 01e4 45       		.byte	69
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 10
+
+
+ 514 01e5 88       		.byte	-120
+ 515 01e6 4C       		.byte	76
+ 516 01e7 80       		.byte	-128
+ 517 01e8 4E       		.byte	78
+ 518 01e9 44       		.byte	68
+ 519 01ea 4F       		.byte	79
+ 520 01eb 04       		.byte	4
+ 521 01ec 55       		.byte	85
+ 522 01ed 01       		.byte	1
+ 523 01ee 56       		.byte	86
+ 524 01ef 18       		.byte	24
+ 525 01f0 5C       		.byte	92
+ 526 01f1 40       		.byte	64
+ 527 01f2 5E       		.byte	94
+ 528 01f3 08       		.byte	8
+ 529 01f4 5F       		.byte	95
+ 530 01f5 01       		.byte	1
+ 531 01f6 76       		.byte	118
+ 532 01f7 80       		.byte	-128
+ 533 01f8 91       		.byte	-111
+ 534 01f9 80       		.byte	-128
+ 535 01fa 92       		.byte	-110
+ 536 01fb 08       		.byte	8
+ 537 01fc 94       		.byte	-108
+ 538 01fd 04       		.byte	4
+ 539 01fe 96       		.byte	-106
+ 540 01ff D0       		.byte	-48
+ 541 0200 97       		.byte	-105
+ 542 0201 54       		.byte	84
+ 543 0202 98       		.byte	-104
+ 544 0203 02       		.byte	2
+ 545 0204 99       		.byte	-103
+ 546 0205 88       		.byte	-120
+ 547 0206 9C       		.byte	-100
+ 548 0207 10       		.byte	16
+ 549 0208 9D       		.byte	-99
+ 550 0209 02       		.byte	2
+ 551 020a 9E       		.byte	-98
+ 552 020b 0C       		.byte	12
+ 553 020c 9F       		.byte	-97
+ 554 020d 41       		.byte	65
+ 555 020e A0       		.byte	-96
+ 556 020f 02       		.byte	2
+ 557 0210 A1       		.byte	-95
+ 558 0211 08       		.byte	8
+ 559 0212 A2       		.byte	-94
+ 560 0213 20       		.byte	32
+ 561 0214 A5       		.byte	-91
+ 562 0215 15       		.byte	21
+ 563 0216 A6       		.byte	-90
+ 564 0217 01       		.byte	1
+ 565 0218 A7       		.byte	-89
+ 566 0219 80       		.byte	-128
+ 567 021a AB       		.byte	-85
+ 568 021b 08       		.byte	8
+ 569 021c AC       		.byte	-84
+ 570 021d 08       		.byte	8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 11
+
+
+ 571 021e AF       		.byte	-81
+ 572 021f 01       		.byte	1
+ 573 0220 C0       		.byte	-64
+ 574 0221 DC       		.byte	-36
+ 575 0222 C2       		.byte	-62
+ 576 0223 F3       		.byte	-13
+ 577 0224 C4       		.byte	-60
+ 578 0225 F0       		.byte	-16
+ 579 0226 CA       		.byte	-54
+ 580 0227 BB       		.byte	-69
+ 581 0228 CC       		.byte	-52
+ 582 0229 C4       		.byte	-60
+ 583 022a CE       		.byte	-50
+ 584 022b 36       		.byte	54
+ 585 022c D0       		.byte	-48
+ 586 022d 50       		.byte	80
+ 587 022e D2       		.byte	-46
+ 588 022f 20       		.byte	32
+ 589 0230 D6       		.byte	-42
+ 590 0231 D0       		.byte	-48
+ 591 0232 EE       		.byte	-18
+ 592 0233 01       		.byte	1
+ 593 0234 02       		.byte	2
+ 594 0235 01       		.byte	1
+ 595 0236 05       		.byte	5
+ 596 0237 03       		.byte	3
+ 597 0238 06       		.byte	6
+ 598 0239 06       		.byte	6
+ 599 023a 07       		.byte	7
+ 600 023b 0C       		.byte	12
+ 601 023c 0A       		.byte	10
+ 602 023d 09       		.byte	9
+ 603 023e 0D       		.byte	13
+ 604 023f 02       		.byte	2
+ 605 0240 0F       		.byte	15
+ 606 0241 0D       		.byte	13
+ 607 0242 11       		.byte	17
+ 608 0243 05       		.byte	5
+ 609 0244 13       		.byte	19
+ 610 0245 0A       		.byte	10
+ 611 0246 14       		.byte	20
+ 612 0247 08       		.byte	8
+ 613 0248 19       		.byte	25
+ 614 0249 09       		.byte	9
+ 615 024a 1B       		.byte	27
+ 616 024b 06       		.byte	6
+ 617 024c 1C       		.byte	28
+ 618 024d 04       		.byte	4
+ 619 024e 1E       		.byte	30
+ 620 024f 02       		.byte	2
+ 621 0250 28       		.byte	40
+ 622 0251 08       		.byte	8
+ 623 0252 30       		.byte	48
+ 624 0253 02       		.byte	2
+ 625 0254 32       		.byte	50
+ 626 0255 04       		.byte	4
+ 627 0256 34       		.byte	52
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 12
+
+
+ 628 0257 01       		.byte	1
+ 629 0258 36       		.byte	54
+ 630 0259 08       		.byte	8
+ 631 025a 37       		.byte	55
+ 632 025b 0F       		.byte	15
+ 633 025c 3B       		.byte	59
+ 634 025d 80       		.byte	-128
+ 635 025e 3E       		.byte	62
+ 636 025f 15       		.byte	21
+ 637 0260 40       		.byte	64
+ 638 0261 30       		.byte	48
+ 639 0262 41       		.byte	65
+ 640 0263 04       		.byte	4
+ 641 0264 45       		.byte	69
+ 642 0265 D0       		.byte	-48
+ 643 0266 46       		.byte	70
+ 644 0267 02       		.byte	2
+ 645 0268 47       		.byte	71
+ 646 0269 01       		.byte	1
+ 647 026a 48       		.byte	72
+ 648 026b 1E       		.byte	30
+ 649 026c 49       		.byte	73
+ 650 026d FF       		.byte	-1
+ 651 026e 4A       		.byte	74
+ 652 026f FF       		.byte	-1
+ 653 0270 4B       		.byte	75
+ 654 0271 FF       		.byte	-1
+ 655 0272 4D       		.byte	77
+ 656 0273 A0       		.byte	-96
+ 657 0274 4F       		.byte	79
+ 658 0275 04       		.byte	4
+ 659 0276 50       		.byte	80
+ 660 0277 18       		.byte	24
+ 661 0278 52       		.byte	82
+ 662 0279 80       		.byte	-128
+ 663 027a 58       		.byte	88
+ 664 027b 04       		.byte	4
+ 665 027c 59       		.byte	89
+ 666 027d 04       		.byte	4
+ 667 027e 5A       		.byte	90
+ 668 027f 04       		.byte	4
+ 669 0280 5B       		.byte	91
+ 670 0281 04       		.byte	4
+ 671 0282 5C       		.byte	92
+ 672 0283 10       		.byte	16
+ 673 0284 5D       		.byte	93
+ 674 0285 20       		.byte	32
+ 675 0286 5F       		.byte	95
+ 676 0287 01       		.byte	1
+ 677 0288 60       		.byte	96
+ 678 0289 40       		.byte	64
+ 679 028a 62       		.byte	98
+ 680 028b C0       		.byte	-64
+ 681 028c 64       		.byte	100
+ 682 028d 40       		.byte	64
+ 683 028e 65       		.byte	101
+ 684 028f 40       		.byte	64
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 13
+
+
+ 685 0290 66       		.byte	102
+ 686 0291 C0       		.byte	-64
+ 687 0292 68       		.byte	104
+ 688 0293 C0       		.byte	-64
+ 689 0294 6A       		.byte	106
+ 690 0295 C0       		.byte	-64
+ 691 0296 6C       		.byte	108
+ 692 0297 C0       		.byte	-64
+ 693 0298 6E       		.byte	110
+ 694 0299 C0       		.byte	-64
+ 695 029a 80       		.byte	-128
+ 696 029b 30       		.byte	48
+ 697 029c 82       		.byte	-126
+ 698 029d C9       		.byte	-55
+ 699 029e 84       		.byte	-124
+ 700 029f CF       		.byte	-49
+ 701 02a0 86       		.byte	-122
+ 702 02a1 30       		.byte	48
+ 703 02a2 87       		.byte	-121
+ 704 02a3 40       		.byte	64
+ 705 02a4 88       		.byte	-120
+ 706 02a5 94       		.byte	-108
+ 707 02a6 89       		.byte	-119
+ 708 02a7 70       		.byte	112
+ 709 02a8 8A       		.byte	-118
+ 710 02a9 60       		.byte	96
+ 711 02aa 8C       		.byte	-116
+ 712 02ab 73       		.byte	115
+ 713 02ac 8D       		.byte	-115
+ 714 02ad 01       		.byte	1
+ 715 02ae 8F       		.byte	-113
+ 716 02af 0A       		.byte	10
+ 717 02b0 91       		.byte	-111
+ 718 02b1 01       		.byte	1
+ 719 02b2 93       		.byte	-109
+ 720 02b3 02       		.byte	2
+ 721 02b4 95       		.byte	-107
+ 722 02b5 12       		.byte	18
+ 723 02b6 97       		.byte	-105
+ 724 02b7 21       		.byte	33
+ 725 02b8 99       		.byte	-103
+ 726 02b9 01       		.byte	1
+ 727 02ba 9B       		.byte	-101
+ 728 02bb 06       		.byte	6
+ 729 02bc 9E       		.byte	-98
+ 730 02bd 0F       		.byte	15
+ 731 02be 9F       		.byte	-97
+ 732 02bf 70       		.byte	112
+ 733 02c0 A1       		.byte	-95
+ 734 02c1 40       		.byte	64
+ 735 02c2 A4       		.byte	-92
+ 736 02c3 9E       		.byte	-98
+ 737 02c4 A6       		.byte	-90
+ 738 02c5 60       		.byte	96
+ 739 02c6 A7       		.byte	-89
+ 740 02c7 80       		.byte	-128
+ 741 02c8 A8       		.byte	-88
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 14
+
+
+ 742 02c9 FD       		.byte	-3
+ 743 02ca A9       		.byte	-87
+ 744 02cb 10       		.byte	16
+ 745 02cc AA       		.byte	-86
+ 746 02cd 02       		.byte	2
+ 747 02ce AB       		.byte	-85
+ 748 02cf 20       		.byte	32
+ 749 02d0 AD       		.byte	-83
+ 750 02d1 70       		.byte	112
+ 751 02d2 B1       		.byte	-79
+ 752 02d3 04       		.byte	4
+ 753 02d4 B2       		.byte	-78
+ 754 02d5 FF       		.byte	-1
+ 755 02d6 B3       		.byte	-77
+ 756 02d7 03       		.byte	3
+ 757 02d8 B5       		.byte	-75
+ 758 02d9 08       		.byte	8
+ 759 02da B7       		.byte	-73
+ 760 02db F0       		.byte	-16
+ 761 02dc BA       		.byte	-70
+ 762 02dd C0       		.byte	-64
+ 763 02de BB       		.byte	-69
+ 764 02df 08       		.byte	8
+ 765 02e0 BE       		.byte	-66
+ 766 02e1 04       		.byte	4
+ 767 02e2 D4       		.byte	-44
+ 768 02e3 0F       		.byte	15
+ 769 02e4 D8       		.byte	-40
+ 770 02e5 0A       		.byte	10
+ 771 02e6 D9       		.byte	-39
+ 772 02e7 04       		.byte	4
+ 773 02e8 DB       		.byte	-37
+ 774 02e9 04       		.byte	4
+ 775 02ea DC       		.byte	-36
+ 776 02eb 20       		.byte	32
+ 777 02ec DD       		.byte	-35
+ 778 02ed 20       		.byte	32
+ 779 02ee DF       		.byte	-33
+ 780 02ef 01       		.byte	1
+ 781 02f0 00       		.byte	0
+ 782 02f1 68       		.byte	104
+ 783 02f2 01       		.byte	1
+ 784 02f3 86       		.byte	-122
+ 785 02f4 02       		.byte	2
+ 786 02f5 04       		.byte	4
+ 787 02f6 04       		.byte	4
+ 788 02f7 04       		.byte	4
+ 789 02f8 06       		.byte	6
+ 790 02f9 80       		.byte	-128
+ 791 02fa 07       		.byte	7
+ 792 02fb 08       		.byte	8
+ 793 02fc 09       		.byte	9
+ 794 02fd 80       		.byte	-128
+ 795 02fe 0E       		.byte	14
+ 796 02ff 01       		.byte	1
+ 797 0300 0F       		.byte	15
+ 798 0301 20       		.byte	32
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 15
+
+
+ 799 0302 12       		.byte	18
+ 800 0303 E8       		.byte	-24
+ 801 0304 13       		.byte	19
+ 802 0305 10       		.byte	16
+ 803 0306 16       		.byte	22
+ 804 0307 08       		.byte	8
+ 805 0308 19       		.byte	25
+ 806 0309 08       		.byte	8
+ 807 030a 1A       		.byte	26
+ 808 030b 01       		.byte	1
+ 809 030c 1E       		.byte	30
+ 810 030d 58       		.byte	88
+ 811 030e 1F       		.byte	31
+ 812 030f 80       		.byte	-128
+ 813 0310 20       		.byte	32
+ 814 0311 20       		.byte	32
+ 815 0312 21       		.byte	33
+ 816 0313 80       		.byte	-128
+ 817 0314 22       		.byte	34
+ 818 0315 15       		.byte	21
+ 819 0316 23       		.byte	35
+ 820 0317 02       		.byte	2
+ 821 0318 25       		.byte	37
+ 822 0319 40       		.byte	64
+ 823 031a 26       		.byte	38
+ 824 031b 80       		.byte	-128
+ 825 031c 29       		.byte	41
+ 826 031d 9A       		.byte	-102
+ 827 031e 31       		.byte	49
+ 828 031f 80       		.byte	-128
+ 829 0320 32       		.byte	50
+ 830 0321 15       		.byte	21
+ 831 0322 34       		.byte	52
+ 832 0323 10       		.byte	16
+ 833 0324 37       		.byte	55
+ 834 0325 01       		.byte	1
+ 835 0326 39       		.byte	57
+ 836 0327 84       		.byte	-124
+ 837 0328 3B       		.byte	59
+ 838 0329 10       		.byte	16
+ 839 032a 3D       		.byte	61
+ 840 032b 88       		.byte	-120
+ 841 032c 46       		.byte	70
+ 842 032d 80       		.byte	-128
+ 843 032e 47       		.byte	71
+ 844 032f 08       		.byte	8
+ 845 0330 4F       		.byte	79
+ 846 0331 01       		.byte	1
+ 847 0332 56       		.byte	86
+ 848 0333 A8       		.byte	-88
+ 849 0334 57       		.byte	87
+ 850 0335 18       		.byte	24
+ 851 0336 58       		.byte	88
+ 852 0337 88       		.byte	-120
+ 853 0338 59       		.byte	89
+ 854 0339 21       		.byte	33
+ 855 033a 61       		.byte	97
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 16
+
+
+ 856 033b 10       		.byte	16
+ 857 033c 62       		.byte	98
+ 858 033d 20       		.byte	32
+ 859 033e 77       		.byte	119
+ 860 033f 40       		.byte	64
+ 861 0340 79       		.byte	121
+ 862 0341 08       		.byte	8
+ 863 0342 91       		.byte	-111
+ 864 0343 80       		.byte	-128
+ 865 0344 93       		.byte	-109
+ 866 0345 30       		.byte	48
+ 867 0346 94       		.byte	-108
+ 868 0347 02       		.byte	2
+ 869 0348 95       		.byte	-107
+ 870 0349 41       		.byte	65
+ 871 034a 96       		.byte	-106
+ 872 034b 50       		.byte	80
+ 873 034c 97       		.byte	-105
+ 874 034d 41       		.byte	65
+ 875 034e 99       		.byte	-103
+ 876 034f 82       		.byte	-126
+ 877 0350 9A       		.byte	-102
+ 878 0351 10       		.byte	16
+ 879 0352 9B       		.byte	-101
+ 880 0353 08       		.byte	8
+ 881 0354 9C       		.byte	-100
+ 882 0355 10       		.byte	16
+ 883 0356 9E       		.byte	-98
+ 884 0357 27       		.byte	39
+ 885 0358 9F       		.byte	-97
+ 886 0359 55       		.byte	85
+ 887 035a A0       		.byte	-96
+ 888 035b 86       		.byte	-122
+ 889 035c A1       		.byte	-95
+ 890 035d 01       		.byte	1
+ 891 035e A2       		.byte	-94
+ 892 035f 30       		.byte	48
+ 893 0360 A5       		.byte	-91
+ 894 0361 94       		.byte	-108
+ 895 0362 A6       		.byte	-90
+ 896 0363 05       		.byte	5
+ 897 0364 A7       		.byte	-89
+ 898 0365 88       		.byte	-120
+ 899 0366 AF       		.byte	-81
+ 900 0367 02       		.byte	2
+ 901 0368 C0       		.byte	-64
+ 902 0369 7F       		.byte	127
+ 903 036a C2       		.byte	-62
+ 904 036b A1       		.byte	-95
+ 905 036c C4       		.byte	-60
+ 906 036d 46       		.byte	70
+ 907 036e CA       		.byte	-54
+ 908 036f 0F       		.byte	15
+ 909 0370 CC       		.byte	-52
+ 910 0371 AF       		.byte	-81
+ 911 0372 CE       		.byte	-50
+ 912 0373 5E       		.byte	94
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 17
+
+
+ 913 0374 D0       		.byte	-48
+ 914 0375 C0       		.byte	-64
+ 915 0376 D6       		.byte	-42
+ 916 0377 0F       		.byte	15
+ 917 0378 DE       		.byte	-34
+ 918 0379 02       		.byte	2
+ 919 037a EE       		.byte	-18
+ 920 037b 01       		.byte	1
+ 921 037c E6       		.byte	-26
+ 922 037d 80       		.byte	-128
+ 923 037e 54       		.byte	84
+ 924 037f 09       		.byte	9
+ 925 0380 56       		.byte	86
+ 926 0381 04       		.byte	4
+ 927 0382 5B       		.byte	91
+ 928 0383 04       		.byte	4
+ 929 0384 5D       		.byte	93
+ 930 0385 10       		.byte	16
+ 931 0386 5F       		.byte	95
+ 932 0387 01       		.byte	1
+ 933 0388 04       		.byte	4
+ 934 0389 02       		.byte	2
+ 935 038a 05       		.byte	5
+ 936 038b 06       		.byte	6
+ 937 038c 06       		.byte	6
+ 938 038d 02       		.byte	2
+ 939 038e 07       		.byte	7
+ 940 038f 08       		.byte	8
+ 941 0390 0C       		.byte	12
+ 942 0391 08       		.byte	8
+ 943 0392 0E       		.byte	14
+ 944 0393 6C       		.byte	108
+ 945 0394 0F       		.byte	15
+ 946 0395 01       		.byte	1
+ 947 0396 15       		.byte	21
+ 948 0397 01       		.byte	1
+ 949 0398 17       		.byte	23
+ 950 0399 14       		.byte	20
+ 951 039a 1C       		.byte	28
+ 952 039b 21       		.byte	33
+ 953 039c 1D       		.byte	29
+ 954 039d 20       		.byte	32
+ 955 039e 1E       		.byte	30
+ 956 039f 40       		.byte	64
+ 957 03a0 1F       		.byte	31
+ 958 03a1 10       		.byte	16
+ 959 03a2 24       		.byte	36
+ 960 03a3 04       		.byte	4
+ 961 03a4 25       		.byte	37
+ 962 03a5 84       		.byte	-124
+ 963 03a6 26       		.byte	38
+ 964 03a7 0C       		.byte	12
+ 965 03a8 27       		.byte	39
+ 966 03a9 09       		.byte	9
+ 967 03aa 2C       		.byte	44
+ 968 03ab 08       		.byte	8
+ 969 03ac 2D       		.byte	45
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 18
+
+
+ 970 03ad 01       		.byte	1
+ 971 03ae 2E       		.byte	46
+ 972 03af 84       		.byte	-124
+ 973 03b0 35       		.byte	53
+ 974 03b1 02       		.byte	2
+ 975 03b2 37       		.byte	55
+ 976 03b3 14       		.byte	20
+ 977 03b4 3C       		.byte	60
+ 978 03b5 04       		.byte	4
+ 979 03b6 3D       		.byte	61
+ 980 03b7 80       		.byte	-128
+ 981 03b8 3E       		.byte	62
+ 982 03b9 02       		.byte	2
+ 983 03ba 44       		.byte	68
+ 984 03bb 10       		.byte	16
+ 985 03bc 45       		.byte	69
+ 986 03bd 20       		.byte	32
+ 987 03be 46       		.byte	70
+ 988 03bf 80       		.byte	-128
+ 989 03c0 47       		.byte	71
+ 990 03c1 09       		.byte	9
+ 991 03c2 4D       		.byte	77
+ 992 03c3 08       		.byte	8
+ 993 03c4 4E       		.byte	78
+ 994 03c5 09       		.byte	9
+ 995 03c6 4F       		.byte	79
+ 996 03c7 01       		.byte	1
+ 997 03c8 55       		.byte	85
+ 998 03c9 40       		.byte	64
+ 999 03ca 56       		.byte	86
+ 1000 03cb 21       		.byte	33
+ 1001 03cc 57       		.byte	87
+ 1002 03cd 80       		.byte	-128
+ 1003 03ce 58       		.byte	88
+ 1004 03cf 20       		.byte	32
+ 1005 03d0 59       		.byte	89
+ 1006 03d1 88       		.byte	-120
+ 1007 03d2 5B       		.byte	91
+ 1008 03d3 02       		.byte	2
+ 1009 03d4 60       		.byte	96
+ 1010 03d5 01       		.byte	1
+ 1011 03d6 61       		.byte	97
+ 1012 03d7 02       		.byte	2
+ 1013 03d8 66       		.byte	102
+ 1014 03d9 40       		.byte	64
+ 1015 03da 6C       		.byte	108
+ 1016 03db 01       		.byte	1
+ 1017 03dc 6D       		.byte	109
+ 1018 03dd 01       		.byte	1
+ 1019 03de 6F       		.byte	111
+ 1020 03df 14       		.byte	20
+ 1021 03e0 76       		.byte	118
+ 1022 03e1 02       		.byte	2
+ 1023 03e2 80       		.byte	-128
+ 1024 03e3 20       		.byte	32
+ 1025 03e4 83       		.byte	-125
+ 1026 03e5 80       		.byte	-128
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 19
+
+
+ 1027 03e6 84       		.byte	-124
+ 1028 03e7 10       		.byte	16
+ 1029 03e8 85       		.byte	-123
+ 1030 03e9 82       		.byte	-126
+ 1031 03ea 87       		.byte	-121
+ 1032 03eb 12       		.byte	18
+ 1033 03ec 8A       		.byte	-118
+ 1034 03ed 01       		.byte	1
+ 1035 03ee 8D       		.byte	-115
+ 1036 03ef 84       		.byte	-124
+ 1037 03f0 8E       		.byte	-114
+ 1038 03f1 40       		.byte	64
+ 1039 03f2 94       		.byte	-108
+ 1040 03f3 02       		.byte	2
+ 1041 03f4 95       		.byte	-107
+ 1042 03f5 01       		.byte	1
+ 1043 03f6 9A       		.byte	-102
+ 1044 03f7 40       		.byte	64
+ 1045 03f8 9C       		.byte	-100
+ 1046 03f9 10       		.byte	16
+ 1047 03fa 9E       		.byte	-98
+ 1048 03fb 23       		.byte	35
+ 1049 03fc 9F       		.byte	-97
+ 1050 03fd 15       		.byte	21
+ 1051 03fe A2       		.byte	-94
+ 1052 03ff 10       		.byte	16
+ 1053 0400 A5       		.byte	-91
+ 1054 0401 04       		.byte	4
+ 1055 0402 AC       		.byte	-84
+ 1056 0403 84       		.byte	-124
+ 1057 0404 C0       		.byte	-64
+ 1058 0405 F0       		.byte	-16
+ 1059 0406 C2       		.byte	-62
+ 1060 0407 F0       		.byte	-16
+ 1061 0408 C4       		.byte	-60
+ 1062 0409 70       		.byte	112
+ 1063 040a CA       		.byte	-54
+ 1064 040b F0       		.byte	-16
+ 1065 040c CC       		.byte	-52
+ 1066 040d E0       		.byte	-32
+ 1067 040e CE       		.byte	-50
+ 1068 040f D0       		.byte	-48
+ 1069 0410 D0       		.byte	-48
+ 1070 0411 E0       		.byte	-32
+ 1071 0412 D2       		.byte	-46
+ 1072 0413 30       		.byte	48
+ 1073 0414 D6       		.byte	-42
+ 1074 0415 0F       		.byte	15
+ 1075 0416 D8       		.byte	-40
+ 1076 0417 19       		.byte	25
+ 1077 0418 E0       		.byte	-32
+ 1078 0419 20       		.byte	32
+ 1079 041a E6       		.byte	-26
+ 1080 041b 40       		.byte	64
+ 1081 041c 00       		.byte	0
+ 1082 041d 06       		.byte	6
+ 1083 041e 01       		.byte	1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 20
+
+
+ 1084 041f 01       		.byte	1
+ 1085 0420 03       		.byte	3
+ 1086 0421 02       		.byte	2
+ 1087 0422 0E       		.byte	14
+ 1088 0423 04       		.byte	4
+ 1089 0424 14       		.byte	20
+ 1090 0425 01       		.byte	1
+ 1091 0426 17       		.byte	23
+ 1092 0427 08       		.byte	8
+ 1093 0428 1E       		.byte	30
+ 1094 0429 01       		.byte	1
+ 1095 042a 21       		.byte	33
+ 1096 042b 01       		.byte	1
+ 1097 042c 22       		.byte	34
+ 1098 042d 04       		.byte	4
+ 1099 042e 23       		.byte	35
+ 1100 042f 04       		.byte	4
+ 1101 0430 26       		.byte	38
+ 1102 0431 02       		.byte	2
+ 1103 0432 31       		.byte	49
+ 1104 0433 08       		.byte	8
+ 1105 0434 32       		.byte	50
+ 1106 0435 02       		.byte	2
+ 1107 0436 33       		.byte	51
+ 1108 0437 04       		.byte	4
+ 1109 0438 34       		.byte	52
+ 1110 0439 04       		.byte	4
+ 1111 043a 35       		.byte	53
+ 1112 043b 02       		.byte	2
+ 1113 043c 36       		.byte	54
+ 1114 043d 01       		.byte	1
+ 1115 043e 37       		.byte	55
+ 1116 043f 01       		.byte	1
+ 1117 0440 39       		.byte	57
+ 1118 0441 80       		.byte	-128
+ 1119 0442 3E       		.byte	62
+ 1120 0443 54       		.byte	84
+ 1121 0444 54       		.byte	84
+ 1122 0445 40       		.byte	64
+ 1123 0446 58       		.byte	88
+ 1124 0447 04       		.byte	4
+ 1125 0448 59       		.byte	89
+ 1126 0449 04       		.byte	4
+ 1127 044a 5B       		.byte	91
+ 1128 044b 04       		.byte	4
+ 1129 044c 5C       		.byte	92
+ 1130 044d 20       		.byte	32
+ 1131 044e 5D       		.byte	93
+ 1132 044f 10       		.byte	16
+ 1133 0450 5F       		.byte	95
+ 1134 0451 01       		.byte	1
+ 1135 0452 80       		.byte	-128
+ 1136 0453 01       		.byte	1
+ 1137 0454 85       		.byte	-123
+ 1138 0455 07       		.byte	7
+ 1139 0456 89       		.byte	-119
+ 1140 0457 07       		.byte	7
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 21
+
+
+ 1141 0458 8E       		.byte	-114
+ 1142 0459 04       		.byte	4
+ 1143 045a 91       		.byte	-111
+ 1144 045b 04       		.byte	4
+ 1145 045c 92       		.byte	-110
+ 1146 045d 02       		.byte	2
+ 1147 045e 9E       		.byte	-98
+ 1148 045f 01       		.byte	1
+ 1149 0460 A0       		.byte	-96
+ 1150 0461 01       		.byte	1
+ 1151 0462 A3       		.byte	-93
+ 1152 0463 01       		.byte	1
+ 1153 0464 A6       		.byte	-90
+ 1154 0465 02       		.byte	2
+ 1155 0466 AE       		.byte	-82
+ 1156 0467 04       		.byte	4
+ 1157 0468 B0       		.byte	-80
+ 1158 0469 04       		.byte	4
+ 1159 046a B1       		.byte	-79
+ 1160 046b 02       		.byte	2
+ 1161 046c B2       		.byte	-78
+ 1162 046d 02       		.byte	2
+ 1163 046e B3       		.byte	-77
+ 1164 046f 01       		.byte	1
+ 1165 0470 B4       		.byte	-76
+ 1166 0471 01       		.byte	1
+ 1167 0472 B5       		.byte	-75
+ 1168 0473 01       		.byte	1
+ 1169 0474 B7       		.byte	-73
+ 1170 0475 04       		.byte	4
+ 1171 0476 BE       		.byte	-66
+ 1172 0477 14       		.byte	20
+ 1173 0478 C0       		.byte	-64
+ 1174 0479 40       		.byte	64
+ 1175 047a C1       		.byte	-63
+ 1176 047b 02       		.byte	2
+ 1177 047c C5       		.byte	-59
+ 1178 047d D2       		.byte	-46
+ 1179 047e C7       		.byte	-57
+ 1180 047f 01       		.byte	1
+ 1181 0480 C8       		.byte	-56
+ 1182 0481 1B       		.byte	27
+ 1183 0482 C9       		.byte	-55
+ 1184 0483 FF       		.byte	-1
+ 1185 0484 CA       		.byte	-54
+ 1186 0485 FF       		.byte	-1
+ 1187 0486 CB       		.byte	-53
+ 1188 0487 FF       		.byte	-1
+ 1189 0488 CD       		.byte	-51
+ 1190 0489 A0       		.byte	-96
+ 1191 048a CF       		.byte	-49
+ 1192 048b 04       		.byte	4
+ 1193 048c D0       		.byte	-48
+ 1194 048d 18       		.byte	24
+ 1195 048e D4       		.byte	-44
+ 1196 048f 05       		.byte	5
+ 1197 0490 D8       		.byte	-40
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 22
+
+
+ 1198 0491 0B       		.byte	11
+ 1199 0492 D9       		.byte	-39
+ 1200 0493 0B       		.byte	11
+ 1201 0494 DA       		.byte	-38
+ 1202 0495 0B       		.byte	11
+ 1203 0496 DB       		.byte	-37
+ 1204 0497 0B       		.byte	11
+ 1205 0498 DF       		.byte	-33
+ 1206 0499 01       		.byte	1
+ 1207 049a E0       		.byte	-32
+ 1208 049b 40       		.byte	64
+ 1209 049c E2       		.byte	-30
+ 1210 049d C0       		.byte	-64
+ 1211 049e E4       		.byte	-28
+ 1212 049f 40       		.byte	64
+ 1213 04a0 E5       		.byte	-27
+ 1214 04a1 40       		.byte	64
+ 1215 04a2 E6       		.byte	-26
+ 1216 04a3 C0       		.byte	-64
+ 1217 04a4 E8       		.byte	-24
+ 1218 04a5 C0       		.byte	-64
+ 1219 04a6 EA       		.byte	-22
+ 1220 04a7 C0       		.byte	-64
+ 1221 04a8 EC       		.byte	-20
+ 1222 04a9 C0       		.byte	-64
+ 1223 04aa EE       		.byte	-18
+ 1224 04ab C0       		.byte	-64
+ 1225 04ac 01       		.byte	1
+ 1226 04ad 40       		.byte	64
+ 1227 04ae 03       		.byte	3
+ 1228 04af 40       		.byte	64
+ 1229 04b0 07       		.byte	7
+ 1230 04b1 42       		.byte	66
+ 1231 04b2 08       		.byte	8
+ 1232 04b3 40       		.byte	64
+ 1233 04b4 09       		.byte	9
+ 1234 04b5 80       		.byte	-128
+ 1235 04b6 0A       		.byte	10
+ 1236 04b7 40       		.byte	64
+ 1237 04b8 0C       		.byte	12
+ 1238 04b9 80       		.byte	-128
+ 1239 04ba 0D       		.byte	13
+ 1240 04bb 08       		.byte	8
+ 1241 04bc 10       		.byte	16
+ 1242 04bd 22       		.byte	34
+ 1243 04be 13       		.byte	19
+ 1244 04bf 02       		.byte	2
+ 1245 04c0 14       		.byte	20
+ 1246 04c1 40       		.byte	64
+ 1247 04c2 16       		.byte	22
+ 1248 04c3 10       		.byte	16
+ 1249 04c4 17       		.byte	23
+ 1250 04c5 08       		.byte	8
+ 1251 04c6 19       		.byte	25
+ 1252 04c7 26       		.byte	38
+ 1253 04c8 1A       		.byte	26
+ 1254 04c9 40       		.byte	64
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 23
+
+
+ 1255 04ca 1C       		.byte	28
+ 1256 04cb 08       		.byte	8
+ 1257 04cc 1E       		.byte	30
+ 1258 04cd 02       		.byte	2
+ 1259 04ce 1F       		.byte	31
+ 1260 04cf 08       		.byte	8
+ 1261 04d0 20       		.byte	32
+ 1262 04d1 04       		.byte	4
+ 1263 04d2 21       		.byte	33
+ 1264 04d3 06       		.byte	6
+ 1265 04d4 22       		.byte	34
+ 1266 04d5 40       		.byte	64
+ 1267 04d6 25       		.byte	37
+ 1268 04d7 98       		.byte	-104
+ 1269 04d8 27       		.byte	39
+ 1270 04d9 40       		.byte	64
+ 1271 04da 29       		.byte	41
+ 1272 04db 02       		.byte	2
+ 1273 04dc 2C       		.byte	44
+ 1274 04dd A0       		.byte	-96
+ 1275 04de 2E       		.byte	46
+ 1276 04df 04       		.byte	4
+ 1277 04e0 31       		.byte	49
+ 1278 04e1 02       		.byte	2
+ 1279 04e2 37       		.byte	55
+ 1280 04e3 08       		.byte	8
+ 1281 04e4 38       		.byte	56
+ 1282 04e5 28       		.byte	40
+ 1283 04e6 3D       		.byte	61
+ 1284 04e7 02       		.byte	2
+ 1285 04e8 42       		.byte	66
+ 1286 04e9 44       		.byte	68
+ 1287 04ea 44       		.byte	68
+ 1288 04eb 01       		.byte	1
+ 1289 04ec 46       		.byte	70
+ 1290 04ed 01       		.byte	1
+ 1291 04ee 48       		.byte	72
+ 1292 04ef 20       		.byte	32
+ 1293 04f0 49       		.byte	73
+ 1294 04f1 01       		.byte	1
+ 1295 04f2 50       		.byte	80
+ 1296 04f3 14       		.byte	20
+ 1297 04f4 59       		.byte	89
+ 1298 04f5 05       		.byte	5
+ 1299 04f6 5A       		.byte	90
+ 1300 04f7 80       		.byte	-128
+ 1301 04f8 64       		.byte	100
+ 1302 04f9 01       		.byte	1
+ 1303 04fa 66       		.byte	102
+ 1304 04fb 20       		.byte	32
+ 1305 04fc 67       		.byte	103
+ 1306 04fd 20       		.byte	32
+ 1307 04fe 69       		.byte	105
+ 1308 04ff 40       		.byte	64
+ 1309 0500 7B       		.byte	123
+ 1310 0501 80       		.byte	-128
+ 1311 0502 87       		.byte	-121
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 24
+
+
+ 1312 0503 48       		.byte	72
+ 1313 0504 93       		.byte	-109
+ 1314 0505 20       		.byte	32
+ 1315 0506 94       		.byte	-108
+ 1316 0507 06       		.byte	6
+ 1317 0508 95       		.byte	-107
+ 1318 0509 49       		.byte	73
+ 1319 050a 97       		.byte	-105
+ 1320 050b 40       		.byte	64
+ 1321 050c 9A       		.byte	-102
+ 1322 050d 50       		.byte	80
+ 1323 050e 9B       		.byte	-101
+ 1324 050f 02       		.byte	2
+ 1325 0510 9C       		.byte	-100
+ 1326 0511 90       		.byte	-112
+ 1327 0512 9D       		.byte	-99
+ 1328 0513 20       		.byte	32
+ 1329 0514 9E       		.byte	-98
+ 1330 0515 03       		.byte	3
+ 1331 0516 9F       		.byte	-97
+ 1332 0517 15       		.byte	21
+ 1333 0518 A0       		.byte	-96
+ 1334 0519 82       		.byte	-126
+ 1335 051a A1       		.byte	-95
+ 1336 051b 01       		.byte	1
+ 1337 051c A2       		.byte	-94
+ 1338 051d 10       		.byte	16
+ 1339 051e A3       		.byte	-93
+ 1340 051f 80       		.byte	-128
+ 1341 0520 A5       		.byte	-91
+ 1342 0521 14       		.byte	20
+ 1343 0522 A6       		.byte	-90
+ 1344 0523 01       		.byte	1
+ 1345 0524 A8       		.byte	-88
+ 1346 0525 48       		.byte	72
+ 1347 0526 A9       		.byte	-87
+ 1348 0527 01       		.byte	1
+ 1349 0528 AA       		.byte	-86
+ 1350 0529 08       		.byte	8
+ 1351 052a C0       		.byte	-64
+ 1352 052b 99       		.byte	-103
+ 1353 052c C2       		.byte	-62
+ 1354 052d A9       		.byte	-87
+ 1355 052e C4       		.byte	-60
+ 1356 052f 3D       		.byte	61
+ 1357 0530 CA       		.byte	-54
+ 1358 0531 81       		.byte	-127
+ 1359 0532 CC       		.byte	-52
+ 1360 0533 41       		.byte	65
+ 1361 0534 CE       		.byte	-50
+ 1362 0535 86       		.byte	-122
+ 1363 0536 D0       		.byte	-48
+ 1364 0537 05       		.byte	5
+ 1365 0538 D6       		.byte	-42
+ 1366 0539 0B       		.byte	11
+ 1367 053a D8       		.byte	-40
+ 1368 053b 70       		.byte	112
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 25
+
+
+ 1369 053c DE       		.byte	-34
+ 1370 053d 01       		.byte	1
+ 1371 053e 12       		.byte	18
+ 1372 053f 80       		.byte	-128
+ 1373 0540 33       		.byte	51
+ 1374 0541 20       		.byte	32
+ 1375 0542 36       		.byte	54
+ 1376 0543 80       		.byte	-128
+ 1377 0544 3D       		.byte	61
+ 1378 0545 80       		.byte	-128
+ 1379 0546 6D       		.byte	109
+ 1380 0547 80       		.byte	-128
+ 1381 0548 6F       		.byte	111
+ 1382 0549 20       		.byte	32
+ 1383 054a C4       		.byte	-60
+ 1384 054b 10       		.byte	16
+ 1385 054c CC       		.byte	-52
+ 1386 054d 30       		.byte	48
+ 1387 054e CE       		.byte	-50
+ 1388 054f 20       		.byte	32
+ 1389 0550 53       		.byte	83
+ 1390 0551 01       		.byte	1
+ 1391 0552 57       		.byte	87
+ 1392 0553 08       		.byte	8
+ 1393 0554 83       		.byte	-125
+ 1394 0555 01       		.byte	1
+ 1395 0556 8E       		.byte	-114
+ 1396 0557 04       		.byte	4
+ 1397 0558 A5       		.byte	-91
+ 1398 0559 40       		.byte	64
+ 1399 055a D4       		.byte	-44
+ 1400 055b C0       		.byte	-64
+ 1401 055c E6       		.byte	-26
+ 1402 055d 20       		.byte	32
+ 1403 055e 52       		.byte	82
+ 1404 055f 04       		.byte	4
+ 1405 0560 9A       		.byte	-102
+ 1406 0561 04       		.byte	4
+ 1407 0562 A5       		.byte	-91
+ 1408 0563 40       		.byte	64
+ 1409 0564 A7       		.byte	-89
+ 1410 0565 08       		.byte	8
+ 1411 0566 D4       		.byte	-44
+ 1412 0567 20       		.byte	32
+ 1413 0568 A5       		.byte	-91
+ 1414 0569 40       		.byte	64
+ 1415 056a AF       		.byte	-81
+ 1416 056b 08       		.byte	8
+ 1417 056c EE       		.byte	-18
+ 1418 056d 40       		.byte	64
+ 1419 056e 12       		.byte	18
+ 1420 056f 40       		.byte	64
+ 1421 0570 C4       		.byte	-60
+ 1422 0571 08       		.byte	8
+ 1423 0572 02       		.byte	2
+ 1424 0573 20       		.byte	32
+ 1425 0574 8A       		.byte	-118
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 26
+
+
+ 1426 0575 40       		.byte	64
+ 1427 0576 9A       		.byte	-102
+ 1428 0577 40       		.byte	64
+ 1429 0578 C0       		.byte	-64
+ 1430 0579 08       		.byte	8
+ 1431 057a E6       		.byte	-26
+ 1432 057b 01       		.byte	1
+ 1433 057c AA       		.byte	-86
+ 1434 057d 20       		.byte	32
+ 1435 057e A5       		.byte	-91
+ 1436 057f 40       		.byte	64
+ 1437 0580 13       		.byte	19
+ 1438 0581 02       		.byte	2
+ 1439 0582 74       		.byte	116
+ 1440 0583 02       		.byte	2
+ 1441 0584 85       		.byte	-123
+ 1442 0585 40       		.byte	64
+ 1443 0586 8B       		.byte	-117
+ 1444 0587 02       		.byte	2
+ 1445 0588 8C       		.byte	-116
+ 1446 0589 02       		.byte	2
+ 1447 058a A5       		.byte	-91
+ 1448 058b 40       		.byte	64
+ 1449 058c C4       		.byte	-60
+ 1450 058d 10       		.byte	16
+ 1451 058e DE       		.byte	-34
+ 1452 058f 20       		.byte	32
+ 1453 0590 E2       		.byte	-30
+ 1454 0591 40       		.byte	64
+ 1455 0592 00       		.byte	0
+ 1456 0593 07       		.byte	7
+ 1457 0594 08       		.byte	8
+ 1458 0595 07       		.byte	7
+ 1459 0596 0A       		.byte	10
+ 1460 0597 07       		.byte	7
+ 1461 0598 10       		.byte	16
+ 1462 0599 07       		.byte	7
+ 1463 059a 1A       		.byte	26
+ 1464 059b 07       		.byte	7
+ 1465 059c 00       		.byte	0
+ 1466 059d 0F       		.byte	15
+ 1467 059e 10       		.byte	16
+ 1468 059f 01       		.byte	1
+ 1469 05a0 6C       		.byte	108
+ 1470 05a1 00       		.byte	0
+ 1471 05a2 80       		.byte	-128
+ 1472 05a3 00       		.byte	0
+ 1473 05a4 00       		.byte	0
+ 1474 05a5 00       		.byte	0
+ 1475 05a6 00       		.byte	0
+ 1476 05a7 00       		.byte	0
+ 1477 05a8 E8       		.byte	-24
+ 1478 05a9 0C       		.byte	12
+ 1479 05aa 04       		.byte	4
+ 1480 05ab 00       		.byte	0
+ 1481 05ac 00       		.byte	0
+ 1482 05ad 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 27
+
+
+ 1483 05ae 80       		.byte	-128
+ 1484 05af 01       		.byte	1
+ 1485 05b0 11       		.byte	17
+ 1486 05b1 00       		.byte	0
+ 1487 05b2 26       		.byte	38
+ 1488 05b3 02       		.byte	2
+ 1489 05b4 01       		.byte	1
+ 1490 05b5 08       		.byte	8
+ 1491 05b6 06       		.byte	6
+ 1492 05b7 00       		.byte	0
+ 1493 05b8 17       		.byte	23
+ 1494 05b9 00       		.byte	0
+ 1495 05ba 40       		.byte	64
+ 1496 05bb 00       		.byte	0
+ 1497 05bc 10       		.byte	16
+ 1498 05bd 00       		.byte	0
+ 1499 05be 68       		.byte	104
+ 1500 05bf 00       		.byte	0
+ 1501 05c0 EC       		.byte	-20
+ 1502 05c1 00       		.byte	0
+ 1503 05c2 00       		.byte	0
+ 1504 05c3 02       		.byte	2
+ 1505 05c4 08       		.byte	8
+ 1506 05c5 00       		.byte	0
+ 1507 05c6 13       		.byte	19
+ 1508 05c7 00       		.byte	0
+ 1509 05c8 EC       		.byte	-20
+ 1510 05c9 0C       		.byte	12
+ 1511 05ca 00       		.byte	0
+ 1512 05cb 00       		.byte	0
+ 1513 05cc EC       		.byte	-20
+ 1514 05cd 00       		.byte	0
+ 1515 05ce 00       		.byte	0
+ 1516 05cf 01       		.byte	1
+ 1517 05d0 00       		.byte	0
+ 1518 05d1 08       		.byte	8
+ 1519 05d2 07       		.byte	7
+ 1520 05d3 04       		.byte	4
+ 1521 05d4 80       		.byte	-128
+ 1522 05d5 01       		.byte	1
+ 1523 05d6 78       		.byte	120
+ 1524 05d7 02       		.byte	2
+ 1525 05d8 00       		.byte	0
+ 1526 05d9 00       		.byte	0
+ 1527 05da 88       		.byte	-120
+ 1528 05db 00       		.byte	0
+ 1529 05dc 00       		.byte	0
+ 1530 05dd 00       		.byte	0
+ 1531 05de 10       		.byte	16
+ 1532 05df 40       		.byte	64
+ 1533 05e0 36       		.byte	54
+ 1534 05e1 01       		.byte	1
+ 1535 05e2 00       		.byte	0
+ 1536 05e3 00       		.byte	0
+ 1537 05e4 00       		.byte	0
+ 1538 05e5 2C       		.byte	44
+ 1539 05e6 40       		.byte	64
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 28
+
+
+ 1540 05e7 3E       		.byte	62
+ 1541 05e8 3B       		.byte	59
+ 1542 05e9 FF       		.byte	-1
+ 1543 05ea FF       		.byte	-1
+ 1544 05eb FF       		.byte	-1
+ 1545 05ec 00       		.byte	0
+ 1546 05ed A0       		.byte	-96
+ 1547 05ee 00       		.byte	0
+ 1548 05ef 01       		.byte	1
+ 1549 05f0 18       		.byte	24
+ 1550 05f1 00       		.byte	0
+ 1551 05f2 80       		.byte	-128
+ 1552 05f3 00       		.byte	0
+ 1553 05f4 05       		.byte	5
+ 1554 05f5 00       		.byte	0
+ 1555 05f6 00       		.byte	0
+ 1556 05f7 00       		.byte	0
+ 1557 05f8 04       		.byte	4
+ 1558 05f9 04       		.byte	4
+ 1559 05fa 04       		.byte	4
+ 1560 05fb 04       		.byte	4
+ 1561 05fc 01       		.byte	1
+ 1562 05fd 02       		.byte	2
+ 1563 05fe 00       		.byte	0
+ 1564 05ff 01       		.byte	1
+ 1565 0600 40       		.byte	64
+ 1566 0601 00       		.byte	0
+ 1567 0602 80       		.byte	-128
+ 1568 0603 00       		.byte	0
+ 1569 0604 40       		.byte	64
+ 1570 0605 40       		.byte	64
+ 1571 0606 80       		.byte	-128
+ 1572 0607 00       		.byte	0
+ 1573 0608 40       		.byte	64
+ 1574 0609 00       		.byte	0
+ 1575 060a 80       		.byte	-128
+ 1576 060b 00       		.byte	0
+ 1577 060c 40       		.byte	64
+ 1578 060d 20       		.byte	32
+ 1579 060e 80       		.byte	-128
+ 1580 060f 00       		.byte	0
+ 1581 0610 00       		.byte	0
+ 1582 0611 00       		.byte	0
+ 1583 0612 00       		.byte	0
+ 1584 0613 00       		.byte	0
+ 1585 0614 00       		.byte	0
+ 1586 0615 00       		.byte	0
+ 1587 0616 00       		.byte	0
+ 1588 0617 00       		.byte	0
+ 1589 0618 00       		.byte	0
+ 1590 0619 00       		.byte	0
+ 1591 061a 00       		.byte	0
+ 1592 061b 00       		.byte	0
+ 1593 061c 00       		.byte	0
+ 1594 061d 00       		.byte	0
+ 1595 061e 00       		.byte	0
+ 1596 061f 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 29
+
+
+ 1597 0620 04       		.byte	4
+ 1598 0621 1A       		.byte	26
+ 1599 0622 80       		.byte	-128
+ 1600 0623 00       		.byte	0
+ 1601 0624 0A       		.byte	10
+ 1602 0625 9C       		.byte	-100
+ 1603 0626 10       		.byte	16
+ 1604 0627 03       		.byte	3
+ 1605 0628 56       		.byte	86
+ 1606 0629 00       		.byte	0
+ 1607 062a 09       		.byte	9
+ 1608 062b 00       		.byte	0
+ 1609 062c 84       		.byte	-124
+ 1610 062d 82       		.byte	-126
+ 1611 062e 00       		.byte	0
+ 1612 062f 00       		.byte	0
+ 1613 0630 01       		.byte	1
+ 1614 0631 18       		.byte	24
+ 1615 0632 00       		.byte	0
+ 1616 0633 02       		.byte	2
+ 1617 0634 04       		.byte	4
+ 1618 0635 02       		.byte	2
+ 1619 0636 00       		.byte	0
+ 1620 0637 18       		.byte	24
+ 1621 0638 07       		.byte	7
+ 1622 0639 18       		.byte	24
+ 1623 063a 38       		.byte	56
+ 1624 063b 02       		.byte	2
+ 1625 063c 60       		.byte	96
+ 1626 063d 00       		.byte	0
+ 1627 063e 00       		.byte	0
+ 1628 063f 00       		.byte	0
+ 1629 0640 84       		.byte	-124
+ 1630 0641 1A       		.byte	26
+ 1631 0642 00       		.byte	0
+ 1632 0643 00       		.byte	0
+ 1633 0644 80       		.byte	-128
+ 1634 0645 33       		.byte	51
+ 1635 0646 04       		.byte	4
+ 1636 0647 44       		.byte	68
+ 1637 0648 84       		.byte	-124
+ 1638 0649 18       		.byte	24
+ 1639 064a 00       		.byte	0
+ 1640 064b 00       		.byte	0
+ 1641 064c 00       		.byte	0
+ 1642 064d C1       		.byte	-63
+ 1643 064e 00       		.byte	0
+ 1644 064f 38       		.byte	56
+ 1645 0650 7F       		.byte	127
+ 1646 0651 00       		.byte	0
+ 1647 0652 08       		.byte	8
+ 1648 0653 13       		.byte	19
+ 1649 0654 80       		.byte	-128
+ 1650 0655 E0       		.byte	-32
+ 1651 0656 02       		.byte	2
+ 1652 0657 0F       		.byte	15
+ 1653 0658 02       		.byte	2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 30
+
+
+ 1654 0659 00       		.byte	0
+ 1655 065a 00       		.byte	0
+ 1656 065b A0       		.byte	-96
+ 1657 065c 00       		.byte	0
+ 1658 065d 00       		.byte	0
+ 1659 065e 54       		.byte	84
+ 1660 065f 00       		.byte	0
+ 1661 0660 43       		.byte	67
+ 1662 0661 06       		.byte	6
+ 1663 0662 20       		.byte	32
+ 1664 0663 00       		.byte	0
+ 1665 0664 05       		.byte	5
+ 1666 0665 BE       		.byte	-66
+ 1667 0666 FC       		.byte	-4
+ 1668 0667 D0       		.byte	-48
+ 1669 0668 2F       		.byte	47
+ 1670 0669 FF       		.byte	-1
+ 1671 066a FF       		.byte	-1
+ 1672 066b FF       		.byte	-1
+ 1673 066c 22       		.byte	34
+ 1674 066d 00       		.byte	0
+ 1675 066e F0       		.byte	-16
+ 1676 066f 08       		.byte	8
+ 1677 0670 04       		.byte	4
+ 1678 0671 00       		.byte	0
+ 1679 0672 00       		.byte	0
+ 1680 0673 00       		.byte	0
+ 1681 0674 00       		.byte	0
+ 1682 0675 00       		.byte	0
+ 1683 0676 02       		.byte	2
+ 1684 0677 20       		.byte	32
+ 1685 0678 04       		.byte	4
+ 1686 0679 04       		.byte	4
+ 1687 067a 04       		.byte	4
+ 1688 067b 04       		.byte	4
+ 1689 067c 11       		.byte	17
+ 1690 067d 11       		.byte	17
+ 1691 067e 00       		.byte	0
+ 1692 067f 01       		.byte	1
+ 1693 0680 00       		.byte	0
+ 1694 0681 00       		.byte	0
+ 1695 0682 C0       		.byte	-64
+ 1696 0683 00       		.byte	0
+ 1697 0684 40       		.byte	64
+ 1698 0685 01       		.byte	1
+ 1699 0686 10       		.byte	16
+ 1700 0687 11       		.byte	17
+ 1701 0688 C0       		.byte	-64
+ 1702 0689 01       		.byte	1
+ 1703 068a 00       		.byte	0
+ 1704 068b 11       		.byte	17
+ 1705 068c 40       		.byte	64
+ 1706 068d 01       		.byte	1
+ 1707 068e 40       		.byte	64
+ 1708 068f 01       		.byte	1
+ 1709 0690 00       		.byte	0
+ 1710 0691 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 31
+
+
+ 1711 0692 00       		.byte	0
+ 1712 0693 00       		.byte	0
+ 1713 0694 00       		.byte	0
+ 1714 0695 00       		.byte	0
+ 1715 0696 00       		.byte	0
+ 1716 0697 00       		.byte	0
+ 1717 0698 00       		.byte	0
+ 1718 0699 00       		.byte	0
+ 1719 069a 00       		.byte	0
+ 1720 069b 00       		.byte	0
+ 1721 069c 00       		.byte	0
+ 1722 069d 00       		.byte	0
+ 1723 069e 00       		.byte	0
+ 1724 069f 00       		.byte	0
+ 1725 06a0 00       		.byte	0
+ 1726 06a1 03       		.byte	3
+ 1727 06a2 03       		.byte	3
+ 1728 06a3 00       		.byte	0
+ 1729 06a4 03       		.byte	3
+ 1730 06a5 00       		.byte	0
+ 1731 06a6 00       		.byte	0
+ 1732 06a7 00       		.byte	0
+ 1733 06a8 A8       		.byte	-88
+ 1734 06a9 00       		.byte	0
+ 1735 06aa 11       		.byte	17
+ 1736 06ab AE       		.byte	-82
+ 1737 06ac 86       		.byte	-122
+ 1738 06ad 00       		.byte	0
+ 1739 06ae 06       		.byte	6
+ 1740 06af 00       		.byte	0
+ 1741 06b0 00       		.byte	0
+ 1742 06b1 00       		.byte	0
+ 1743 06b2 00       		.byte	0
+ 1744 06b3 00       		.byte	0
+ 1745 06b4 00       		.byte	0
+ 1746 06b5 0B       		.byte	11
+ 1747 06b6 0B       		.byte	11
+ 1748 06b7 00       		.byte	0
+ 1749 06b8 00       		.byte	0
+ 1750 06b9 00       		.byte	0
+ 1751 06ba 00       		.byte	0
+ 1752 06bb 00       		.byte	0
+ 1753 06bc 08       		.byte	8
+ 1754 06bd 00       		.byte	0
+ 1755 06be 01       		.byte	1
+ 1756 06bf 3A       		.byte	58
+ 1757 06c0 32       		.byte	50
+ 1758 06c1 00       		.byte	0
+ 1759 06c2 00       		.byte	0
+ 1760 06c3 00       		.byte	0
+ 1761 06c4 00       		.byte	0
+ 1762 06c5 00       		.byte	0
+ 1763 06c6 00       		.byte	0
+ 1764 06c7 00       		.byte	0
+ 1765              		.section	.cywolatch,"a",%progbits
+ 1766              		.align	2
+ 1767              		.type	cy_meta_wonvl, %object
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 32
+
+
+ 1768              		.size	cy_meta_wonvl, 4
+ 1769              	cy_meta_wonvl:
+ 1770 0000 BC       		.byte	-68
+ 1771 0001 90       		.byte	-112
+ 1772 0002 AC       		.byte	-84
+ 1773 0003 AF       		.byte	-81
+ 1774              		.section	.cycustnvl,"a",%progbits
+ 1775              		.align	2
+ 1776              		.type	cy_meta_custnvl, %object
+ 1777              		.size	cy_meta_custnvl, 4
+ 1778              	cy_meta_custnvl:
+ 1779 0000 00       		.byte	0
+ 1780 0001 00       		.byte	0
+ 1781 0002 40       		.byte	64
+ 1782 0003 05       		.byte	5
+ 1783              		.section	.cymeta,"a",%progbits
+ 1784              		.align	2
+ 1785              		.type	cy_metadata, %object
+ 1786              		.size	cy_metadata, 12
+ 1787              	cy_metadata:
+ 1788 0000 00       		.byte	0
+ 1789 0001 01       		.byte	1
+ 1790 0002 2E       		.byte	46
+ 1791 0003 16       		.byte	22
+ 1792 0004 10       		.byte	16
+ 1793 0005 69       		.byte	105
+ 1794 0006 00       		.byte	0
+ 1795 0007 01       		.byte	1
+ 1796 0008 00       		.byte	0
+ 1797 0009 00       		.byte	0
+ 1798 000a 00       		.byte	0
+ 1799 000b 00       		.byte	0
+ 1800              		.section	.cyflashprotect,"a",%progbits
+ 1801              		.align	2
+ 1802              		.type	cy_meta_flashprotect, %object
+ 1803              		.size	cy_meta_flashprotect, 256
+ 1804              	cy_meta_flashprotect:
+ 1805 0000 00000000 		.space	256
+ 1805      00000000 
+ 1805      00000000 
+ 1805      00000000 
+ 1805      00000000 
+ 1806              		.text
+ 1807              	.Letext0:
+ 1808              		.file 1 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1809              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1810              		.file 3 "Generated_Source\\PSoC5\\cymetadata.c"
+ 1811              		.section	.debug_info,"",%progbits
+ 1812              	.Ldebug_info0:
+ 1813 0000 35010000 		.4byte	0x135
+ 1814 0004 0400     		.2byte	0x4
+ 1815 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 1816 000a 04       		.byte	0x4
+ 1817 000b 01       		.uleb128 0x1
+ 1818 000c 32000000 		.4byte	.LASF17
+ 1819 0010 0C       		.byte	0xc
+ 1820 0011 BE010000 		.4byte	.LASF18
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 33
+
+
+ 1821 0015 5F010000 		.4byte	.LASF19
+ 1822 0019 00000000 		.4byte	.Ldebug_line0
+ 1823 001d 02       		.uleb128 0x2
+ 1824 001e 01       		.byte	0x1
+ 1825 001f 06       		.byte	0x6
+ 1826 0020 B2010000 		.4byte	.LASF0
+ 1827 0024 03       		.uleb128 0x3
+ 1828 0025 0E000000 		.4byte	.LASF9
+ 1829 0029 01       		.byte	0x1
+ 1830 002a 1D       		.byte	0x1d
+ 1831 002b 2F000000 		.4byte	0x2f
+ 1832 002f 02       		.uleb128 0x2
+ 1833 0030 01       		.byte	0x1
+ 1834 0031 08       		.byte	0x8
+ 1835 0032 24000000 		.4byte	.LASF1
+ 1836 0036 02       		.uleb128 0x2
+ 1837 0037 02       		.byte	0x2
+ 1838 0038 05       		.byte	0x5
+ 1839 0039 9F010000 		.4byte	.LASF2
+ 1840 003d 02       		.uleb128 0x2
+ 1841 003e 02       		.byte	0x2
+ 1842 003f 07       		.byte	0x7
+ 1843 0040 D2000000 		.4byte	.LASF3
+ 1844 0044 02       		.uleb128 0x2
+ 1845 0045 04       		.byte	0x4
+ 1846 0046 05       		.byte	0x5
+ 1847 0047 A9010000 		.4byte	.LASF4
+ 1848 004b 02       		.uleb128 0x2
+ 1849 004c 04       		.byte	0x4
+ 1850 004d 07       		.byte	0x7
+ 1851 004e C0000000 		.4byte	.LASF5
+ 1852 0052 02       		.uleb128 0x2
+ 1853 0053 08       		.byte	0x8
+ 1854 0054 05       		.byte	0x5
+ 1855 0055 00000000 		.4byte	.LASF6
+ 1856 0059 02       		.uleb128 0x2
+ 1857 005a 08       		.byte	0x8
+ 1858 005b 07       		.byte	0x7
+ 1859 005c 14010000 		.4byte	.LASF7
+ 1860 0060 04       		.uleb128 0x4
+ 1861 0061 04       		.byte	0x4
+ 1862 0062 05       		.byte	0x5
+ 1863 0063 696E7400 		.ascii	"int\000"
+ 1864 0067 02       		.uleb128 0x2
+ 1865 0068 04       		.byte	0x4
+ 1866 0069 07       		.byte	0x7
+ 1867 006a 07010000 		.4byte	.LASF8
+ 1868 006e 03       		.uleb128 0x3
+ 1869 006f 2B010000 		.4byte	.LASF10
+ 1870 0073 02       		.byte	0x2
+ 1871 0074 18       		.byte	0x18
+ 1872 0075 24000000 		.4byte	0x24
+ 1873 0079 05       		.uleb128 0x5
+ 1874 007a 91000000 		.4byte	0x91
+ 1875 007e 8A000000 		.4byte	0x8a
+ 1876 0082 06       		.uleb128 0x6
+ 1877 0083 8A000000 		.4byte	0x8a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 34
+
+
+ 1878 0087 C706     		.2byte	0x6c7
+ 1879 0089 00       		.byte	0
+ 1880 008a 02       		.uleb128 0x2
+ 1881 008b 04       		.byte	0x4
+ 1882 008c 07       		.byte	0x7
+ 1883 008d 56010000 		.4byte	.LASF11
+ 1884 0091 07       		.uleb128 0x7
+ 1885 0092 6E000000 		.4byte	0x6e
+ 1886 0096 08       		.uleb128 0x8
+ 1887 0097 F5000000 		.4byte	.LASF12
+ 1888 009b 03       		.byte	0x3
+ 1889 009c 1F       		.byte	0x1f
+ 1890 009d A7000000 		.4byte	0xa7
+ 1891 00a1 05       		.uleb128 0x5
+ 1892 00a2 03       		.byte	0x3
+ 1893 00a3 00000000 		.4byte	cy_meta_configecc
+ 1894 00a7 07       		.uleb128 0x7
+ 1895 00a8 79000000 		.4byte	0x79
+ 1896 00ac 05       		.uleb128 0x5
+ 1897 00ad 91000000 		.4byte	0x91
+ 1898 00b1 BC000000 		.4byte	0xbc
+ 1899 00b5 09       		.uleb128 0x9
+ 1900 00b6 8A000000 		.4byte	0x8a
+ 1901 00ba 03       		.byte	0x3
+ 1902 00bb 00       		.byte	0
+ 1903 00bc 0A       		.uleb128 0xa
+ 1904 00bd E5000000 		.4byte	.LASF13
+ 1905 00c1 03       		.byte	0x3
+ 1906 00c2 0501     		.2byte	0x105
+ 1907 00c4 CE000000 		.4byte	0xce
+ 1908 00c8 05       		.uleb128 0x5
+ 1909 00c9 03       		.byte	0x3
+ 1910 00ca 00000000 		.4byte	cy_meta_custnvl
+ 1911 00ce 07       		.uleb128 0x7
+ 1912 00cf AC000000 		.4byte	0xac
+ 1913 00d3 0A       		.uleb128 0xa
+ 1914 00d4 48010000 		.4byte	.LASF14
+ 1915 00d8 03       		.byte	0x3
+ 1916 00d9 1301     		.2byte	0x113
+ 1917 00db E5000000 		.4byte	0xe5
+ 1918 00df 05       		.uleb128 0x5
+ 1919 00e0 03       		.byte	0x3
+ 1920 00e1 00000000 		.4byte	cy_meta_wonvl
+ 1921 00e5 07       		.uleb128 0x7
+ 1922 00e6 AC000000 		.4byte	0xac
+ 1923 00ea 05       		.uleb128 0x5
+ 1924 00eb 91000000 		.4byte	0x91
+ 1925 00ef FA000000 		.4byte	0xfa
+ 1926 00f3 09       		.uleb128 0x9
+ 1927 00f4 8A000000 		.4byte	0x8a
+ 1928 00f8 FF       		.byte	0xff
+ 1929 00f9 00       		.byte	0
+ 1930 00fa 0A       		.uleb128 0xa
+ 1931 00fb 33010000 		.4byte	.LASF15
+ 1932 00ff 03       		.byte	0x3
+ 1933 0100 2101     		.2byte	0x121
+ 1934 0102 0C010000 		.4byte	0x10c
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 35
+
+
+ 1935 0106 05       		.uleb128 0x5
+ 1936 0107 03       		.byte	0x3
+ 1937 0108 00000000 		.4byte	cy_meta_flashprotect
+ 1938 010c 07       		.uleb128 0x7
+ 1939 010d EA000000 		.4byte	0xea
+ 1940 0111 05       		.uleb128 0x5
+ 1941 0112 91000000 		.4byte	0x91
+ 1942 0116 21010000 		.4byte	0x121
+ 1943 011a 09       		.uleb128 0x9
+ 1944 011b 8A000000 		.4byte	0x8a
+ 1945 011f 0B       		.byte	0xb
+ 1946 0120 00       		.byte	0
+ 1947 0121 0A       		.uleb128 0xa
+ 1948 0122 18000000 		.4byte	.LASF16
+ 1949 0126 03       		.byte	0x3
+ 1950 0127 4E01     		.2byte	0x14e
+ 1951 0129 33010000 		.4byte	0x133
+ 1952 012d 05       		.uleb128 0x5
+ 1953 012e 03       		.byte	0x3
+ 1954 012f 00000000 		.4byte	cy_metadata
+ 1955 0133 07       		.uleb128 0x7
+ 1956 0134 11010000 		.4byte	0x111
+ 1957 0138 00       		.byte	0
+ 1958              		.section	.debug_abbrev,"",%progbits
+ 1959              	.Ldebug_abbrev0:
+ 1960 0000 01       		.uleb128 0x1
+ 1961 0001 11       		.uleb128 0x11
+ 1962 0002 01       		.byte	0x1
+ 1963 0003 25       		.uleb128 0x25
+ 1964 0004 0E       		.uleb128 0xe
+ 1965 0005 13       		.uleb128 0x13
+ 1966 0006 0B       		.uleb128 0xb
+ 1967 0007 03       		.uleb128 0x3
+ 1968 0008 0E       		.uleb128 0xe
+ 1969 0009 1B       		.uleb128 0x1b
+ 1970 000a 0E       		.uleb128 0xe
+ 1971 000b 10       		.uleb128 0x10
+ 1972 000c 17       		.uleb128 0x17
+ 1973 000d 00       		.byte	0
+ 1974 000e 00       		.byte	0
+ 1975 000f 02       		.uleb128 0x2
+ 1976 0010 24       		.uleb128 0x24
+ 1977 0011 00       		.byte	0
+ 1978 0012 0B       		.uleb128 0xb
+ 1979 0013 0B       		.uleb128 0xb
+ 1980 0014 3E       		.uleb128 0x3e
+ 1981 0015 0B       		.uleb128 0xb
+ 1982 0016 03       		.uleb128 0x3
+ 1983 0017 0E       		.uleb128 0xe
+ 1984 0018 00       		.byte	0
+ 1985 0019 00       		.byte	0
+ 1986 001a 03       		.uleb128 0x3
+ 1987 001b 16       		.uleb128 0x16
+ 1988 001c 00       		.byte	0
+ 1989 001d 03       		.uleb128 0x3
+ 1990 001e 0E       		.uleb128 0xe
+ 1991 001f 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 36
+
+
+ 1992 0020 0B       		.uleb128 0xb
+ 1993 0021 3B       		.uleb128 0x3b
+ 1994 0022 0B       		.uleb128 0xb
+ 1995 0023 49       		.uleb128 0x49
+ 1996 0024 13       		.uleb128 0x13
+ 1997 0025 00       		.byte	0
+ 1998 0026 00       		.byte	0
+ 1999 0027 04       		.uleb128 0x4
+ 2000 0028 24       		.uleb128 0x24
+ 2001 0029 00       		.byte	0
+ 2002 002a 0B       		.uleb128 0xb
+ 2003 002b 0B       		.uleb128 0xb
+ 2004 002c 3E       		.uleb128 0x3e
+ 2005 002d 0B       		.uleb128 0xb
+ 2006 002e 03       		.uleb128 0x3
+ 2007 002f 08       		.uleb128 0x8
+ 2008 0030 00       		.byte	0
+ 2009 0031 00       		.byte	0
+ 2010 0032 05       		.uleb128 0x5
+ 2011 0033 01       		.uleb128 0x1
+ 2012 0034 01       		.byte	0x1
+ 2013 0035 49       		.uleb128 0x49
+ 2014 0036 13       		.uleb128 0x13
+ 2015 0037 01       		.uleb128 0x1
+ 2016 0038 13       		.uleb128 0x13
+ 2017 0039 00       		.byte	0
+ 2018 003a 00       		.byte	0
+ 2019 003b 06       		.uleb128 0x6
+ 2020 003c 21       		.uleb128 0x21
+ 2021 003d 00       		.byte	0
+ 2022 003e 49       		.uleb128 0x49
+ 2023 003f 13       		.uleb128 0x13
+ 2024 0040 2F       		.uleb128 0x2f
+ 2025 0041 05       		.uleb128 0x5
+ 2026 0042 00       		.byte	0
+ 2027 0043 00       		.byte	0
+ 2028 0044 07       		.uleb128 0x7
+ 2029 0045 26       		.uleb128 0x26
+ 2030 0046 00       		.byte	0
+ 2031 0047 49       		.uleb128 0x49
+ 2032 0048 13       		.uleb128 0x13
+ 2033 0049 00       		.byte	0
+ 2034 004a 00       		.byte	0
+ 2035 004b 08       		.uleb128 0x8
+ 2036 004c 34       		.uleb128 0x34
+ 2037 004d 00       		.byte	0
+ 2038 004e 03       		.uleb128 0x3
+ 2039 004f 0E       		.uleb128 0xe
+ 2040 0050 3A       		.uleb128 0x3a
+ 2041 0051 0B       		.uleb128 0xb
+ 2042 0052 3B       		.uleb128 0x3b
+ 2043 0053 0B       		.uleb128 0xb
+ 2044 0054 49       		.uleb128 0x49
+ 2045 0055 13       		.uleb128 0x13
+ 2046 0056 3F       		.uleb128 0x3f
+ 2047 0057 19       		.uleb128 0x19
+ 2048 0058 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 37
+
+
+ 2049 0059 18       		.uleb128 0x18
+ 2050 005a 00       		.byte	0
+ 2051 005b 00       		.byte	0
+ 2052 005c 09       		.uleb128 0x9
+ 2053 005d 21       		.uleb128 0x21
+ 2054 005e 00       		.byte	0
+ 2055 005f 49       		.uleb128 0x49
+ 2056 0060 13       		.uleb128 0x13
+ 2057 0061 2F       		.uleb128 0x2f
+ 2058 0062 0B       		.uleb128 0xb
+ 2059 0063 00       		.byte	0
+ 2060 0064 00       		.byte	0
+ 2061 0065 0A       		.uleb128 0xa
+ 2062 0066 34       		.uleb128 0x34
+ 2063 0067 00       		.byte	0
+ 2064 0068 03       		.uleb128 0x3
+ 2065 0069 0E       		.uleb128 0xe
+ 2066 006a 3A       		.uleb128 0x3a
+ 2067 006b 0B       		.uleb128 0xb
+ 2068 006c 3B       		.uleb128 0x3b
+ 2069 006d 05       		.uleb128 0x5
+ 2070 006e 49       		.uleb128 0x49
+ 2071 006f 13       		.uleb128 0x13
+ 2072 0070 3F       		.uleb128 0x3f
+ 2073 0071 19       		.uleb128 0x19
+ 2074 0072 02       		.uleb128 0x2
+ 2075 0073 18       		.uleb128 0x18
+ 2076 0074 00       		.byte	0
+ 2077 0075 00       		.byte	0
+ 2078 0076 00       		.byte	0
+ 2079              		.section	.debug_aranges,"",%progbits
+ 2080 0000 14000000 		.4byte	0x14
+ 2081 0004 0200     		.2byte	0x2
+ 2082 0006 00000000 		.4byte	.Ldebug_info0
+ 2083 000a 04       		.byte	0x4
+ 2084 000b 00       		.byte	0
+ 2085 000c 0000     		.2byte	0
+ 2086 000e 0000     		.2byte	0
+ 2087 0010 00000000 		.4byte	0
+ 2088 0014 00000000 		.4byte	0
+ 2089              		.section	.debug_line,"",%progbits
+ 2090              	.Ldebug_line0:
+ 2091 0000 3D010000 		.section	.debug_str,"MS",%progbits,1
+ 2091      02003701 
+ 2091      00000201 
+ 2091      FB0E0D00 
+ 2091      01010101 
+ 2092              	.LASF6:
+ 2093 0000 6C6F6E67 		.ascii	"long long int\000"
+ 2093      206C6F6E 
+ 2093      6720696E 
+ 2093      7400
+ 2094              	.LASF9:
+ 2095 000e 5F5F7569 		.ascii	"__uint8_t\000"
+ 2095      6E74385F 
+ 2095      7400
+ 2096              	.LASF16:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 38
+
+
+ 2097 0018 63795F6D 		.ascii	"cy_metadata\000"
+ 2097      65746164 
+ 2097      61746100 
+ 2098              	.LASF1:
+ 2099 0024 756E7369 		.ascii	"unsigned char\000"
+ 2099      676E6564 
+ 2099      20636861 
+ 2099      7200
+ 2100              	.LASF17:
+ 2101 0032 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2101      43313120 
+ 2101      352E342E 
+ 2101      31203230 
+ 2101      31363036 
+ 2102 0065 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2102      20726576 
+ 2102      6973696F 
+ 2102      6E203233 
+ 2102      37373135 
+ 2103 0098 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2103      66756E63 
+ 2103      74696F6E 
+ 2103      2D736563 
+ 2103      74696F6E 
+ 2104              	.LASF5:
+ 2105 00c0 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2105      20756E73 
+ 2105      69676E65 
+ 2105      6420696E 
+ 2105      7400
+ 2106              	.LASF3:
+ 2107 00d2 73686F72 		.ascii	"short unsigned int\000"
+ 2107      7420756E 
+ 2107      7369676E 
+ 2107      65642069 
+ 2107      6E7400
+ 2108              	.LASF13:
+ 2109 00e5 63795F6D 		.ascii	"cy_meta_custnvl\000"
+ 2109      6574615F 
+ 2109      63757374 
+ 2109      6E766C00 
+ 2110              	.LASF12:
+ 2111 00f5 63795F6D 		.ascii	"cy_meta_configecc\000"
+ 2111      6574615F 
+ 2111      636F6E66 
+ 2111      69676563 
+ 2111      6300
+ 2112              	.LASF8:
+ 2113 0107 756E7369 		.ascii	"unsigned int\000"
+ 2113      676E6564 
+ 2113      20696E74 
+ 2113      00
+ 2114              	.LASF7:
+ 2115 0114 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2115      206C6F6E 
+ 2115      6720756E 
+ 2115      7369676E 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\cc1Hdgqh.s 			page 39
+
+
+ 2115      65642069 
+ 2116              	.LASF10:
+ 2117 012b 75696E74 		.ascii	"uint8_t\000"
+ 2117      385F7400 
+ 2118              	.LASF15:
+ 2119 0133 63795F6D 		.ascii	"cy_meta_flashprotect\000"
+ 2119      6574615F 
+ 2119      666C6173 
+ 2119      6870726F 
+ 2119      74656374 
+ 2120              	.LASF14:
+ 2121 0148 63795F6D 		.ascii	"cy_meta_wonvl\000"
+ 2121      6574615F 
+ 2121      776F6E76 
+ 2121      6C00
+ 2122              	.LASF11:
+ 2123 0156 73697A65 		.ascii	"sizetype\000"
+ 2123      74797065 
+ 2123      00
+ 2124              	.LASF19:
+ 2125 015f 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 2125      73657273 
+ 2125      5C737472 
+ 2125      61705C44 
+ 2125      6F63756D 
+ 2126 018c 69393334 		.ascii	"i9341_master.cydsn\000"
+ 2126      315F6D61 
+ 2126      73746572 
+ 2126      2E637964 
+ 2126      736E00
+ 2127              	.LASF2:
+ 2128 019f 73686F72 		.ascii	"short int\000"
+ 2128      7420696E 
+ 2128      7400
+ 2129              	.LASF4:
+ 2130 01a9 6C6F6E67 		.ascii	"long int\000"
+ 2130      20696E74 
+ 2130      00
+ 2131              	.LASF0:
+ 2132 01b2 7369676E 		.ascii	"signed char\000"
+ 2132      65642063 
+ 2132      68617200 
+ 2133              	.LASF18:
+ 2134 01be 47656E65 		.ascii	"Generated_Source\\PSoC5\\cymetadata.c\000"
+ 2134      72617465 
+ 2134      645F536F 
+ 2134      75726365 
+ 2134      5C50536F 
+ 2135              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

@@ -1,0 +1,3365 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"spi_dma.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.calculate_needed_tds,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	calculate_needed_tds, %function
+  24              	calculate_needed_tds:
+  25              	.LFB69:
+  26              		.file 1 "spi_dma.c"
+   1:spi_dma.c     **** #include "project.h"
+   2:spi_dma.c     **** #include "spi_dma.h"
+   3:spi_dma.c     **** 
+   4:spi_dma.c     **** #define TD_POOL_SIZE    (10U)
+   5:spi_dma.c     **** // #define DBG_SPI_DMA
+   6:spi_dma.c     **** 
+   7:spi_dma.c     **** static const uint8_t DMA_REQUEST_PER_BURST = 1;
+   8:spi_dma.c     **** static const uint8_t DMA_BYTES_PER_BURST = 1;
+   9:spi_dma.c     **** static const size_t MAX_BYTES_PER_TD = 4095;
+  10:spi_dma.c     **** 
+  11:spi_dma.c     **** static uint8_t DMA_Tx_TD_pool[TD_POOL_SIZE] = {0};
+  12:spi_dma.c     **** static uint8_t DMA_Tx_Chan = 0;
+  13:spi_dma.c     **** 
+  14:spi_dma.c     **** static volatile spi_xfer_status_t spi_xfer_status = SPI_XFER_IDLE;
+  15:spi_dma.c     **** 
+  16:spi_dma.c     **** /* Keep track of the number of allocated TDs */
+  17:spi_dma.c     **** static volatile size_t g_tds_needed = 0;
+  18:spi_dma.c     **** 
+  19:spi_dma.c     **** void spi_initialize_dma(void)
+  20:spi_dma.c     **** {
+  21:spi_dma.c     ****     DMA_Tx_Chan = DMA_Tx_DmaInitialize(DMA_BYTES_PER_BURST, DMA_REQUEST_PER_BURST,
+  22:spi_dma.c     ****         HI16(CYDEV_SRAM_BASE), HI16(CYDEV_PERIPH_BASE));
+  23:spi_dma.c     **** }
+  24:spi_dma.c     **** 
+  25:spi_dma.c     **** /* Transfer data in blocking mode */
+  26:spi_dma.c     **** void send_spi(const uint8_t *tx_data, const size_t size)
+  27:spi_dma.c     **** {
+  28:spi_dma.c     ****     uint8_t dummy = 0;
+  29:spi_dma.c     ****     
+  30:spi_dma.c     ****     spi_xfer_status = SPI_XFER_ONGOING;
+  31:spi_dma.c     ****     
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 2
+
+
+  32:spi_dma.c     ****     SS_Write(0);
+  33:spi_dma.c     ****     
+  34:spi_dma.c     ****     for (size_t idx = 0; idx < size; idx++) {
+  35:spi_dma.c     ****         SPI_WriteTxData(tx_data[idx]);
+  36:spi_dma.c     ****         
+  37:spi_dma.c     ****         while(!(SPI_ReadTxStatus() & SPI_STS_BYTE_COMPLETE)) {
+  38:spi_dma.c     ****         }
+  39:spi_dma.c     ****         
+  40:spi_dma.c     ****         /* Read the data available on the Rx FIFO so it doesn't trigger an
+  41:spi_dma.c     ****          * overrun interrupt */
+  42:spi_dma.c     ****         dummy = SPI_ReadRxData();
+  43:spi_dma.c     ****     }
+  44:spi_dma.c     ****     
+  45:spi_dma.c     ****     SS_Write(1);
+  46:spi_dma.c     ****     
+  47:spi_dma.c     ****     spi_xfer_status = SPI_XFER_IDLE;
+  48:spi_dma.c     **** }
+  49:spi_dma.c     **** 
+  50:spi_dma.c     **** /* Called when the data transfer is done.
+  51:spi_dma.c     ****  * We need to disable the DMA channel and free the allocated TDs.
+  52:spi_dma.c     ****  *
+  53:spi_dma.c     ****  * Interesting links:
+  54:spi_dma.c     ****  * https://community.cypress.com/thread/31826
+  55:spi_dma.c     ****  * https://community.cypress.com/thread/14232 */
+  56:spi_dma.c     **** void spi_xfer_on_completion(void)
+  57:spi_dma.c     **** {
+  58:spi_dma.c     ****     spi_xfer_set_status(SPI_XFER_IDLE);
+  59:spi_dma.c     ****     
+  60:spi_dma.c     ****     cystatus ch_disable_sts = CyDmaChDisable(DMA_Tx_Chan);
+  61:spi_dma.c     ****     if (CYRET_SUCCESS != ch_disable_sts) {
+  62:spi_dma.c     ****         UART_PutString("Error trying to disable the DMA channel");
+  63:spi_dma.c     ****         
+  64:spi_dma.c     ****         while (1) {
+  65:spi_dma.c     ****             
+  66:spi_dma.c     ****         }
+  67:spi_dma.c     ****     }
+  68:spi_dma.c     **** 
+  69:spi_dma.c     **** #ifdef DBG_SPI_DMA
+  70:spi_dma.c     ****     UART_PutString("TDs used: ");
+  71:spi_dma.c     ****     UART_PutHexByte(g_tds_needed);
+  72:spi_dma.c     ****     UART_PutCRLF();
+  73:spi_dma.c     ****     uint8_t free_tds = CyDmaTdFreeCount();
+  74:spi_dma.c     ****     UART_PutString("Free TDs: ");
+  75:spi_dma.c     ****     UART_PutHexByte(free_tds);
+  76:spi_dma.c     **** #endif
+  77:spi_dma.c     **** 
+  78:spi_dma.c     ****     /* Free all used TDs */
+  79:spi_dma.c     ****     for (size_t idx = 0; idx < g_tds_needed; idx++) {
+  80:spi_dma.c     **** #ifdef DBG_SPI_DMA
+  81:spi_dma.c     ****         UART_PutCRLF();
+  82:spi_dma.c     ****         UART_PutString("Freeing TD handle ");
+  83:spi_dma.c     ****         UART_PutHexByte(DMA_Tx_TD_pool[idx]);
+  84:spi_dma.c     ****         UART_PutCRLF();
+  85:spi_dma.c     **** #endif
+  86:spi_dma.c     ****         CyDmaTdFree(DMA_Tx_TD_pool[idx]);
+  87:spi_dma.c     ****     }
+  88:spi_dma.c     **** 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 3
+
+
+  89:spi_dma.c     **** #ifdef DBG_SPI_DMA
+  90:spi_dma.c     ****     free_tds = CyDmaTdFreeCount();
+  91:spi_dma.c     ****     UART_PutChar('.');
+  92:spi_dma.c     ****     UART_PutHexByte(free_tds);
+  93:spi_dma.c     ****     UART_PutCRLF();
+  94:spi_dma.c     **** #endif
+  95:spi_dma.c     **** }
+  96:spi_dma.c     **** 
+  97:spi_dma.c     **** uint8_t spi_xfer_is_ongoing(void)
+  98:spi_dma.c     **** {
+  99:spi_dma.c     ****     return (uint8_t) SPI_XFER_IDLE != spi_xfer_status;
+ 100:spi_dma.c     **** }
+ 101:spi_dma.c     **** 
+ 102:spi_dma.c     **** void spi_xfer_set_status(spi_xfer_status_t status)
+ 103:spi_dma.c     **** {
+ 104:spi_dma.c     ****     spi_xfer_status = status;
+ 105:spi_dma.c     **** }
+ 106:spi_dma.c     **** 
+ 107:spi_dma.c     **** spi_xfer_status_t spi_xfer_get_status(void)
+ 108:spi_dma.c     **** {
+ 109:spi_dma.c     ****     return spi_xfer_status;
+ 110:spi_dma.c     **** }
+ 111:spi_dma.c     **** 
+ 112:spi_dma.c     **** static size_t calculate_needed_tds(size_t bytes_to_transfer)
+ 113:spi_dma.c     **** {
+  27              		.loc 1 113 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32              	.LVL0:
+ 114:spi_dma.c     ****     /* We only need one td for transfers <= MAX_BYTES_PER_TD (4096) bytes */
+ 115:spi_dma.c     ****     size_t retval = 1;
+ 116:spi_dma.c     ****     
+ 117:spi_dma.c     ****     /* Keep track of the needed TDs to transfer bytes_to_transfer bytes */
+ 118:spi_dma.c     ****     if (MAX_BYTES_PER_TD < bytes_to_transfer) {
+  33              		.loc 1 118 0
+  34 0000 B0F5805F 		cmp	r0, #4096
+  35 0004 09D3     		bcc	.L3
+ 119:spi_dma.c     ****         retval = (bytes_to_transfer + MAX_BYTES_PER_TD) / MAX_BYTES_PER_TD;
+  36              		.loc 1 119 0
+  37 0006 00F6FF70 		addw	r0, r0, #4095
+  38              	.LVL1:
+  39 000a 054B     		ldr	r3, .L4
+  40 000c A3FB0023 		umull	r2, r3, r3, r0
+  41 0010 C01A     		subs	r0, r0, r3
+  42              	.LVL2:
+  43 0012 03EB5000 		add	r0, r3, r0, lsr #1
+  44 0016 C00A     		lsrs	r0, r0, #11
+  45              	.LVL3:
+  46 0018 7047     		bx	lr
+  47              	.LVL4:
+  48              	.L3:
+ 115:spi_dma.c     ****     
+  49              		.loc 1 115 0
+  50 001a 0120     		movs	r0, #1
+  51              	.LVL5:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 4
+
+
+ 120:spi_dma.c     ****     }
+ 121:spi_dma.c     **** 
+ 122:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 123:spi_dma.c     ****     UART_PutString("Needed TDs: ");
+ 124:spi_dma.c     ****     UART_PutHexInt((uint16_t) retval);
+ 125:spi_dma.c     ****     UART_PutCRLF();
+ 126:spi_dma.c     **** #endif
+ 127:spi_dma.c     **** 
+ 128:spi_dma.c     ****     return retval;
+ 129:spi_dma.c     **** }
+  52              		.loc 1 129 0
+  53 001c 7047     		bx	lr
+  54              	.L5:
+  55 001e 00BF     		.align	2
+  56              	.L4:
+  57 0020 01011000 		.word	1048833
+  58              		.cfi_endproc
+  59              	.LFE69:
+  60              		.size	calculate_needed_tds, .-calculate_needed_tds
+  61              		.section	.text.spi_initialize_dma,"ax",%progbits
+  62              		.align	2
+  63              		.global	spi_initialize_dma
+  64              		.thumb
+  65              		.thumb_func
+  66              		.type	spi_initialize_dma, %function
+  67              	spi_initialize_dma:
+  68              	.LFB63:
+  20:spi_dma.c     ****     DMA_Tx_Chan = DMA_Tx_DmaInitialize(DMA_BYTES_PER_BURST, DMA_REQUEST_PER_BURST,
+  69              		.loc 1 20 0
+  70              		.cfi_startproc
+  71              		@ args = 0, pretend = 0, frame = 0
+  72              		@ frame_needed = 0, uses_anonymous_args = 0
+  73 0000 08B5     		push	{r3, lr}
+  74              		.cfi_def_cfa_offset 8
+  75              		.cfi_offset 3, -8
+  76              		.cfi_offset 14, -4
+  21:spi_dma.c     ****         HI16(CYDEV_SRAM_BASE), HI16(CYDEV_PERIPH_BASE));
+  77              		.loc 1 21 0
+  78 0002 4FF48043 		mov	r3, #16384
+  79 0006 41F6FF72 		movw	r2, #8191
+  80 000a 0121     		movs	r1, #1
+  81 000c 0846     		mov	r0, r1
+  82 000e FFF7FEFF 		bl	DMA_Tx_DmaInitialize
+  83              	.LVL6:
+  84 0012 014B     		ldr	r3, .L8
+  85 0014 1870     		strb	r0, [r3]
+  86 0016 08BD     		pop	{r3, pc}
+  87              	.L9:
+  88              		.align	2
+  89              	.L8:
+  90 0018 00000000 		.word	.LANCHOR0
+  91              		.cfi_endproc
+  92              	.LFE63:
+  93              		.size	spi_initialize_dma, .-spi_initialize_dma
+  94              		.section	.text.send_spi,"ax",%progbits
+  95              		.align	2
+  96              		.global	send_spi
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 5
+
+
+  97              		.thumb
+  98              		.thumb_func
+  99              		.type	send_spi, %function
+ 100              	send_spi:
+ 101              	.LFB64:
+  27:spi_dma.c     ****     uint8_t dummy = 0;
+ 102              		.loc 1 27 0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 0, uses_anonymous_args = 0
+ 106              	.LVL7:
+ 107 0000 70B5     		push	{r4, r5, r6, lr}
+ 108              		.cfi_def_cfa_offset 16
+ 109              		.cfi_offset 4, -16
+ 110              		.cfi_offset 5, -12
+ 111              		.cfi_offset 6, -8
+ 112              		.cfi_offset 14, -4
+ 113 0002 0646     		mov	r6, r0
+ 114 0004 0D46     		mov	r5, r1
+ 115              	.LVL8:
+  30:spi_dma.c     ****     
+ 116              		.loc 1 30 0
+ 117 0006 0222     		movs	r2, #2
+ 118 0008 0D4B     		ldr	r3, .L15
+ 119 000a 5A70     		strb	r2, [r3, #1]
+  32:spi_dma.c     ****     
+ 120              		.loc 1 32 0
+ 121 000c 0020     		movs	r0, #0
+ 122              	.LVL9:
+ 123 000e FFF7FEFF 		bl	SS_Write
+ 124              	.LVL10:
+ 125              	.LBB2:
+  34:spi_dma.c     ****         SPI_WriteTxData(tx_data[idx]);
+ 126              		.loc 1 34 0
+ 127 0012 0024     		movs	r4, #0
+ 128 0014 0AE0     		b	.L11
+ 129              	.LVL11:
+ 130              	.L13:
+  35:spi_dma.c     ****         
+ 131              		.loc 1 35 0
+ 132 0016 305D     		ldrb	r0, [r6, r4]	@ zero_extendqisi2
+ 133 0018 FFF7FEFF 		bl	SPI_WriteTxData
+ 134              	.LVL12:
+ 135              	.L12:
+  37:spi_dma.c     ****         }
+ 136              		.loc 1 37 0 discriminator 1
+ 137 001c FFF7FEFF 		bl	SPI_ReadTxStatus
+ 138              	.LVL13:
+ 139 0020 10F0080F 		tst	r0, #8
+ 140 0024 FAD0     		beq	.L12
+  42:spi_dma.c     ****     }
+ 141              		.loc 1 42 0 discriminator 2
+ 142 0026 FFF7FEFF 		bl	SPI_ReadRxData
+ 143              	.LVL14:
+  34:spi_dma.c     ****         SPI_WriteTxData(tx_data[idx]);
+ 144              		.loc 1 34 0 discriminator 2
+ 145 002a 0134     		adds	r4, r4, #1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 6
+
+
+ 146              	.LVL15:
+ 147              	.L11:
+  34:spi_dma.c     ****         SPI_WriteTxData(tx_data[idx]);
+ 148              		.loc 1 34 0 is_stmt 0 discriminator 1
+ 149 002c AC42     		cmp	r4, r5
+ 150 002e F2D3     		bcc	.L13
+ 151              	.LBE2:
+  45:spi_dma.c     ****     
+ 152              		.loc 1 45 0 is_stmt 1
+ 153 0030 0120     		movs	r0, #1
+ 154 0032 FFF7FEFF 		bl	SS_Write
+ 155              	.LVL16:
+  47:spi_dma.c     **** }
+ 156              		.loc 1 47 0
+ 157 0036 0022     		movs	r2, #0
+ 158 0038 014B     		ldr	r3, .L15
+ 159 003a 5A70     		strb	r2, [r3, #1]
+ 160 003c 70BD     		pop	{r4, r5, r6, pc}
+ 161              	.LVL17:
+ 162              	.L16:
+ 163 003e 00BF     		.align	2
+ 164              	.L15:
+ 165 0040 00000000 		.word	.LANCHOR0
+ 166              		.cfi_endproc
+ 167              	.LFE64:
+ 168              		.size	send_spi, .-send_spi
+ 169              		.section	.text.spi_xfer_is_ongoing,"ax",%progbits
+ 170              		.align	2
+ 171              		.global	spi_xfer_is_ongoing
+ 172              		.thumb
+ 173              		.thumb_func
+ 174              		.type	spi_xfer_is_ongoing, %function
+ 175              	spi_xfer_is_ongoing:
+ 176              	.LFB66:
+  98:spi_dma.c     ****     return (uint8_t) SPI_XFER_IDLE != spi_xfer_status;
+ 177              		.loc 1 98 0
+ 178              		.cfi_startproc
+ 179              		@ args = 0, pretend = 0, frame = 0
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              		@ link register save eliminated.
+  99:spi_dma.c     **** }
+ 182              		.loc 1 99 0
+ 183 0000 034B     		ldr	r3, .L18
+ 184 0002 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 185 0004 13F0FF0F 		tst	r3, #255
+ 100:spi_dma.c     **** 
+ 186              		.loc 1 100 0
+ 187 0008 14BF     		ite	ne
+ 188 000a 0120     		movne	r0, #1
+ 189 000c 0020     		moveq	r0, #0
+ 190 000e 7047     		bx	lr
+ 191              	.L19:
+ 192              		.align	2
+ 193              	.L18:
+ 194 0010 00000000 		.word	.LANCHOR0
+ 195              		.cfi_endproc
+ 196              	.LFE66:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 7
+
+
+ 197              		.size	spi_xfer_is_ongoing, .-spi_xfer_is_ongoing
+ 198              		.section	.text.spi_xfer_set_status,"ax",%progbits
+ 199              		.align	2
+ 200              		.global	spi_xfer_set_status
+ 201              		.thumb
+ 202              		.thumb_func
+ 203              		.type	spi_xfer_set_status, %function
+ 204              	spi_xfer_set_status:
+ 205              	.LFB67:
+ 103:spi_dma.c     ****     spi_xfer_status = status;
+ 206              		.loc 1 103 0
+ 207              		.cfi_startproc
+ 208              		@ args = 0, pretend = 0, frame = 0
+ 209              		@ frame_needed = 0, uses_anonymous_args = 0
+ 210              		@ link register save eliminated.
+ 211              	.LVL18:
+ 104:spi_dma.c     **** }
+ 212              		.loc 1 104 0
+ 213 0000 014B     		ldr	r3, .L21
+ 214 0002 5870     		strb	r0, [r3, #1]
+ 215 0004 7047     		bx	lr
+ 216              	.L22:
+ 217 0006 00BF     		.align	2
+ 218              	.L21:
+ 219 0008 00000000 		.word	.LANCHOR0
+ 220              		.cfi_endproc
+ 221              	.LFE67:
+ 222              		.size	spi_xfer_set_status, .-spi_xfer_set_status
+ 223              		.section	.text.spi_xfer_on_completion,"ax",%progbits
+ 224              		.align	2
+ 225              		.global	spi_xfer_on_completion
+ 226              		.thumb
+ 227              		.thumb_func
+ 228              		.type	spi_xfer_on_completion, %function
+ 229              	spi_xfer_on_completion:
+ 230              	.LFB65:
+  57:spi_dma.c     ****     spi_xfer_set_status(SPI_XFER_IDLE);
+ 231              		.loc 1 57 0
+ 232              		.cfi_startproc
+ 233              		@ args = 0, pretend = 0, frame = 0
+ 234              		@ frame_needed = 0, uses_anonymous_args = 0
+ 235 0000 10B5     		push	{r4, lr}
+ 236              		.cfi_def_cfa_offset 8
+ 237              		.cfi_offset 4, -8
+ 238              		.cfi_offset 14, -4
+  58:spi_dma.c     ****     
+ 239              		.loc 1 58 0
+ 240 0002 0020     		movs	r0, #0
+ 241 0004 FFF7FEFF 		bl	spi_xfer_set_status
+ 242              	.LVL19:
+  60:spi_dma.c     ****     if (CYRET_SUCCESS != ch_disable_sts) {
+ 243              		.loc 1 60 0
+ 244 0008 0A4B     		ldr	r3, .L29
+ 245 000a 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 246 000c FFF7FEFF 		bl	CyDmaChDisable
+ 247              	.LVL20:
+  61:spi_dma.c     ****         UART_PutString("Error trying to disable the DMA channel");
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 8
+
+
+ 248              		.loc 1 61 0
+ 249 0010 50B1     		cbz	r0, .L27
+  62:spi_dma.c     ****         
+ 250              		.loc 1 62 0
+ 251 0012 0948     		ldr	r0, .L29+4
+ 252              	.LVL21:
+ 253 0014 FFF7FEFF 		bl	UART_PutString
+ 254              	.LVL22:
+ 255              	.L25:
+ 256 0018 FEE7     		b	.L25
+ 257              	.LVL23:
+ 258              	.L26:
+ 259              	.LBB3:
+  86:spi_dma.c     ****     }
+ 260              		.loc 1 86 0 discriminator 3
+ 261 001a 064B     		ldr	r3, .L29
+ 262 001c 2344     		add	r3, r3, r4
+ 263 001e 1879     		ldrb	r0, [r3, #4]	@ zero_extendqisi2
+ 264 0020 FFF7FEFF 		bl	CyDmaTdFree
+ 265              	.LVL24:
+  79:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 266              		.loc 1 79 0 discriminator 3
+ 267 0024 0134     		adds	r4, r4, #1
+ 268              	.LVL25:
+ 269 0026 00E0     		b	.L24
+ 270              	.LVL26:
+ 271              	.L27:
+ 272              	.LBE3:
+ 273 0028 0024     		movs	r4, #0
+ 274              	.LVL27:
+ 275              	.L24:
+ 276              	.LBB4:
+  79:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 277              		.loc 1 79 0 is_stmt 0 discriminator 1
+ 278 002a 024B     		ldr	r3, .L29
+ 279 002c 1B69     		ldr	r3, [r3, #16]
+ 280 002e 9C42     		cmp	r4, r3
+ 281 0030 F3D3     		bcc	.L26
+ 282              	.LBE4:
+  95:spi_dma.c     **** 
+ 283              		.loc 1 95 0 is_stmt 1
+ 284 0032 10BD     		pop	{r4, pc}
+ 285              	.LVL28:
+ 286              	.L30:
+ 287              		.align	2
+ 288              	.L29:
+ 289 0034 00000000 		.word	.LANCHOR0
+ 290 0038 00000000 		.word	.LC0
+ 291              		.cfi_endproc
+ 292              	.LFE65:
+ 293              		.size	spi_xfer_on_completion, .-spi_xfer_on_completion
+ 294              		.section	.text.spi_xfer_get_status,"ax",%progbits
+ 295              		.align	2
+ 296              		.global	spi_xfer_get_status
+ 297              		.thumb
+ 298              		.thumb_func
+ 299              		.type	spi_xfer_get_status, %function
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 9
+
+
+ 300              	spi_xfer_get_status:
+ 301              	.LFB68:
+ 108:spi_dma.c     ****     return spi_xfer_status;
+ 302              		.loc 1 108 0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		@ link register save eliminated.
+ 109:spi_dma.c     **** }
+ 307              		.loc 1 109 0
+ 308 0000 014B     		ldr	r3, .L32
+ 309 0002 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 110:spi_dma.c     **** 
+ 310              		.loc 1 110 0
+ 311 0004 7047     		bx	lr
+ 312              	.L33:
+ 313 0006 00BF     		.align	2
+ 314              	.L32:
+ 315 0008 00000000 		.word	.LANCHOR0
+ 316              		.cfi_endproc
+ 317              	.LFE68:
+ 318              		.size	spi_xfer_get_status, .-spi_xfer_get_status
+ 319              		.section	.text.send_spi_dma,"ax",%progbits
+ 320              		.align	2
+ 321              		.global	send_spi_dma
+ 322              		.thumb
+ 323              		.thumb_func
+ 324              		.type	send_spi_dma, %function
+ 325              	send_spi_dma:
+ 326              	.LFB70:
+ 130:spi_dma.c     **** 
+ 131:spi_dma.c     **** // transfer_count parameter is limited to 4095 bytes.
+ 132:spi_dma.c     **** void send_spi_dma(const uint8_t *tx_data, uint8_t *rx_data, const size_t size)
+ 133:spi_dma.c     **** {    
+ 327              		.loc 1 133 0
+ 328              		.cfi_startproc
+ 329              		@ args = 0, pretend = 0, frame = 0
+ 330              		@ frame_needed = 0, uses_anonymous_args = 0
+ 331              	.LVL29:
+ 134:spi_dma.c     ****     (void) rx_data;
+ 135:spi_dma.c     ****     
+ 136:spi_dma.c     ****     if (0 == size) {
+ 332              		.loc 1 136 0
+ 333 0000 002A     		cmp	r2, #0
+ 334 0002 00F09080 		beq	.L54
+ 133:spi_dma.c     ****     (void) rx_data;
+ 335              		.loc 1 133 0
+ 336 0006 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 337              		.cfi_def_cfa_offset 24
+ 338              		.cfi_offset 4, -24
+ 339              		.cfi_offset 5, -20
+ 340              		.cfi_offset 6, -16
+ 341              		.cfi_offset 7, -12
+ 342              		.cfi_offset 8, -8
+ 343              		.cfi_offset 14, -4
+ 344 000a 1446     		mov	r4, r2
+ 345 000c 0546     		mov	r5, r0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 10
+
+
+ 346              	.LVL30:
+ 137:spi_dma.c     ****         return;
+ 138:spi_dma.c     ****     }
+ 139:spi_dma.c     ****     
+ 140:spi_dma.c     ****     cystatus tx_td_sts;
+ 141:spi_dma.c     ****     size_t tx_addr_offset = 0;
+ 142:spi_dma.c     ****     
+ 143:spi_dma.c     ****     SPI_ClearTxBuffer();
+ 347              		.loc 1 143 0
+ 348 000e FFF7FEFF 		bl	SPI_ClearTxBuffer
+ 349              	.LVL31:
+ 144:spi_dma.c     ****     
+ 145:spi_dma.c     ****     /* Calculate neccesary TDs */
+ 146:spi_dma.c     ****     g_tds_needed = calculate_needed_tds(size);
+ 350              		.loc 1 146 0
+ 351 0012 2046     		mov	r0, r4
+ 352 0014 FFF7FEFF 		bl	calculate_needed_tds
+ 353              	.LVL32:
+ 354 0018 434B     		ldr	r3, .L55
+ 355 001a 1861     		str	r0, [r3, #16]
+ 356              	.LVL33:
+ 357              	.LBB5:
+ 147:spi_dma.c     ****     
+ 148:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 149:spi_dma.c     ****     UART_PutString("Allocating ");
+ 150:spi_dma.c     ****     UART_PutHexByte(g_tds_needed);
+ 151:spi_dma.c     ****     UART_PutString(" TDs\r\n");
+ 152:spi_dma.c     **** #endif
+ 153:spi_dma.c     ****     
+ 154:spi_dma.c     ****     /* Allocate a pool of TD handles */
+ 155:spi_dma.c     ****     for (size_t idx = 0; idx < g_tds_needed; idx++) {
+ 358              		.loc 1 155 0
+ 359 001c 0026     		movs	r6, #0
+ 360 001e 0CE0     		b	.L36
+ 361              	.LVL34:
+ 362              	.L39:
+ 363              	.LBB6:
+ 156:spi_dma.c     ****         uint8_t td_idx = CyDmaTdAllocate();
+ 364              		.loc 1 156 0
+ 365 0020 FFF7FEFF 		bl	CyDmaTdAllocate
+ 366              	.LVL35:
+ 157:spi_dma.c     ****         
+ 158:spi_dma.c     ****         if (CY_DMA_INVALID_TD != td_idx) {
+ 367              		.loc 1 158 0
+ 368 0024 FF28     		cmp	r0, #255
+ 369 0026 04D0     		beq	.L37
+ 159:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 160:spi_dma.c     ****             UART_PutString("Allocated\r\n");
+ 161:spi_dma.c     **** #endif
+ 162:spi_dma.c     ****             DMA_Tx_TD_pool[idx] = td_idx;
+ 370              		.loc 1 162 0
+ 371 0028 3F4B     		ldr	r3, .L55
+ 372 002a 3344     		add	r3, r3, r6
+ 373 002c 1871     		strb	r0, [r3, #4]
+ 374              	.LBE6:
+ 155:spi_dma.c     ****         uint8_t td_idx = CyDmaTdAllocate();
+ 375              		.loc 1 155 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 11
+
+
+ 376 002e 0136     		adds	r6, r6, #1
+ 377              	.LVL36:
+ 378 0030 03E0     		b	.L36
+ 379              	.L37:
+ 380              	.LBB7:
+ 163:spi_dma.c     ****         } else {
+ 164:spi_dma.c     ****             UART_PutString("No free TDs available");
+ 381              		.loc 1 164 0
+ 382 0032 3E48     		ldr	r0, .L55+4
+ 383              	.LVL37:
+ 384 0034 FFF7FEFF 		bl	UART_PutString
+ 385              	.LVL38:
+ 386              	.L38:
+ 387 0038 FEE7     		b	.L38
+ 388              	.LVL39:
+ 389              	.L36:
+ 390              	.LBE7:
+ 155:spi_dma.c     ****         uint8_t td_idx = CyDmaTdAllocate();
+ 391              		.loc 1 155 0 discriminator 1
+ 392 003a 3B4B     		ldr	r3, .L55
+ 393 003c 1B69     		ldr	r3, [r3, #16]
+ 394 003e 9E42     		cmp	r6, r3
+ 395 0040 EED3     		bcc	.L39
+ 396              	.LBE5:
+ 165:spi_dma.c     ****             
+ 166:spi_dma.c     ****             while (1) {
+ 167:spi_dma.c     ****             
+ 168:spi_dma.c     ****             }
+ 169:spi_dma.c     ****         }
+ 170:spi_dma.c     ****     }
+ 171:spi_dma.c     ****     
+ 172:spi_dma.c     ****     /* First TD on the pool is always the initial TD of the DMA channel */
+ 173:spi_dma.c     ****     cystatus td_sts = CyDmaChSetInitialTd(DMA_Tx_Chan, DMA_Tx_TD_pool[0]);
+ 397              		.loc 1 173 0
+ 398 0042 394B     		ldr	r3, .L55
+ 399 0044 1979     		ldrb	r1, [r3, #4]	@ zero_extendqisi2
+ 400 0046 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 401 0048 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 402              	.LVL40:
+ 174:spi_dma.c     ****     if (CYRET_SUCCESS != td_sts) {
+ 403              		.loc 1 174 0
+ 404 004c 18B1     		cbz	r0, .L40
+ 175:spi_dma.c     ****         UART_PutString("Invalid first TD");
+ 405              		.loc 1 175 0
+ 406 004e 3848     		ldr	r0, .L55+8
+ 407              	.LVL41:
+ 408 0050 FFF7FEFF 		bl	UART_PutString
+ 409              	.LVL42:
+ 410              	.L41:
+ 411 0054 FEE7     		b	.L41
+ 412              	.LVL43:
+ 413              	.L40:
+ 176:spi_dma.c     ****         
+ 177:spi_dma.c     ****         while (1) {
+ 178:spi_dma.c     ****             
+ 179:spi_dma.c     ****         }
+ 180:spi_dma.c     ****     }
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 12
+
+
+ 181:spi_dma.c     ****     
+ 182:spi_dma.c     ****     /* Number of TDs with MAX_BYTES_PE_TD bytes to send */
+ 183:spi_dma.c     ****     size_t td_max_bytes = size / MAX_BYTES_PER_TD;
+ 414              		.loc 1 183 0
+ 415 0056 374B     		ldr	r3, .L55+12
+ 416 0058 A3FB0423 		umull	r2, r3, r3, r4
+ 417 005c E21A     		subs	r2, r4, r3
+ 418 005e 03EB5203 		add	r3, r3, r2, lsr #1
+ 419 0062 DB0A     		lsrs	r3, r3, #11
+ 420              	.LVL44:
+ 184:spi_dma.c     ****     
+ 185:spi_dma.c     ****     /* Los bytes a enviar por el ultimo TD se calculan restandole los bytes
+ 186:spi_dma.c     ****      * enviados por los TDs previos, en caso de usar mas de 1 TD todos los TDs
+ 187:spi_dma.c     ****      * excepto el ultimo envian MAX_BYTES_PER_TD. */
+ 188:spi_dma.c     ****     uint16_t bytes_for_last_td = size - (td_max_bytes * MAX_BYTES_PER_TD);;
+ 421              		.loc 1 188 0
+ 422 0064 C3EB0333 		rsb	r3, r3, r3, lsl #12
+ 423              	.LVL45:
+ 424 0068 E31A     		subs	r3, r4, r3
+ 425 006a 9EB2     		uxth	r6, r3
+ 426              	.LVL46:
+ 427              	.LBB8:
+ 189:spi_dma.c     **** 
+ 190:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 191:spi_dma.c     ****     UART_PutString("TDs with MAX_BYTES_PER_TD: ");
+ 192:spi_dma.c     ****     UART_PutHexInt((uint16_t) td_max_bytes);
+ 193:spi_dma.c     ****     UART_PutCRLF();
+ 194:spi_dma.c     ****     UART_PutString("Bytes for last TD: ");
+ 195:spi_dma.c     ****     UART_PutHexInt((uint16_t) bytes_for_last_td);
+ 196:spi_dma.c     ****     UART_PutCRLF();
+ 197:spi_dma.c     **** #endif
+ 198:spi_dma.c     **** 
+ 199:spi_dma.c     ****     /* Configure all needed TDs */    
+ 200:spi_dma.c     ****     for (size_t td_idx = 0; td_idx < g_tds_needed; td_idx++) {
+ 428              		.loc 1 200 0
+ 429 006c 0024     		movs	r4, #0
+ 430              	.LVL47:
+ 431              	.LBE8:
+ 141:spi_dma.c     ****     
+ 432              		.loc 1 141 0
+ 433 006e 2746     		mov	r7, r4
+ 434              	.LBB10:
+ 435              		.loc 1 200 0
+ 436 0070 46E0     		b	.L42
+ 437              	.LVL48:
+ 438              	.L52:
+ 439              	.LBB9:
+ 201:spi_dma.c     ****         
+ 202:spi_dma.c     ****         uint8_t is_last_td_to_configure = td_idx == (g_tds_needed - 1);
+ 440              		.loc 1 202 0
+ 441 0072 2D4B     		ldr	r3, .L55
+ 442 0074 1B69     		ldr	r3, [r3, #16]
+ 443 0076 013B     		subs	r3, r3, #1
+ 444              	.LVL49:
+ 203:spi_dma.c     ****         
+ 204:spi_dma.c     ****         if (is_last_td_to_configure) {
+ 445              		.loc 1 204 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 13
+
+
+ 446 0078 9C42     		cmp	r4, r3
+ 447 007a 1ED1     		bne	.L43
+ 205:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 206:spi_dma.c     ****             UART_PutString("Configuring last TD...\r\nTD idx: ");
+ 207:spi_dma.c     ****             UART_PutHexByte(td_idx);
+ 208:spi_dma.c     ****             UART_PutString(" - TD handle: ");
+ 209:spi_dma.c     ****             UART_PutHexByte(DMA_Tx_TD_pool[td_idx]);
+ 210:spi_dma.c     ****             UART_PutCRLF();
+ 211:spi_dma.c     **** #endif
+ 212:spi_dma.c     **** 
+ 213:spi_dma.c     ****             /* The last TD should generate a pulse on the nrq signal to let us know it
+ 214:spi_dma.c     ****              * is done transfering data */
+ 215:spi_dma.c     ****             tx_td_sts = CyDmaTdSetConfiguration(DMA_Tx_TD_pool[td_idx],
+ 448              		.loc 1 215 0
+ 449 007c 2A48     		ldr	r0, .L55
+ 450 007e 2044     		add	r0, r0, r4
+ 451 0080 0523     		movs	r3, #5
+ 452              	.LVL50:
+ 453 0082 FE22     		movs	r2, #254
+ 454 0084 3146     		mov	r1, r6
+ 455 0086 0079     		ldrb	r0, [r0, #4]	@ zero_extendqisi2
+ 456 0088 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 457              	.LVL51:
+ 216:spi_dma.c     ****                 bytes_for_last_td,
+ 217:spi_dma.c     ****                 CY_DMA_DISABLE_TD, /* Disable this DMA channel after this TD is done */
+ 218:spi_dma.c     ****                 CY_DMA_TD_INC_SRC_ADR | DMA_Tx__TD_TERMOUT_EN);
+ 219:spi_dma.c     ****             
+ 220:spi_dma.c     ****             if (CYRET_SUCCESS != tx_td_sts) {
+ 458              		.loc 1 220 0
+ 459 008c 18B1     		cbz	r0, .L44
+ 221:spi_dma.c     ****                 UART_PutString("Invalid TD configuration");
+ 460              		.loc 1 221 0
+ 461 008e 2A48     		ldr	r0, .L55+16
+ 462              	.LVL52:
+ 463 0090 FFF7FEFF 		bl	UART_PutString
+ 464              	.LVL53:
+ 465              	.L45:
+ 466 0094 FEE7     		b	.L45
+ 467              	.LVL54:
+ 468              	.L44:
+ 222:spi_dma.c     ****                 
+ 223:spi_dma.c     ****                 while (1) {
+ 224:spi_dma.c     ****             
+ 225:spi_dma.c     ****                 }
+ 226:spi_dma.c     ****             }
+ 227:spi_dma.c     **** 
+ 228:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 229:spi_dma.c     ****             UART_PutString("source array offset: ");
+ 230:spi_dma.c     ****             UART_PutHexInt(tx_addr_offset);
+ 231:spi_dma.c     ****             UART_PutCRLF();
+ 232:spi_dma.c     ****             
+ 233:spi_dma.c     ****             UART_PutString("Configuring TD addresses\r\n");
+ 234:spi_dma.c     **** #endif
+ 235:spi_dma.c     **** 
+ 236:spi_dma.c     ****             tx_td_sts = CyDmaTdSetAddress(DMA_Tx_TD_pool[td_idx],
+ 469              		.loc 1 236 0
+ 470 0096 244B     		ldr	r3, .L55
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 14
+
+
+ 471 0098 1C44     		add	r4, r4, r3
+ 472              	.LVL55:
+ 237:spi_dma.c     ****                 LO16((uint32_t) &tx_data[tx_addr_offset]),
+ 473              		.loc 1 237 0
+ 474 009a E919     		adds	r1, r5, r7
+ 236:spi_dma.c     ****                 LO16((uint32_t) &tx_data[tx_addr_offset]),
+ 475              		.loc 1 236 0
+ 476 009c 46F24552 		movw	r2, #25925
+ 477 00a0 89B2     		uxth	r1, r1
+ 478 00a2 2079     		ldrb	r0, [r4, #4]	@ zero_extendqisi2
+ 479              	.LVL56:
+ 480 00a4 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 481              	.LVL57:
+ 238:spi_dma.c     ****                 LO16((uint32_t) SPI_TXDATA_PTR));
+ 239:spi_dma.c     ****             
+ 240:spi_dma.c     ****             if (CYRET_SUCCESS != tx_td_sts) {
+ 482              		.loc 1 240 0
+ 483 00a8 0446     		mov	r4, r0
+ 484              	.LVL58:
+ 485 00aa 68B3     		cbz	r0, .L46
+ 241:spi_dma.c     ****                 UART_PutString("Invalid TD address");
+ 486              		.loc 1 241 0
+ 487 00ac 2348     		ldr	r0, .L55+20
+ 488              	.LVL59:
+ 489 00ae FFF7FEFF 		bl	UART_PutString
+ 490              	.LVL60:
+ 242:spi_dma.c     ****                 UART_PutHexByte(tx_td_sts);
+ 491              		.loc 1 242 0
+ 492 00b2 E0B2     		uxtb	r0, r4
+ 493 00b4 FFF7FEFF 		bl	UART_PutHexByte
+ 494              	.LVL61:
+ 495              	.L47:
+ 496 00b8 FEE7     		b	.L47
+ 497              	.LVL62:
+ 498              	.L43:
+ 243:spi_dma.c     ****                 
+ 244:spi_dma.c     ****                 while (1) {
+ 245:spi_dma.c     ****             
+ 246:spi_dma.c     ****                 }
+ 247:spi_dma.c     ****             }
+ 248:spi_dma.c     ****             
+ 249:spi_dma.c     ****             break;
+ 250:spi_dma.c     ****         } else {
+ 251:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 252:spi_dma.c     ****             UART_PutString("Configuring TD...\r\nTD idx: ");
+ 253:spi_dma.c     ****             UART_PutHexByte(td_idx);
+ 254:spi_dma.c     ****             UART_PutCRLF();
+ 255:spi_dma.c     **** #endif
+ 256:spi_dma.c     **** 
+ 257:spi_dma.c     ****             tx_td_sts = CyDmaTdSetConfiguration(DMA_Tx_TD_pool[td_idx],
+ 499              		.loc 1 257 0
+ 500 00ba 1B4B     		ldr	r3, .L55
+ 501              	.LVL63:
+ 502 00bc 1819     		adds	r0, r3, r4
+ 258:spi_dma.c     ****                 (uint16_t) MAX_BYTES_PER_TD,
+ 259:spi_dma.c     ****                 DMA_Tx_TD_pool[td_idx + 1] /* Next TD */,
+ 503              		.loc 1 259 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 15
+
+
+ 504 00be 04F10108 		add	r8, r4, #1
+ 257:spi_dma.c     ****                 (uint16_t) MAX_BYTES_PER_TD,
+ 505              		.loc 1 257 0
+ 506 00c2 03EB0802 		add	r2, r3, r8
+ 507 00c6 0123     		movs	r3, #1
+ 508 00c8 1279     		ldrb	r2, [r2, #4]	@ zero_extendqisi2
+ 509 00ca 40F6FF71 		movw	r1, #4095
+ 510 00ce 0079     		ldrb	r0, [r0, #4]	@ zero_extendqisi2
+ 511 00d0 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 512              	.LVL64:
+ 260:spi_dma.c     ****                 CY_DMA_TD_INC_SRC_ADR);
+ 261:spi_dma.c     ****             
+ 262:spi_dma.c     ****             if (CYRET_SUCCESS != tx_td_sts) {
+ 513              		.loc 1 262 0
+ 514 00d4 18B1     		cbz	r0, .L48
+ 263:spi_dma.c     ****                 UART_PutString("Invalid TD configuration");
+ 515              		.loc 1 263 0
+ 516 00d6 1848     		ldr	r0, .L55+16
+ 517              	.LVL65:
+ 518 00d8 FFF7FEFF 		bl	UART_PutString
+ 519              	.LVL66:
+ 520              	.L49:
+ 521 00dc FEE7     		b	.L49
+ 522              	.LVL67:
+ 523              	.L48:
+ 264:spi_dma.c     ****                 while (1) {
+ 265:spi_dma.c     ****             
+ 266:spi_dma.c     ****                 }
+ 267:spi_dma.c     ****             }
+ 268:spi_dma.c     **** 
+ 269:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 270:spi_dma.c     ****             UART_PutString("source array offset:");
+ 271:spi_dma.c     ****             UART_PutHexInt(tx_addr_offset);
+ 272:spi_dma.c     ****             UART_PutCRLF();
+ 273:spi_dma.c     **** #endif
+ 274:spi_dma.c     **** 
+ 275:spi_dma.c     ****             tx_td_sts = CyDmaTdSetAddress(DMA_Tx_TD_pool[td_idx],
+ 524              		.loc 1 275 0
+ 525 00de 124B     		ldr	r3, .L55
+ 526 00e0 1C44     		add	r4, r4, r3
+ 527              	.LVL68:
+ 276:spi_dma.c     ****                 LO16((uint32_t) &tx_data[tx_addr_offset]),
+ 528              		.loc 1 276 0
+ 529 00e2 E919     		adds	r1, r5, r7
+ 275:spi_dma.c     ****                 LO16((uint32_t) &tx_data[tx_addr_offset]),
+ 530              		.loc 1 275 0
+ 531 00e4 46F24552 		movw	r2, #25925
+ 532 00e8 89B2     		uxth	r1, r1
+ 533 00ea 2079     		ldrb	r0, [r4, #4]	@ zero_extendqisi2
+ 534              	.LVL69:
+ 535 00ec FFF7FEFF 		bl	CyDmaTdSetAddress
+ 536              	.LVL70:
+ 277:spi_dma.c     ****                 LO16((uint32_t) SPI_TXDATA_PTR));
+ 278:spi_dma.c     ****             
+ 279:spi_dma.c     ****             if (CYRET_SUCCESS != tx_td_sts) {
+ 537              		.loc 1 279 0
+ 538 00f0 18B1     		cbz	r0, .L50
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 16
+
+
+ 280:spi_dma.c     ****                 UART_PutString("Invalid TD address");
+ 539              		.loc 1 280 0
+ 540 00f2 1248     		ldr	r0, .L55+20
+ 541              	.LVL71:
+ 542 00f4 FFF7FEFF 		bl	UART_PutString
+ 543              	.LVL72:
+ 544              	.L51:
+ 545 00f8 FEE7     		b	.L51
+ 546              	.LVL73:
+ 547              	.L50:
+ 281:spi_dma.c     ****                 
+ 282:spi_dma.c     ****                 while (1) {
+ 283:spi_dma.c     ****             
+ 284:spi_dma.c     ****                 }
+ 285:spi_dma.c     ****             }
+ 286:spi_dma.c     ****             
+ 287:spi_dma.c     ****             tx_addr_offset += MAX_BYTES_PER_TD;
+ 548              		.loc 1 287 0 discriminator 2
+ 549 00fa 07F6FF77 		addw	r7, r7, #4095
+ 550              	.LVL74:
+ 551              	.LBE9:
+ 200:spi_dma.c     ****         
+ 552              		.loc 1 200 0 discriminator 2
+ 553 00fe 4446     		mov	r4, r8
+ 554              	.LVL75:
+ 555              	.L42:
+ 200:spi_dma.c     ****         
+ 556              		.loc 1 200 0 is_stmt 0 discriminator 1
+ 557 0100 094B     		ldr	r3, .L55
+ 558 0102 1B69     		ldr	r3, [r3, #16]
+ 559 0104 9C42     		cmp	r4, r3
+ 560 0106 B4D3     		bcc	.L52
+ 561              	.LVL76:
+ 562              	.L46:
+ 563              	.LBE10:
+ 288:spi_dma.c     ****         }
+ 289:spi_dma.c     ****     }
+ 290:spi_dma.c     ****     
+ 291:spi_dma.c     **** #ifdef DBG_SPI_DMA
+ 292:spi_dma.c     ****     UART_PutString("Done configuring\r\n");
+ 293:spi_dma.c     **** #endif
+ 294:spi_dma.c     **** 
+ 295:spi_dma.c     ****     spi_xfer_status = SPI_XFER_ONGOING;
+ 564              		.loc 1 295 0 is_stmt 1
+ 565 0108 074B     		ldr	r3, .L55
+ 566 010a 0222     		movs	r2, #2
+ 567 010c 5A70     		strb	r2, [r3, #1]
+ 296:spi_dma.c     ****     CyDmaChEnable(DMA_Tx_Chan, 1 /* Restore TDs configuration when done */);
+ 568              		.loc 1 296 0
+ 569 010e 0121     		movs	r1, #1
+ 570 0110 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 571 0112 FFF7FEFF 		bl	CyDmaChEnable
+ 572              	.LVL77:
+ 297:spi_dma.c     ****     
+ 298:spi_dma.c     ****     SS_Write(0);
+ 573              		.loc 1 298 0
+ 574 0116 0020     		movs	r0, #0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 17
+
+
+ 575 0118 FFF7FEFF 		bl	SS_Write
+ 576              	.LVL78:
+ 299:spi_dma.c     ****     
+ 300:spi_dma.c     ****     /* let the spi interrupt tx fifo not full trigger the dma request */
+ 301:spi_dma.c     ****     SPI_SetTxInterruptMode(1u << SPI_STS_TX_FIFO_NOT_FULL_SHIFT);
+ 577              		.loc 1 301 0
+ 578 011c 0420     		movs	r0, #4
+ 579 011e FFF7FEFF 		bl	SPI_SetTxInterruptMode
+ 580              	.LVL79:
+ 581 0122 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 582              	.LVL80:
+ 583              	.L54:
+ 584              		.cfi_def_cfa_offset 0
+ 585              		.cfi_restore 4
+ 586              		.cfi_restore 5
+ 587              		.cfi_restore 6
+ 588              		.cfi_restore 7
+ 589              		.cfi_restore 8
+ 590              		.cfi_restore 14
+ 591 0126 7047     		bx	lr
+ 592              	.L56:
+ 593              		.align	2
+ 594              	.L55:
+ 595 0128 00000000 		.word	.LANCHOR0
+ 596 012c 28000000 		.word	.LC1
+ 597 0130 40000000 		.word	.LC2
+ 598 0134 01011000 		.word	1048833
+ 599 0138 54000000 		.word	.LC3
+ 600 013c 70000000 		.word	.LC4
+ 601              		.cfi_endproc
+ 602              	.LFE70:
+ 603              		.size	send_spi_dma, .-send_spi_dma
+ 604              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 605              		.align	2
+ 606              	.LC0:
+ 607 0000 4572726F 		.ascii	"Error trying to disable the DMA channel\000"
+ 607      72207472 
+ 607      79696E67 
+ 607      20746F20 
+ 607      64697361 
+ 608              	.LC1:
+ 609 0028 4E6F2066 		.ascii	"No free TDs available\000"
+ 609      72656520 
+ 609      54447320 
+ 609      61766169 
+ 609      6C61626C 
+ 610 003e 0000     		.space	2
+ 611              	.LC2:
+ 612 0040 496E7661 		.ascii	"Invalid first TD\000"
+ 612      6C696420 
+ 612      66697273 
+ 612      74205444 
+ 612      00
+ 613 0051 000000   		.space	3
+ 614              	.LC3:
+ 615 0054 496E7661 		.ascii	"Invalid TD configuration\000"
+ 615      6C696420 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 18
+
+
+ 615      54442063 
+ 615      6F6E6669 
+ 615      67757261 
+ 616 006d 000000   		.space	3
+ 617              	.LC4:
+ 618 0070 496E7661 		.ascii	"Invalid TD address\000"
+ 618      6C696420 
+ 618      54442061 
+ 618      64647265 
+ 618      737300
+ 619              		.bss
+ 620              		.align	2
+ 621              		.set	.LANCHOR0,. + 0
+ 622              		.type	DMA_Tx_Chan, %object
+ 623              		.size	DMA_Tx_Chan, 1
+ 624              	DMA_Tx_Chan:
+ 625 0000 00       		.space	1
+ 626              		.type	spi_xfer_status, %object
+ 627              		.size	spi_xfer_status, 1
+ 628              	spi_xfer_status:
+ 629 0001 00       		.space	1
+ 630 0002 0000     		.space	2
+ 631              		.type	DMA_Tx_TD_pool, %object
+ 632              		.size	DMA_Tx_TD_pool, 10
+ 633              	DMA_Tx_TD_pool:
+ 634 0004 00000000 		.space	10
+ 634      00000000 
+ 634      0000
+ 635 000e 0000     		.space	2
+ 636              		.type	g_tds_needed, %object
+ 637              		.size	g_tds_needed, 4
+ 638              	g_tds_needed:
+ 639 0010 00000000 		.space	4
+ 640              		.text
+ 641              	.Letext0:
+ 642              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 643              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 644              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 645              		.file 5 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 646              		.file 6 "spi_dma.h"
+ 647              		.file 7 "Generated_Source\\PSoC5/DMA_Tx_dma.h"
+ 648              		.file 8 "Generated_Source\\PSoC5/SPI.h"
+ 649              		.file 9 "Generated_Source\\PSoC5/SS.h"
+ 650              		.file 10 "Generated_Source\\PSoC5/CYDMAC.H"
+ 651              		.file 11 "Generated_Source\\PSoC5/UART.h"
+ 652              		.file 12 "Generated_Source\\PSoC5/core_cm3.h"
+ 653              		.section	.debug_info,"",%progbits
+ 654              	.Ldebug_info0:
+ 655 0000 E4060000 		.4byte	0x6e4
+ 656 0004 0400     		.2byte	0x4
+ 657 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 658 000a 04       		.byte	0x4
+ 659 000b 01       		.uleb128 0x1
+ 660 000c 5E040000 		.4byte	.LASF77
+ 661 0010 0C       		.byte	0xc
+ 662 0011 74010000 		.4byte	.LASF78
+ 663 0015 7F020000 		.4byte	.LASF79
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 19
+
+
+ 664 0019 48000000 		.4byte	.Ldebug_ranges0+0x48
+ 665 001d 00000000 		.4byte	0
+ 666 0021 00000000 		.4byte	.Ldebug_line0
+ 667 0025 02       		.uleb128 0x2
+ 668 0026 08       		.byte	0x8
+ 669 0027 07       		.byte	0x7
+ 670 0028 D3020000 		.4byte	.LASF0
+ 671 002c 02       		.uleb128 0x2
+ 672 002d 04       		.byte	0x4
+ 673 002e 07       		.byte	0x7
+ 674 002f F3020000 		.4byte	.LASF1
+ 675 0033 02       		.uleb128 0x2
+ 676 0034 01       		.byte	0x1
+ 677 0035 06       		.byte	0x6
+ 678 0036 BF020000 		.4byte	.LASF2
+ 679 003a 03       		.uleb128 0x3
+ 680 003b E4010000 		.4byte	.LASF5
+ 681 003f 02       		.byte	0x2
+ 682 0040 1D       		.byte	0x1d
+ 683 0041 45000000 		.4byte	0x45
+ 684 0045 02       		.uleb128 0x2
+ 685 0046 01       		.byte	0x1
+ 686 0047 08       		.byte	0x8
+ 687 0048 50020000 		.4byte	.LASF3
+ 688 004c 02       		.uleb128 0x2
+ 689 004d 02       		.byte	0x2
+ 690 004e 05       		.byte	0x5
+ 691 004f 30000000 		.4byte	.LASF4
+ 692 0053 03       		.uleb128 0x3
+ 693 0054 B2000000 		.4byte	.LASF6
+ 694 0058 02       		.byte	0x2
+ 695 0059 2B       		.byte	0x2b
+ 696 005a 5E000000 		.4byte	0x5e
+ 697 005e 02       		.uleb128 0x2
+ 698 005f 02       		.byte	0x2
+ 699 0060 07       		.byte	0x7
+ 700 0061 42030000 		.4byte	.LASF7
+ 701 0065 03       		.uleb128 0x3
+ 702 0066 28040000 		.4byte	.LASF8
+ 703 006a 02       		.byte	0x2
+ 704 006b 3F       		.byte	0x3f
+ 705 006c 70000000 		.4byte	0x70
+ 706 0070 02       		.uleb128 0x2
+ 707 0071 04       		.byte	0x4
+ 708 0072 05       		.byte	0x5
+ 709 0073 75030000 		.4byte	.LASF9
+ 710 0077 03       		.uleb128 0x3
+ 711 0078 9A000000 		.4byte	.LASF10
+ 712 007c 02       		.byte	0x2
+ 713 007d 41       		.byte	0x41
+ 714 007e 82000000 		.4byte	0x82
+ 715 0082 02       		.uleb128 0x2
+ 716 0083 04       		.byte	0x4
+ 717 0084 07       		.byte	0x7
+ 718 0085 D1030000 		.4byte	.LASF11
+ 719 0089 02       		.uleb128 0x2
+ 720 008a 08       		.byte	0x8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 20
+
+
+ 721 008b 05       		.byte	0x5
+ 722 008c 7E010000 		.4byte	.LASF12
+ 723 0090 04       		.uleb128 0x4
+ 724 0091 04       		.byte	0x4
+ 725 0092 05       		.byte	0x5
+ 726 0093 696E7400 		.ascii	"int\000"
+ 727 0097 03       		.uleb128 0x3
+ 728 0098 10010000 		.4byte	.LASF13
+ 729 009c 03       		.byte	0x3
+ 730 009d 18       		.byte	0x18
+ 731 009e 3A000000 		.4byte	0x3a
+ 732 00a2 03       		.uleb128 0x3
+ 733 00a3 00030000 		.4byte	.LASF14
+ 734 00a7 03       		.byte	0x3
+ 735 00a8 24       		.byte	0x24
+ 736 00a9 53000000 		.4byte	0x53
+ 737 00ad 03       		.uleb128 0x3
+ 738 00ae CB020000 		.4byte	.LASF15
+ 739 00b2 03       		.byte	0x3
+ 740 00b3 2C       		.byte	0x2c
+ 741 00b4 65000000 		.4byte	0x65
+ 742 00b8 03       		.uleb128 0x3
+ 743 00b9 EA020000 		.4byte	.LASF16
+ 744 00bd 03       		.byte	0x3
+ 745 00be 30       		.byte	0x30
+ 746 00bf 77000000 		.4byte	0x77
+ 747 00c3 05       		.uleb128 0x5
+ 748 00c4 27010000 		.4byte	.LASF17
+ 749 00c8 04       		.byte	0x4
+ 750 00c9 E801     		.2byte	0x1e8
+ 751 00cb 45000000 		.4byte	0x45
+ 752 00cf 05       		.uleb128 0x5
+ 753 00d0 F7000000 		.4byte	.LASF18
+ 754 00d4 04       		.byte	0x4
+ 755 00d5 E901     		.2byte	0x1e9
+ 756 00d7 5E000000 		.4byte	0x5e
+ 757 00db 05       		.uleb128 0x5
+ 758 00dc C5030000 		.4byte	.LASF19
+ 759 00e0 04       		.byte	0x4
+ 760 00e1 EA01     		.2byte	0x1ea
+ 761 00e3 82000000 		.4byte	0x82
+ 762 00e7 02       		.uleb128 0x2
+ 763 00e8 04       		.byte	0x4
+ 764 00e9 04       		.byte	0x4
+ 765 00ea 6E010000 		.4byte	.LASF20
+ 766 00ee 02       		.uleb128 0x2
+ 767 00ef 08       		.byte	0x8
+ 768 00f0 04       		.byte	0x4
+ 769 00f1 E3030000 		.4byte	.LASF21
+ 770 00f5 02       		.uleb128 0x2
+ 771 00f6 01       		.byte	0x1
+ 772 00f7 08       		.byte	0x8
+ 773 00f8 61030000 		.4byte	.LASF22
+ 774 00fc 05       		.uleb128 0x5
+ 775 00fd 18030000 		.4byte	.LASF23
+ 776 0101 04       		.byte	0x4
+ 777 0102 8A02     		.2byte	0x28a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 21
+
+
+ 778 0104 82000000 		.4byte	0x82
+ 779 0108 05       		.uleb128 0x5
+ 780 0109 CC030000 		.4byte	.LASF24
+ 781 010d 04       		.byte	0x4
+ 782 010e 9202     		.2byte	0x292
+ 783 0110 14010000 		.4byte	0x114
+ 784 0114 06       		.uleb128 0x6
+ 785 0115 C3000000 		.4byte	0xc3
+ 786 0119 03       		.uleb128 0x3
+ 787 011a 3A000000 		.4byte	.LASF25
+ 788 011e 05       		.byte	0x5
+ 789 011f D8       		.byte	0xd8
+ 790 0120 2C000000 		.4byte	0x2c
+ 791 0124 02       		.uleb128 0x2
+ 792 0125 08       		.byte	0x8
+ 793 0126 04       		.byte	0x4
+ 794 0127 8E000000 		.4byte	.LASF26
+ 795 012b 02       		.uleb128 0x2
+ 796 012c 04       		.byte	0x4
+ 797 012d 07       		.byte	0x7
+ 798 012e 67000000 		.4byte	.LASF27
+ 799 0132 07       		.uleb128 0x7
+ 800 0133 01       		.byte	0x1
+ 801 0134 45000000 		.4byte	0x45
+ 802 0138 06       		.byte	0x6
+ 803 0139 09       		.byte	0x9
+ 804 013a 51010000 		.4byte	0x151
+ 805 013e 08       		.uleb128 0x8
+ 806 013f 7E030000 		.4byte	.LASF28
+ 807 0143 00       		.byte	0
+ 808 0144 08       		.uleb128 0x8
+ 809 0145 10000000 		.4byte	.LASF29
+ 810 0149 01       		.byte	0x1
+ 811 014a 08       		.uleb128 0x8
+ 812 014b CD010000 		.4byte	.LASF30
+ 813 014f 02       		.byte	0x2
+ 814 0150 00       		.byte	0
+ 815 0151 03       		.uleb128 0x3
+ 816 0152 2C020000 		.4byte	.LASF31
+ 817 0156 06       		.byte	0x6
+ 818 0157 0D       		.byte	0xd
+ 819 0158 32010000 		.4byte	0x132
+ 820 015c 09       		.uleb128 0x9
+ 821 015d 9D030000 		.4byte	.LASF80
+ 822 0161 01       		.byte	0x1
+ 823 0162 70       		.byte	0x70
+ 824 0163 19010000 		.4byte	0x119
+ 825 0167 00000000 		.4byte	.LFB69
+ 826 016b 24000000 		.4byte	.LFE69-.LFB69
+ 827 016f 01       		.uleb128 0x1
+ 828 0170 9C       		.byte	0x9c
+ 829 0171 94010000 		.4byte	0x194
+ 830 0175 0A       		.uleb128 0xa
+ 831 0176 3E020000 		.4byte	.LASF34
+ 832 017a 01       		.byte	0x1
+ 833 017b 70       		.byte	0x70
+ 834 017c 19010000 		.4byte	0x119
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 22
+
+
+ 835 0180 00000000 		.4byte	.LLST0
+ 836 0184 0B       		.uleb128 0xb
+ 837 0185 BD000000 		.4byte	.LASF37
+ 838 0189 01       		.byte	0x1
+ 839 018a 73       		.byte	0x73
+ 840 018b 19010000 		.4byte	0x119
+ 841 018f 48000000 		.4byte	.LLST1
+ 842 0193 00       		.byte	0
+ 843 0194 0C       		.uleb128 0xc
+ 844 0195 02020000 		.4byte	.LASF32
+ 845 0199 01       		.byte	0x1
+ 846 019a 13       		.byte	0x13
+ 847 019b 00000000 		.4byte	.LFB63
+ 848 019f 1C000000 		.4byte	.LFE63-.LFB63
+ 849 01a3 01       		.uleb128 0x1
+ 850 01a4 9C       		.byte	0x9c
+ 851 01a5 CC010000 		.4byte	0x1cc
+ 852 01a9 0D       		.uleb128 0xd
+ 853 01aa 12000000 		.4byte	.LVL6
+ 854 01ae 37060000 		.4byte	0x637
+ 855 01b2 0E       		.uleb128 0xe
+ 856 01b3 01       		.uleb128 0x1
+ 857 01b4 50       		.byte	0x50
+ 858 01b5 01       		.uleb128 0x1
+ 859 01b6 31       		.byte	0x31
+ 860 01b7 0E       		.uleb128 0xe
+ 861 01b8 01       		.uleb128 0x1
+ 862 01b9 51       		.byte	0x51
+ 863 01ba 01       		.uleb128 0x1
+ 864 01bb 31       		.byte	0x31
+ 865 01bc 0E       		.uleb128 0xe
+ 866 01bd 01       		.uleb128 0x1
+ 867 01be 52       		.byte	0x52
+ 868 01bf 03       		.uleb128 0x3
+ 869 01c0 0A       		.byte	0xa
+ 870 01c1 FF1F     		.2byte	0x1fff
+ 871 01c3 0E       		.uleb128 0xe
+ 872 01c4 01       		.uleb128 0x1
+ 873 01c5 53       		.byte	0x53
+ 874 01c6 03       		.uleb128 0x3
+ 875 01c7 0A       		.byte	0xa
+ 876 01c8 0040     		.2byte	0x4000
+ 877 01ca 00       		.byte	0
+ 878 01cb 00       		.byte	0
+ 879 01cc 0C       		.uleb128 0xc
+ 880 01cd EC040000 		.4byte	.LASF33
+ 881 01d1 01       		.byte	0x1
+ 882 01d2 1A       		.byte	0x1a
+ 883 01d3 00000000 		.4byte	.LFB64
+ 884 01d7 44000000 		.4byte	.LFE64-.LFB64
+ 885 01db 01       		.uleb128 0x1
+ 886 01dc 9C       		.byte	0x9c
+ 887 01dd 69020000 		.4byte	0x269
+ 888 01e1 0A       		.uleb128 0xa
+ 889 01e2 F5040000 		.4byte	.LASF35
+ 890 01e6 01       		.byte	0x1
+ 891 01e7 1A       		.byte	0x1a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 23
+
+
+ 892 01e8 69020000 		.4byte	0x269
+ 893 01ec 7E000000 		.4byte	.LLST2
+ 894 01f0 0A       		.uleb128 0xa
+ 895 01f1 23040000 		.4byte	.LASF36
+ 896 01f5 01       		.byte	0x1
+ 897 01f6 1A       		.byte	0x1a
+ 898 01f7 74020000 		.4byte	0x274
+ 899 01fb AA000000 		.4byte	.LLST3
+ 900 01ff 0B       		.uleb128 0xb
+ 901 0200 DE010000 		.4byte	.LASF38
+ 902 0204 01       		.byte	0x1
+ 903 0205 1C       		.byte	0x1c
+ 904 0206 97000000 		.4byte	0x97
+ 905 020a D6000000 		.4byte	.LLST4
+ 906 020e 0F       		.uleb128 0xf
+ 907 020f 12000000 		.4byte	.LBB2
+ 908 0213 1E000000 		.4byte	.LBE2-.LBB2
+ 909 0217 46020000 		.4byte	0x246
+ 910 021b 10       		.uleb128 0x10
+ 911 021c 69647800 		.ascii	"idx\000"
+ 912 0220 01       		.byte	0x1
+ 913 0221 22       		.byte	0x22
+ 914 0222 19010000 		.4byte	0x119
+ 915 0226 EA000000 		.4byte	.LLST5
+ 916 022a 11       		.uleb128 0x11
+ 917 022b 1C000000 		.4byte	.LVL12
+ 918 022f 42060000 		.4byte	0x642
+ 919 0233 11       		.uleb128 0x11
+ 920 0234 20000000 		.4byte	.LVL13
+ 921 0238 4D060000 		.4byte	0x64d
+ 922 023c 11       		.uleb128 0x11
+ 923 023d 2A000000 		.4byte	.LVL14
+ 924 0241 58060000 		.4byte	0x658
+ 925 0245 00       		.byte	0
+ 926 0246 12       		.uleb128 0x12
+ 927 0247 12000000 		.4byte	.LVL10
+ 928 024b 63060000 		.4byte	0x663
+ 929 024f 59020000 		.4byte	0x259
+ 930 0253 0E       		.uleb128 0xe
+ 931 0254 01       		.uleb128 0x1
+ 932 0255 50       		.byte	0x50
+ 933 0256 01       		.uleb128 0x1
+ 934 0257 30       		.byte	0x30
+ 935 0258 00       		.byte	0
+ 936 0259 0D       		.uleb128 0xd
+ 937 025a 36000000 		.4byte	.LVL16
+ 938 025e 63060000 		.4byte	0x663
+ 939 0262 0E       		.uleb128 0xe
+ 940 0263 01       		.uleb128 0x1
+ 941 0264 50       		.byte	0x50
+ 942 0265 01       		.uleb128 0x1
+ 943 0266 31       		.byte	0x31
+ 944 0267 00       		.byte	0
+ 945 0268 00       		.byte	0
+ 946 0269 13       		.uleb128 0x13
+ 947 026a 04       		.byte	0x4
+ 948 026b 6F020000 		.4byte	0x26f
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 24
+
+
+ 949 026f 14       		.uleb128 0x14
+ 950 0270 97000000 		.4byte	0x97
+ 951 0274 14       		.uleb128 0x14
+ 952 0275 19010000 		.4byte	0x119
+ 953 0279 15       		.uleb128 0x15
+ 954 027a EE010000 		.4byte	.LASF43
+ 955 027e 01       		.byte	0x1
+ 956 027f 61       		.byte	0x61
+ 957 0280 97000000 		.4byte	0x97
+ 958 0284 00000000 		.4byte	.LFB66
+ 959 0288 14000000 		.4byte	.LFE66-.LFB66
+ 960 028c 01       		.uleb128 0x1
+ 961 028d 9C       		.byte	0x9c
+ 962 028e 0C       		.uleb128 0xc
+ 963 028f 6B020000 		.4byte	.LASF39
+ 964 0293 01       		.byte	0x1
+ 965 0294 66       		.byte	0x66
+ 966 0295 00000000 		.4byte	.LFB67
+ 967 0299 0C000000 		.4byte	.LFE67-.LFB67
+ 968 029d 01       		.uleb128 0x1
+ 969 029e 9C       		.byte	0x9c
+ 970 029f B1020000 		.4byte	0x2b1
+ 971 02a3 16       		.uleb128 0x16
+ 972 02a4 3B030000 		.4byte	.LASF40
+ 973 02a8 01       		.byte	0x1
+ 974 02a9 66       		.byte	0x66
+ 975 02aa 51010000 		.4byte	0x151
+ 976 02ae 01       		.uleb128 0x1
+ 977 02af 50       		.byte	0x50
+ 978 02b0 00       		.byte	0
+ 979 02b1 0C       		.uleb128 0xc
+ 980 02b2 2D010000 		.4byte	.LASF41
+ 981 02b6 01       		.byte	0x1
+ 982 02b7 38       		.byte	0x38
+ 983 02b8 00000000 		.4byte	.LFB65
+ 984 02bc 3C000000 		.4byte	.LFE65-.LFB65
+ 985 02c0 01       		.uleb128 0x1
+ 986 02c1 9C       		.byte	0x9c
+ 987 02c2 27030000 		.4byte	0x327
+ 988 02c6 0B       		.uleb128 0xb
+ 989 02c7 18010000 		.4byte	.LASF42
+ 990 02cb 01       		.byte	0x1
+ 991 02cc 3C       		.byte	0x3c
+ 992 02cd FC000000 		.4byte	0xfc
+ 993 02d1 09010000 		.4byte	.LLST6
+ 994 02d5 17       		.uleb128 0x17
+ 995 02d6 00000000 		.4byte	.Ldebug_ranges0+0
+ 996 02da F7020000 		.4byte	0x2f7
+ 997 02de 10       		.uleb128 0x10
+ 998 02df 69647800 		.ascii	"idx\000"
+ 999 02e3 01       		.byte	0x1
+ 1000 02e4 4F       		.byte	0x4f
+ 1001 02e5 19010000 		.4byte	0x119
+ 1002 02e9 27010000 		.4byte	.LLST7
+ 1003 02ed 11       		.uleb128 0x11
+ 1004 02ee 24000000 		.4byte	.LVL24
+ 1005 02f2 6E060000 		.4byte	0x66e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 25
+
+
+ 1006 02f6 00       		.byte	0
+ 1007 02f7 12       		.uleb128 0x12
+ 1008 02f8 08000000 		.4byte	.LVL19
+ 1009 02fc 8E020000 		.4byte	0x28e
+ 1010 0300 0A030000 		.4byte	0x30a
+ 1011 0304 0E       		.uleb128 0xe
+ 1012 0305 01       		.uleb128 0x1
+ 1013 0306 50       		.byte	0x50
+ 1014 0307 01       		.uleb128 0x1
+ 1015 0308 30       		.byte	0x30
+ 1016 0309 00       		.byte	0
+ 1017 030a 11       		.uleb128 0x11
+ 1018 030b 10000000 		.4byte	.LVL20
+ 1019 030f 79060000 		.4byte	0x679
+ 1020 0313 0D       		.uleb128 0xd
+ 1021 0314 18000000 		.4byte	.LVL22
+ 1022 0318 84060000 		.4byte	0x684
+ 1023 031c 0E       		.uleb128 0xe
+ 1024 031d 01       		.uleb128 0x1
+ 1025 031e 50       		.byte	0x50
+ 1026 031f 05       		.uleb128 0x5
+ 1027 0320 03       		.byte	0x3
+ 1028 0321 00000000 		.4byte	.LC0
+ 1029 0325 00       		.byte	0
+ 1030 0326 00       		.byte	0
+ 1031 0327 15       		.uleb128 0x15
+ 1032 0328 0F040000 		.4byte	.LASF44
+ 1033 032c 01       		.byte	0x1
+ 1034 032d 6B       		.byte	0x6b
+ 1035 032e 51010000 		.4byte	0x151
+ 1036 0332 00000000 		.4byte	.LFB68
+ 1037 0336 0C000000 		.4byte	.LFE68-.LFB68
+ 1038 033a 01       		.uleb128 0x1
+ 1039 033b 9C       		.byte	0x9c
+ 1040 033c 0C       		.uleb128 0xc
+ 1041 033d 95010000 		.4byte	.LASF45
+ 1042 0341 01       		.byte	0x1
+ 1043 0342 84       		.byte	0x84
+ 1044 0343 00000000 		.4byte	.LFB70
+ 1045 0347 40010000 		.4byte	.LFE70-.LFB70
+ 1046 034b 01       		.uleb128 0x1
+ 1047 034c 9C       		.byte	0x9c
+ 1048 034d 9D050000 		.4byte	0x59d
+ 1049 0351 0A       		.uleb128 0xa
+ 1050 0352 F5040000 		.4byte	.LASF35
+ 1051 0356 01       		.byte	0x1
+ 1052 0357 84       		.byte	0x84
+ 1053 0358 69020000 		.4byte	0x269
+ 1054 035c 45010000 		.4byte	.LLST8
+ 1055 0360 0A       		.uleb128 0xa
+ 1056 0361 49040000 		.4byte	.LASF46
+ 1057 0365 01       		.byte	0x1
+ 1058 0366 84       		.byte	0x84
+ 1059 0367 9D050000 		.4byte	0x59d
+ 1060 036b 6E010000 		.4byte	.LLST9
+ 1061 036f 0A       		.uleb128 0xa
+ 1062 0370 23040000 		.4byte	.LASF36
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 26
+
+
+ 1063 0374 01       		.byte	0x1
+ 1064 0375 84       		.byte	0x84
+ 1065 0376 74020000 		.4byte	0x274
+ 1066 037a 9A010000 		.4byte	.LLST10
+ 1067 037e 0B       		.uleb128 0xb
+ 1068 037f 21030000 		.4byte	.LASF47
+ 1069 0383 01       		.byte	0x1
+ 1070 0384 8C       		.byte	0x8c
+ 1071 0385 FC000000 		.4byte	0xfc
+ 1072 0389 D1010000 		.4byte	.LLST11
+ 1073 038d 0B       		.uleb128 0xb
+ 1074 038e 7F000000 		.4byte	.LASF48
+ 1075 0392 01       		.byte	0x1
+ 1076 0393 8D       		.byte	0x8d
+ 1077 0394 19010000 		.4byte	0x119
+ 1078 0398 31020000 		.4byte	.LLST12
+ 1079 039c 0B       		.uleb128 0xb
+ 1080 039d 32040000 		.4byte	.LASF49
+ 1081 03a1 01       		.byte	0x1
+ 1082 03a2 AD       		.byte	0xad
+ 1083 03a3 FC000000 		.4byte	0xfc
+ 1084 03a7 50020000 		.4byte	.LLST13
+ 1085 03ab 0B       		.uleb128 0xb
+ 1086 03ac A5000000 		.4byte	.LASF50
+ 1087 03b0 01       		.byte	0x1
+ 1088 03b1 B7       		.byte	0xb7
+ 1089 03b2 19010000 		.4byte	0x119
+ 1090 03b6 6E020000 		.4byte	.LLST14
+ 1091 03ba 0B       		.uleb128 0xb
+ 1092 03bb 5C010000 		.4byte	.LASF51
+ 1093 03bf 01       		.byte	0x1
+ 1094 03c0 BC       		.byte	0xbc
+ 1095 03c1 A2000000 		.4byte	0xa2
+ 1096 03c5 10030000 		.4byte	.LLST15
+ 1097 03c9 0F       		.uleb128 0xf
+ 1098 03ca 1C000000 		.4byte	.LBB5
+ 1099 03ce 26000000 		.4byte	.LBE5-.LBB5
+ 1100 03d2 17040000 		.4byte	0x417
+ 1101 03d6 10       		.uleb128 0x10
+ 1102 03d7 69647800 		.ascii	"idx\000"
+ 1103 03db 01       		.byte	0x1
+ 1104 03dc 9B       		.byte	0x9b
+ 1105 03dd 19010000 		.4byte	0x119
+ 1106 03e1 23030000 		.4byte	.LLST16
+ 1107 03e5 18       		.uleb128 0x18
+ 1108 03e6 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 1109 03ea 0B       		.uleb128 0xb
+ 1110 03eb BE030000 		.4byte	.LASF52
+ 1111 03ef 01       		.byte	0x1
+ 1112 03f0 9C       		.byte	0x9c
+ 1113 03f1 97000000 		.4byte	0x97
+ 1114 03f5 42030000 		.4byte	.LLST17
+ 1115 03f9 11       		.uleb128 0x11
+ 1116 03fa 24000000 		.4byte	.LVL35
+ 1117 03fe 8F060000 		.4byte	0x68f
+ 1118 0402 0D       		.uleb128 0xd
+ 1119 0403 38000000 		.4byte	.LVL38
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 27
+
+
+ 1120 0407 84060000 		.4byte	0x684
+ 1121 040b 0E       		.uleb128 0xe
+ 1122 040c 01       		.uleb128 0x1
+ 1123 040d 50       		.byte	0x50
+ 1124 040e 05       		.uleb128 0x5
+ 1125 040f 03       		.byte	0x3
+ 1126 0410 28000000 		.4byte	.LC1
+ 1127 0414 00       		.byte	0
+ 1128 0415 00       		.byte	0
+ 1129 0416 00       		.byte	0
+ 1130 0417 17       		.uleb128 0x17
+ 1131 0418 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 1132 041c 2A050000 		.4byte	0x52a
+ 1133 0420 0B       		.uleb128 0xb
+ 1134 0421 BE030000 		.4byte	.LASF52
+ 1135 0425 01       		.byte	0x1
+ 1136 0426 C8       		.byte	0xc8
+ 1137 0427 19010000 		.4byte	0x119
+ 1138 042b 55030000 		.4byte	.LLST18
+ 1139 042f 19       		.uleb128 0x19
+ 1140 0430 72000000 		.4byte	.LBB9
+ 1141 0434 8C000000 		.4byte	.LBE9-.LBB9
+ 1142 0438 0B       		.uleb128 0xb
+ 1143 0439 44010000 		.4byte	.LASF53
+ 1144 043d 01       		.byte	0x1
+ 1145 043e CA       		.byte	0xca
+ 1146 043f 97000000 		.4byte	0x97
+ 1147 0443 B5030000 		.4byte	.LLST19
+ 1148 0447 12       		.uleb128 0x12
+ 1149 0448 8C000000 		.4byte	.LVL51
+ 1150 044c 9A060000 		.4byte	0x69a
+ 1151 0450 66040000 		.4byte	0x466
+ 1152 0454 0E       		.uleb128 0xe
+ 1153 0455 01       		.uleb128 0x1
+ 1154 0456 51       		.byte	0x51
+ 1155 0457 02       		.uleb128 0x2
+ 1156 0458 76       		.byte	0x76
+ 1157 0459 00       		.sleb128 0
+ 1158 045a 0E       		.uleb128 0xe
+ 1159 045b 01       		.uleb128 0x1
+ 1160 045c 52       		.byte	0x52
+ 1161 045d 02       		.uleb128 0x2
+ 1162 045e 09       		.byte	0x9
+ 1163 045f FE       		.byte	0xfe
+ 1164 0460 0E       		.uleb128 0xe
+ 1165 0461 01       		.uleb128 0x1
+ 1166 0462 53       		.byte	0x53
+ 1167 0463 01       		.uleb128 0x1
+ 1168 0464 35       		.byte	0x35
+ 1169 0465 00       		.byte	0
+ 1170 0466 12       		.uleb128 0x12
+ 1171 0467 94000000 		.4byte	.LVL53
+ 1172 046b 84060000 		.4byte	0x684
+ 1173 046f 7D040000 		.4byte	0x47d
+ 1174 0473 0E       		.uleb128 0xe
+ 1175 0474 01       		.uleb128 0x1
+ 1176 0475 50       		.byte	0x50
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 28
+
+
+ 1177 0476 05       		.uleb128 0x5
+ 1178 0477 03       		.byte	0x3
+ 1179 0478 54000000 		.4byte	.LC3
+ 1180 047c 00       		.byte	0
+ 1181 047d 12       		.uleb128 0x12
+ 1182 047e A8000000 		.4byte	.LVL57
+ 1183 0482 A5060000 		.4byte	0x6a5
+ 1184 0486 9B040000 		.4byte	0x49b
+ 1185 048a 0E       		.uleb128 0xe
+ 1186 048b 01       		.uleb128 0x1
+ 1187 048c 51       		.byte	0x51
+ 1188 048d 05       		.uleb128 0x5
+ 1189 048e 75       		.byte	0x75
+ 1190 048f 00       		.sleb128 0
+ 1191 0490 77       		.byte	0x77
+ 1192 0491 00       		.sleb128 0
+ 1193 0492 22       		.byte	0x22
+ 1194 0493 0E       		.uleb128 0xe
+ 1195 0494 01       		.uleb128 0x1
+ 1196 0495 52       		.byte	0x52
+ 1197 0496 03       		.uleb128 0x3
+ 1198 0497 0A       		.byte	0xa
+ 1199 0498 4565     		.2byte	0x6545
+ 1200 049a 00       		.byte	0
+ 1201 049b 12       		.uleb128 0x12
+ 1202 049c B2000000 		.4byte	.LVL60
+ 1203 04a0 84060000 		.4byte	0x684
+ 1204 04a4 B2040000 		.4byte	0x4b2
+ 1205 04a8 0E       		.uleb128 0xe
+ 1206 04a9 01       		.uleb128 0x1
+ 1207 04aa 50       		.byte	0x50
+ 1208 04ab 05       		.uleb128 0x5
+ 1209 04ac 03       		.byte	0x3
+ 1210 04ad 70000000 		.4byte	.LC4
+ 1211 04b1 00       		.byte	0
+ 1212 04b2 12       		.uleb128 0x12
+ 1213 04b3 B8000000 		.4byte	.LVL61
+ 1214 04b7 B0060000 		.4byte	0x6b0
+ 1215 04bb C6040000 		.4byte	0x4c6
+ 1216 04bf 0E       		.uleb128 0xe
+ 1217 04c0 01       		.uleb128 0x1
+ 1218 04c1 50       		.byte	0x50
+ 1219 04c2 02       		.uleb128 0x2
+ 1220 04c3 74       		.byte	0x74
+ 1221 04c4 00       		.sleb128 0
+ 1222 04c5 00       		.byte	0
+ 1223 04c6 12       		.uleb128 0x12
+ 1224 04c7 D4000000 		.4byte	.LVL64
+ 1225 04cb 9A060000 		.4byte	0x69a
+ 1226 04cf E0040000 		.4byte	0x4e0
+ 1227 04d3 0E       		.uleb128 0xe
+ 1228 04d4 01       		.uleb128 0x1
+ 1229 04d5 51       		.byte	0x51
+ 1230 04d6 03       		.uleb128 0x3
+ 1231 04d7 0A       		.byte	0xa
+ 1232 04d8 FF0F     		.2byte	0xfff
+ 1233 04da 0E       		.uleb128 0xe
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 29
+
+
+ 1234 04db 01       		.uleb128 0x1
+ 1235 04dc 53       		.byte	0x53
+ 1236 04dd 01       		.uleb128 0x1
+ 1237 04de 31       		.byte	0x31
+ 1238 04df 00       		.byte	0
+ 1239 04e0 12       		.uleb128 0x12
+ 1240 04e1 DC000000 		.4byte	.LVL66
+ 1241 04e5 84060000 		.4byte	0x684
+ 1242 04e9 F7040000 		.4byte	0x4f7
+ 1243 04ed 0E       		.uleb128 0xe
+ 1244 04ee 01       		.uleb128 0x1
+ 1245 04ef 50       		.byte	0x50
+ 1246 04f0 05       		.uleb128 0x5
+ 1247 04f1 03       		.byte	0x3
+ 1248 04f2 54000000 		.4byte	.LC3
+ 1249 04f6 00       		.byte	0
+ 1250 04f7 12       		.uleb128 0x12
+ 1251 04f8 F0000000 		.4byte	.LVL70
+ 1252 04fc A5060000 		.4byte	0x6a5
+ 1253 0500 15050000 		.4byte	0x515
+ 1254 0504 0E       		.uleb128 0xe
+ 1255 0505 01       		.uleb128 0x1
+ 1256 0506 51       		.byte	0x51
+ 1257 0507 05       		.uleb128 0x5
+ 1258 0508 75       		.byte	0x75
+ 1259 0509 00       		.sleb128 0
+ 1260 050a 77       		.byte	0x77
+ 1261 050b 00       		.sleb128 0
+ 1262 050c 22       		.byte	0x22
+ 1263 050d 0E       		.uleb128 0xe
+ 1264 050e 01       		.uleb128 0x1
+ 1265 050f 52       		.byte	0x52
+ 1266 0510 03       		.uleb128 0x3
+ 1267 0511 0A       		.byte	0xa
+ 1268 0512 4565     		.2byte	0x6545
+ 1269 0514 00       		.byte	0
+ 1270 0515 0D       		.uleb128 0xd
+ 1271 0516 F8000000 		.4byte	.LVL72
+ 1272 051a 84060000 		.4byte	0x684
+ 1273 051e 0E       		.uleb128 0xe
+ 1274 051f 01       		.uleb128 0x1
+ 1275 0520 50       		.byte	0x50
+ 1276 0521 05       		.uleb128 0x5
+ 1277 0522 03       		.byte	0x3
+ 1278 0523 70000000 		.4byte	.LC4
+ 1279 0527 00       		.byte	0
+ 1280 0528 00       		.byte	0
+ 1281 0529 00       		.byte	0
+ 1282 052a 11       		.uleb128 0x11
+ 1283 052b 12000000 		.4byte	.LVL31
+ 1284 052f BB060000 		.4byte	0x6bb
+ 1285 0533 12       		.uleb128 0x12
+ 1286 0534 18000000 		.4byte	.LVL32
+ 1287 0538 5C010000 		.4byte	0x15c
+ 1288 053c 47050000 		.4byte	0x547
+ 1289 0540 0E       		.uleb128 0xe
+ 1290 0541 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 30
+
+
+ 1291 0542 50       		.byte	0x50
+ 1292 0543 02       		.uleb128 0x2
+ 1293 0544 74       		.byte	0x74
+ 1294 0545 00       		.sleb128 0
+ 1295 0546 00       		.byte	0
+ 1296 0547 11       		.uleb128 0x11
+ 1297 0548 4C000000 		.4byte	.LVL40
+ 1298 054c C6060000 		.4byte	0x6c6
+ 1299 0550 12       		.uleb128 0x12
+ 1300 0551 54000000 		.4byte	.LVL42
+ 1301 0555 84060000 		.4byte	0x684
+ 1302 0559 67050000 		.4byte	0x567
+ 1303 055d 0E       		.uleb128 0xe
+ 1304 055e 01       		.uleb128 0x1
+ 1305 055f 50       		.byte	0x50
+ 1306 0560 05       		.uleb128 0x5
+ 1307 0561 03       		.byte	0x3
+ 1308 0562 40000000 		.4byte	.LC2
+ 1309 0566 00       		.byte	0
+ 1310 0567 12       		.uleb128 0x12
+ 1311 0568 16010000 		.4byte	.LVL77
+ 1312 056c D1060000 		.4byte	0x6d1
+ 1313 0570 7A050000 		.4byte	0x57a
+ 1314 0574 0E       		.uleb128 0xe
+ 1315 0575 01       		.uleb128 0x1
+ 1316 0576 51       		.byte	0x51
+ 1317 0577 01       		.uleb128 0x1
+ 1318 0578 31       		.byte	0x31
+ 1319 0579 00       		.byte	0
+ 1320 057a 12       		.uleb128 0x12
+ 1321 057b 1C010000 		.4byte	.LVL78
+ 1322 057f 63060000 		.4byte	0x663
+ 1323 0583 8D050000 		.4byte	0x58d
+ 1324 0587 0E       		.uleb128 0xe
+ 1325 0588 01       		.uleb128 0x1
+ 1326 0589 50       		.byte	0x50
+ 1327 058a 01       		.uleb128 0x1
+ 1328 058b 30       		.byte	0x30
+ 1329 058c 00       		.byte	0
+ 1330 058d 0D       		.uleb128 0xd
+ 1331 058e 22010000 		.4byte	.LVL79
+ 1332 0592 DC060000 		.4byte	0x6dc
+ 1333 0596 0E       		.uleb128 0xe
+ 1334 0597 01       		.uleb128 0x1
+ 1335 0598 50       		.byte	0x50
+ 1336 0599 01       		.uleb128 0x1
+ 1337 059a 34       		.byte	0x34
+ 1338 059b 00       		.byte	0
+ 1339 059c 00       		.byte	0
+ 1340 059d 13       		.uleb128 0x13
+ 1341 059e 04       		.byte	0x4
+ 1342 059f 97000000 		.4byte	0x97
+ 1343 05a3 1A       		.uleb128 0x1a
+ 1344 05a4 B7010000 		.4byte	.LASF54
+ 1345 05a8 01       		.byte	0x1
+ 1346 05a9 07       		.byte	0x7
+ 1347 05aa 6F020000 		.4byte	0x26f
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 31
+
+
+ 1348 05ae 01       		.byte	0x1
+ 1349 05af 1A       		.uleb128 0x1a
+ 1350 05b0 EA030000 		.4byte	.LASF55
+ 1351 05b4 01       		.byte	0x1
+ 1352 05b5 08       		.byte	0x8
+ 1353 05b6 6F020000 		.4byte	0x26f
+ 1354 05ba 01       		.byte	0x1
+ 1355 05bb 1B       		.uleb128 0x1b
+ 1356 05bc 8C030000 		.4byte	.LASF56
+ 1357 05c0 01       		.byte	0x1
+ 1358 05c1 09       		.byte	0x9
+ 1359 05c2 74020000 		.4byte	0x274
+ 1360 05c6 FF0F     		.2byte	0xfff
+ 1361 05c8 1C       		.uleb128 0x1c
+ 1362 05c9 97000000 		.4byte	0x97
+ 1363 05cd D8050000 		.4byte	0x5d8
+ 1364 05d1 1D       		.uleb128 0x1d
+ 1365 05d2 2B010000 		.4byte	0x12b
+ 1366 05d6 09       		.byte	0x9
+ 1367 05d7 00       		.byte	0
+ 1368 05d8 1E       		.uleb128 0x1e
+ 1369 05d9 66030000 		.4byte	.LASF57
+ 1370 05dd 01       		.byte	0x1
+ 1371 05de 0B       		.byte	0xb
+ 1372 05df C8050000 		.4byte	0x5c8
+ 1373 05e3 05       		.uleb128 0x5
+ 1374 05e4 03       		.byte	0x3
+ 1375 05e5 04000000 		.4byte	DMA_Tx_TD_pool
+ 1376 05e9 1E       		.uleb128 0x1e
+ 1377 05ea B2030000 		.4byte	.LASF58
+ 1378 05ee 01       		.byte	0x1
+ 1379 05ef 0C       		.byte	0xc
+ 1380 05f0 97000000 		.4byte	0x97
+ 1381 05f4 05       		.uleb128 0x5
+ 1382 05f5 03       		.byte	0x3
+ 1383 05f6 00000000 		.4byte	DMA_Tx_Chan
+ 1384 05fa 1E       		.uleb128 0x1e
+ 1385 05fb 2B030000 		.4byte	.LASF59
+ 1386 05ff 01       		.byte	0x1
+ 1387 0600 0E       		.byte	0xe
+ 1388 0601 0B060000 		.4byte	0x60b
+ 1389 0605 05       		.uleb128 0x5
+ 1390 0606 03       		.byte	0x3
+ 1391 0607 01000000 		.4byte	spi_xfer_status
+ 1392 060b 06       		.uleb128 0x6
+ 1393 060c 51010000 		.4byte	0x151
+ 1394 0610 1E       		.uleb128 0x1e
+ 1395 0611 5E020000 		.4byte	.LASF60
+ 1396 0615 01       		.byte	0x1
+ 1397 0616 11       		.byte	0x11
+ 1398 0617 21060000 		.4byte	0x621
+ 1399 061b 05       		.uleb128 0x5
+ 1400 061c 03       		.byte	0x3
+ 1401 061d 10000000 		.4byte	g_tds_needed
+ 1402 0621 06       		.uleb128 0x6
+ 1403 0622 19010000 		.4byte	0x119
+ 1404 0626 1F       		.uleb128 0x1f
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 32
+
+
+ 1405 0627 51040000 		.4byte	.LASF81
+ 1406 062b 0C       		.byte	0xc
+ 1407 062c 1207     		.2byte	0x712
+ 1408 062e 32060000 		.4byte	0x632
+ 1409 0632 06       		.uleb128 0x6
+ 1410 0633 AD000000 		.4byte	0xad
+ 1411 0637 20       		.uleb128 0x20
+ 1412 0638 A2010000 		.4byte	.LASF61
+ 1413 063c A2010000 		.4byte	.LASF61
+ 1414 0640 07       		.byte	0x7
+ 1415 0641 1E       		.byte	0x1e
+ 1416 0642 20       		.uleb128 0x20
+ 1417 0643 39040000 		.4byte	.LASF62
+ 1418 0647 39040000 		.4byte	.LASF62
+ 1419 064b 08       		.byte	0x8
+ 1420 064c 5E       		.byte	0x5e
+ 1421 064d 20       		.uleb128 0x20
+ 1422 064e FE030000 		.4byte	.LASF63
+ 1423 0652 FE030000 		.4byte	.LASF63
+ 1424 0656 08       		.byte	0x8
+ 1425 0657 5C       		.byte	0x5c
+ 1426 0658 20       		.uleb128 0x20
+ 1427 0659 70000000 		.4byte	.LASF64
+ 1428 065d 70000000 		.4byte	.LASF64
+ 1429 0661 08       		.byte	0x8
+ 1430 0662 60       		.byte	0x60
+ 1431 0663 20       		.uleb128 0x20
+ 1432 0664 8C010000 		.4byte	.LASF65
+ 1433 0668 8C010000 		.4byte	.LASF65
+ 1434 066c 09       		.byte	0x9
+ 1435 066d 26       		.byte	0x26
+ 1436 066e 20       		.uleb128 0x20
+ 1437 066f 55030000 		.4byte	.LASF66
+ 1438 0673 55030000 		.4byte	.LASF66
+ 1439 0677 0A       		.byte	0xa
+ 1440 0678 39       		.byte	0x39
+ 1441 0679 20       		.uleb128 0x20
+ 1442 067a 09030000 		.4byte	.LASF67
+ 1443 067e 09030000 		.4byte	.LASF67
+ 1444 0682 0A       		.byte	0xa
+ 1445 0683 2A       		.byte	0x2a
+ 1446 0684 20       		.uleb128 0x20
+ 1447 0685 D4000000 		.4byte	.LASF68
+ 1448 0689 D4000000 		.4byte	.LASF68
+ 1449 068d 0B       		.byte	0xb
+ 1450 068e 26       		.byte	0x26
+ 1451 068f 20       		.uleb128 0x20
+ 1452 0690 00000000 		.4byte	.LASF69
+ 1453 0694 00000000 		.4byte	.LASF69
+ 1454 0698 0A       		.byte	0xa
+ 1455 0699 38       		.byte	0x38
+ 1456 069a 20       		.uleb128 0x20
+ 1457 069b 41000000 		.4byte	.LASF70
+ 1458 069f 41000000 		.4byte	.LASF70
+ 1459 06a3 0A       		.byte	0xa
+ 1460 06a4 3B       		.byte	0x3b
+ 1461 06a5 20       		.uleb128 0x20
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 33
+
+
+ 1462 06a6 1E000000 		.4byte	.LASF71
+ 1463 06aa 1E000000 		.4byte	.LASF71
+ 1464 06ae 0A       		.byte	0xa
+ 1465 06af 3F       		.byte	0x3f
+ 1466 06b0 20       		.uleb128 0x20
+ 1467 06b1 C4000000 		.4byte	.LASF72
+ 1468 06b5 C4000000 		.4byte	.LASF72
+ 1469 06b9 0B       		.byte	0xb
+ 1470 06ba 28       		.byte	0x28
+ 1471 06bb 20       		.uleb128 0x20
+ 1472 06bc FE000000 		.4byte	.LASF73
+ 1473 06c0 FE000000 		.4byte	.LASF73
+ 1474 06c4 08       		.byte	0x8
+ 1475 06c5 65       		.byte	0x65
+ 1476 06c6 20       		.uleb128 0x20
+ 1477 06c7 E3000000 		.4byte	.LASF74
+ 1478 06cb E3000000 		.4byte	.LASF74
+ 1479 06cf 0A       		.byte	0xa
+ 1480 06d0 2F       		.byte	0x2f
+ 1481 06d1 20       		.uleb128 0x20
+ 1482 06d2 59000000 		.4byte	.LASF75
+ 1483 06d6 59000000 		.4byte	.LASF75
+ 1484 06da 0A       		.byte	0xa
+ 1485 06db 29       		.byte	0x29
+ 1486 06dc 20       		.uleb128 0x20
+ 1487 06dd 15020000 		.4byte	.LASF76
+ 1488 06e1 15020000 		.4byte	.LASF76
+ 1489 06e5 08       		.byte	0x8
+ 1490 06e6 5A       		.byte	0x5a
+ 1491 06e7 00       		.byte	0
+ 1492              		.section	.debug_abbrev,"",%progbits
+ 1493              	.Ldebug_abbrev0:
+ 1494 0000 01       		.uleb128 0x1
+ 1495 0001 11       		.uleb128 0x11
+ 1496 0002 01       		.byte	0x1
+ 1497 0003 25       		.uleb128 0x25
+ 1498 0004 0E       		.uleb128 0xe
+ 1499 0005 13       		.uleb128 0x13
+ 1500 0006 0B       		.uleb128 0xb
+ 1501 0007 03       		.uleb128 0x3
+ 1502 0008 0E       		.uleb128 0xe
+ 1503 0009 1B       		.uleb128 0x1b
+ 1504 000a 0E       		.uleb128 0xe
+ 1505 000b 55       		.uleb128 0x55
+ 1506 000c 17       		.uleb128 0x17
+ 1507 000d 11       		.uleb128 0x11
+ 1508 000e 01       		.uleb128 0x1
+ 1509 000f 10       		.uleb128 0x10
+ 1510 0010 17       		.uleb128 0x17
+ 1511 0011 00       		.byte	0
+ 1512 0012 00       		.byte	0
+ 1513 0013 02       		.uleb128 0x2
+ 1514 0014 24       		.uleb128 0x24
+ 1515 0015 00       		.byte	0
+ 1516 0016 0B       		.uleb128 0xb
+ 1517 0017 0B       		.uleb128 0xb
+ 1518 0018 3E       		.uleb128 0x3e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 34
+
+
+ 1519 0019 0B       		.uleb128 0xb
+ 1520 001a 03       		.uleb128 0x3
+ 1521 001b 0E       		.uleb128 0xe
+ 1522 001c 00       		.byte	0
+ 1523 001d 00       		.byte	0
+ 1524 001e 03       		.uleb128 0x3
+ 1525 001f 16       		.uleb128 0x16
+ 1526 0020 00       		.byte	0
+ 1527 0021 03       		.uleb128 0x3
+ 1528 0022 0E       		.uleb128 0xe
+ 1529 0023 3A       		.uleb128 0x3a
+ 1530 0024 0B       		.uleb128 0xb
+ 1531 0025 3B       		.uleb128 0x3b
+ 1532 0026 0B       		.uleb128 0xb
+ 1533 0027 49       		.uleb128 0x49
+ 1534 0028 13       		.uleb128 0x13
+ 1535 0029 00       		.byte	0
+ 1536 002a 00       		.byte	0
+ 1537 002b 04       		.uleb128 0x4
+ 1538 002c 24       		.uleb128 0x24
+ 1539 002d 00       		.byte	0
+ 1540 002e 0B       		.uleb128 0xb
+ 1541 002f 0B       		.uleb128 0xb
+ 1542 0030 3E       		.uleb128 0x3e
+ 1543 0031 0B       		.uleb128 0xb
+ 1544 0032 03       		.uleb128 0x3
+ 1545 0033 08       		.uleb128 0x8
+ 1546 0034 00       		.byte	0
+ 1547 0035 00       		.byte	0
+ 1548 0036 05       		.uleb128 0x5
+ 1549 0037 16       		.uleb128 0x16
+ 1550 0038 00       		.byte	0
+ 1551 0039 03       		.uleb128 0x3
+ 1552 003a 0E       		.uleb128 0xe
+ 1553 003b 3A       		.uleb128 0x3a
+ 1554 003c 0B       		.uleb128 0xb
+ 1555 003d 3B       		.uleb128 0x3b
+ 1556 003e 05       		.uleb128 0x5
+ 1557 003f 49       		.uleb128 0x49
+ 1558 0040 13       		.uleb128 0x13
+ 1559 0041 00       		.byte	0
+ 1560 0042 00       		.byte	0
+ 1561 0043 06       		.uleb128 0x6
+ 1562 0044 35       		.uleb128 0x35
+ 1563 0045 00       		.byte	0
+ 1564 0046 49       		.uleb128 0x49
+ 1565 0047 13       		.uleb128 0x13
+ 1566 0048 00       		.byte	0
+ 1567 0049 00       		.byte	0
+ 1568 004a 07       		.uleb128 0x7
+ 1569 004b 04       		.uleb128 0x4
+ 1570 004c 01       		.byte	0x1
+ 1571 004d 0B       		.uleb128 0xb
+ 1572 004e 0B       		.uleb128 0xb
+ 1573 004f 49       		.uleb128 0x49
+ 1574 0050 13       		.uleb128 0x13
+ 1575 0051 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 35
+
+
+ 1576 0052 0B       		.uleb128 0xb
+ 1577 0053 3B       		.uleb128 0x3b
+ 1578 0054 0B       		.uleb128 0xb
+ 1579 0055 01       		.uleb128 0x1
+ 1580 0056 13       		.uleb128 0x13
+ 1581 0057 00       		.byte	0
+ 1582 0058 00       		.byte	0
+ 1583 0059 08       		.uleb128 0x8
+ 1584 005a 28       		.uleb128 0x28
+ 1585 005b 00       		.byte	0
+ 1586 005c 03       		.uleb128 0x3
+ 1587 005d 0E       		.uleb128 0xe
+ 1588 005e 1C       		.uleb128 0x1c
+ 1589 005f 0B       		.uleb128 0xb
+ 1590 0060 00       		.byte	0
+ 1591 0061 00       		.byte	0
+ 1592 0062 09       		.uleb128 0x9
+ 1593 0063 2E       		.uleb128 0x2e
+ 1594 0064 01       		.byte	0x1
+ 1595 0065 03       		.uleb128 0x3
+ 1596 0066 0E       		.uleb128 0xe
+ 1597 0067 3A       		.uleb128 0x3a
+ 1598 0068 0B       		.uleb128 0xb
+ 1599 0069 3B       		.uleb128 0x3b
+ 1600 006a 0B       		.uleb128 0xb
+ 1601 006b 27       		.uleb128 0x27
+ 1602 006c 19       		.uleb128 0x19
+ 1603 006d 49       		.uleb128 0x49
+ 1604 006e 13       		.uleb128 0x13
+ 1605 006f 11       		.uleb128 0x11
+ 1606 0070 01       		.uleb128 0x1
+ 1607 0071 12       		.uleb128 0x12
+ 1608 0072 06       		.uleb128 0x6
+ 1609 0073 40       		.uleb128 0x40
+ 1610 0074 18       		.uleb128 0x18
+ 1611 0075 9742     		.uleb128 0x2117
+ 1612 0077 19       		.uleb128 0x19
+ 1613 0078 01       		.uleb128 0x1
+ 1614 0079 13       		.uleb128 0x13
+ 1615 007a 00       		.byte	0
+ 1616 007b 00       		.byte	0
+ 1617 007c 0A       		.uleb128 0xa
+ 1618 007d 05       		.uleb128 0x5
+ 1619 007e 00       		.byte	0
+ 1620 007f 03       		.uleb128 0x3
+ 1621 0080 0E       		.uleb128 0xe
+ 1622 0081 3A       		.uleb128 0x3a
+ 1623 0082 0B       		.uleb128 0xb
+ 1624 0083 3B       		.uleb128 0x3b
+ 1625 0084 0B       		.uleb128 0xb
+ 1626 0085 49       		.uleb128 0x49
+ 1627 0086 13       		.uleb128 0x13
+ 1628 0087 02       		.uleb128 0x2
+ 1629 0088 17       		.uleb128 0x17
+ 1630 0089 00       		.byte	0
+ 1631 008a 00       		.byte	0
+ 1632 008b 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 36
+
+
+ 1633 008c 34       		.uleb128 0x34
+ 1634 008d 00       		.byte	0
+ 1635 008e 03       		.uleb128 0x3
+ 1636 008f 0E       		.uleb128 0xe
+ 1637 0090 3A       		.uleb128 0x3a
+ 1638 0091 0B       		.uleb128 0xb
+ 1639 0092 3B       		.uleb128 0x3b
+ 1640 0093 0B       		.uleb128 0xb
+ 1641 0094 49       		.uleb128 0x49
+ 1642 0095 13       		.uleb128 0x13
+ 1643 0096 02       		.uleb128 0x2
+ 1644 0097 17       		.uleb128 0x17
+ 1645 0098 00       		.byte	0
+ 1646 0099 00       		.byte	0
+ 1647 009a 0C       		.uleb128 0xc
+ 1648 009b 2E       		.uleb128 0x2e
+ 1649 009c 01       		.byte	0x1
+ 1650 009d 3F       		.uleb128 0x3f
+ 1651 009e 19       		.uleb128 0x19
+ 1652 009f 03       		.uleb128 0x3
+ 1653 00a0 0E       		.uleb128 0xe
+ 1654 00a1 3A       		.uleb128 0x3a
+ 1655 00a2 0B       		.uleb128 0xb
+ 1656 00a3 3B       		.uleb128 0x3b
+ 1657 00a4 0B       		.uleb128 0xb
+ 1658 00a5 27       		.uleb128 0x27
+ 1659 00a6 19       		.uleb128 0x19
+ 1660 00a7 11       		.uleb128 0x11
+ 1661 00a8 01       		.uleb128 0x1
+ 1662 00a9 12       		.uleb128 0x12
+ 1663 00aa 06       		.uleb128 0x6
+ 1664 00ab 40       		.uleb128 0x40
+ 1665 00ac 18       		.uleb128 0x18
+ 1666 00ad 9742     		.uleb128 0x2117
+ 1667 00af 19       		.uleb128 0x19
+ 1668 00b0 01       		.uleb128 0x1
+ 1669 00b1 13       		.uleb128 0x13
+ 1670 00b2 00       		.byte	0
+ 1671 00b3 00       		.byte	0
+ 1672 00b4 0D       		.uleb128 0xd
+ 1673 00b5 898201   		.uleb128 0x4109
+ 1674 00b8 01       		.byte	0x1
+ 1675 00b9 11       		.uleb128 0x11
+ 1676 00ba 01       		.uleb128 0x1
+ 1677 00bb 31       		.uleb128 0x31
+ 1678 00bc 13       		.uleb128 0x13
+ 1679 00bd 00       		.byte	0
+ 1680 00be 00       		.byte	0
+ 1681 00bf 0E       		.uleb128 0xe
+ 1682 00c0 8A8201   		.uleb128 0x410a
+ 1683 00c3 00       		.byte	0
+ 1684 00c4 02       		.uleb128 0x2
+ 1685 00c5 18       		.uleb128 0x18
+ 1686 00c6 9142     		.uleb128 0x2111
+ 1687 00c8 18       		.uleb128 0x18
+ 1688 00c9 00       		.byte	0
+ 1689 00ca 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 37
+
+
+ 1690 00cb 0F       		.uleb128 0xf
+ 1691 00cc 0B       		.uleb128 0xb
+ 1692 00cd 01       		.byte	0x1
+ 1693 00ce 11       		.uleb128 0x11
+ 1694 00cf 01       		.uleb128 0x1
+ 1695 00d0 12       		.uleb128 0x12
+ 1696 00d1 06       		.uleb128 0x6
+ 1697 00d2 01       		.uleb128 0x1
+ 1698 00d3 13       		.uleb128 0x13
+ 1699 00d4 00       		.byte	0
+ 1700 00d5 00       		.byte	0
+ 1701 00d6 10       		.uleb128 0x10
+ 1702 00d7 34       		.uleb128 0x34
+ 1703 00d8 00       		.byte	0
+ 1704 00d9 03       		.uleb128 0x3
+ 1705 00da 08       		.uleb128 0x8
+ 1706 00db 3A       		.uleb128 0x3a
+ 1707 00dc 0B       		.uleb128 0xb
+ 1708 00dd 3B       		.uleb128 0x3b
+ 1709 00de 0B       		.uleb128 0xb
+ 1710 00df 49       		.uleb128 0x49
+ 1711 00e0 13       		.uleb128 0x13
+ 1712 00e1 02       		.uleb128 0x2
+ 1713 00e2 17       		.uleb128 0x17
+ 1714 00e3 00       		.byte	0
+ 1715 00e4 00       		.byte	0
+ 1716 00e5 11       		.uleb128 0x11
+ 1717 00e6 898201   		.uleb128 0x4109
+ 1718 00e9 00       		.byte	0
+ 1719 00ea 11       		.uleb128 0x11
+ 1720 00eb 01       		.uleb128 0x1
+ 1721 00ec 31       		.uleb128 0x31
+ 1722 00ed 13       		.uleb128 0x13
+ 1723 00ee 00       		.byte	0
+ 1724 00ef 00       		.byte	0
+ 1725 00f0 12       		.uleb128 0x12
+ 1726 00f1 898201   		.uleb128 0x4109
+ 1727 00f4 01       		.byte	0x1
+ 1728 00f5 11       		.uleb128 0x11
+ 1729 00f6 01       		.uleb128 0x1
+ 1730 00f7 31       		.uleb128 0x31
+ 1731 00f8 13       		.uleb128 0x13
+ 1732 00f9 01       		.uleb128 0x1
+ 1733 00fa 13       		.uleb128 0x13
+ 1734 00fb 00       		.byte	0
+ 1735 00fc 00       		.byte	0
+ 1736 00fd 13       		.uleb128 0x13
+ 1737 00fe 0F       		.uleb128 0xf
+ 1738 00ff 00       		.byte	0
+ 1739 0100 0B       		.uleb128 0xb
+ 1740 0101 0B       		.uleb128 0xb
+ 1741 0102 49       		.uleb128 0x49
+ 1742 0103 13       		.uleb128 0x13
+ 1743 0104 00       		.byte	0
+ 1744 0105 00       		.byte	0
+ 1745 0106 14       		.uleb128 0x14
+ 1746 0107 26       		.uleb128 0x26
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 38
+
+
+ 1747 0108 00       		.byte	0
+ 1748 0109 49       		.uleb128 0x49
+ 1749 010a 13       		.uleb128 0x13
+ 1750 010b 00       		.byte	0
+ 1751 010c 00       		.byte	0
+ 1752 010d 15       		.uleb128 0x15
+ 1753 010e 2E       		.uleb128 0x2e
+ 1754 010f 00       		.byte	0
+ 1755 0110 3F       		.uleb128 0x3f
+ 1756 0111 19       		.uleb128 0x19
+ 1757 0112 03       		.uleb128 0x3
+ 1758 0113 0E       		.uleb128 0xe
+ 1759 0114 3A       		.uleb128 0x3a
+ 1760 0115 0B       		.uleb128 0xb
+ 1761 0116 3B       		.uleb128 0x3b
+ 1762 0117 0B       		.uleb128 0xb
+ 1763 0118 27       		.uleb128 0x27
+ 1764 0119 19       		.uleb128 0x19
+ 1765 011a 49       		.uleb128 0x49
+ 1766 011b 13       		.uleb128 0x13
+ 1767 011c 11       		.uleb128 0x11
+ 1768 011d 01       		.uleb128 0x1
+ 1769 011e 12       		.uleb128 0x12
+ 1770 011f 06       		.uleb128 0x6
+ 1771 0120 40       		.uleb128 0x40
+ 1772 0121 18       		.uleb128 0x18
+ 1773 0122 9742     		.uleb128 0x2117
+ 1774 0124 19       		.uleb128 0x19
+ 1775 0125 00       		.byte	0
+ 1776 0126 00       		.byte	0
+ 1777 0127 16       		.uleb128 0x16
+ 1778 0128 05       		.uleb128 0x5
+ 1779 0129 00       		.byte	0
+ 1780 012a 03       		.uleb128 0x3
+ 1781 012b 0E       		.uleb128 0xe
+ 1782 012c 3A       		.uleb128 0x3a
+ 1783 012d 0B       		.uleb128 0xb
+ 1784 012e 3B       		.uleb128 0x3b
+ 1785 012f 0B       		.uleb128 0xb
+ 1786 0130 49       		.uleb128 0x49
+ 1787 0131 13       		.uleb128 0x13
+ 1788 0132 02       		.uleb128 0x2
+ 1789 0133 18       		.uleb128 0x18
+ 1790 0134 00       		.byte	0
+ 1791 0135 00       		.byte	0
+ 1792 0136 17       		.uleb128 0x17
+ 1793 0137 0B       		.uleb128 0xb
+ 1794 0138 01       		.byte	0x1
+ 1795 0139 55       		.uleb128 0x55
+ 1796 013a 17       		.uleb128 0x17
+ 1797 013b 01       		.uleb128 0x1
+ 1798 013c 13       		.uleb128 0x13
+ 1799 013d 00       		.byte	0
+ 1800 013e 00       		.byte	0
+ 1801 013f 18       		.uleb128 0x18
+ 1802 0140 0B       		.uleb128 0xb
+ 1803 0141 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 39
+
+
+ 1804 0142 55       		.uleb128 0x55
+ 1805 0143 17       		.uleb128 0x17
+ 1806 0144 00       		.byte	0
+ 1807 0145 00       		.byte	0
+ 1808 0146 19       		.uleb128 0x19
+ 1809 0147 0B       		.uleb128 0xb
+ 1810 0148 01       		.byte	0x1
+ 1811 0149 11       		.uleb128 0x11
+ 1812 014a 01       		.uleb128 0x1
+ 1813 014b 12       		.uleb128 0x12
+ 1814 014c 06       		.uleb128 0x6
+ 1815 014d 00       		.byte	0
+ 1816 014e 00       		.byte	0
+ 1817 014f 1A       		.uleb128 0x1a
+ 1818 0150 34       		.uleb128 0x34
+ 1819 0151 00       		.byte	0
+ 1820 0152 03       		.uleb128 0x3
+ 1821 0153 0E       		.uleb128 0xe
+ 1822 0154 3A       		.uleb128 0x3a
+ 1823 0155 0B       		.uleb128 0xb
+ 1824 0156 3B       		.uleb128 0x3b
+ 1825 0157 0B       		.uleb128 0xb
+ 1826 0158 49       		.uleb128 0x49
+ 1827 0159 13       		.uleb128 0x13
+ 1828 015a 1C       		.uleb128 0x1c
+ 1829 015b 0B       		.uleb128 0xb
+ 1830 015c 00       		.byte	0
+ 1831 015d 00       		.byte	0
+ 1832 015e 1B       		.uleb128 0x1b
+ 1833 015f 34       		.uleb128 0x34
+ 1834 0160 00       		.byte	0
+ 1835 0161 03       		.uleb128 0x3
+ 1836 0162 0E       		.uleb128 0xe
+ 1837 0163 3A       		.uleb128 0x3a
+ 1838 0164 0B       		.uleb128 0xb
+ 1839 0165 3B       		.uleb128 0x3b
+ 1840 0166 0B       		.uleb128 0xb
+ 1841 0167 49       		.uleb128 0x49
+ 1842 0168 13       		.uleb128 0x13
+ 1843 0169 1C       		.uleb128 0x1c
+ 1844 016a 05       		.uleb128 0x5
+ 1845 016b 00       		.byte	0
+ 1846 016c 00       		.byte	0
+ 1847 016d 1C       		.uleb128 0x1c
+ 1848 016e 01       		.uleb128 0x1
+ 1849 016f 01       		.byte	0x1
+ 1850 0170 49       		.uleb128 0x49
+ 1851 0171 13       		.uleb128 0x13
+ 1852 0172 01       		.uleb128 0x1
+ 1853 0173 13       		.uleb128 0x13
+ 1854 0174 00       		.byte	0
+ 1855 0175 00       		.byte	0
+ 1856 0176 1D       		.uleb128 0x1d
+ 1857 0177 21       		.uleb128 0x21
+ 1858 0178 00       		.byte	0
+ 1859 0179 49       		.uleb128 0x49
+ 1860 017a 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 40
+
+
+ 1861 017b 2F       		.uleb128 0x2f
+ 1862 017c 0B       		.uleb128 0xb
+ 1863 017d 00       		.byte	0
+ 1864 017e 00       		.byte	0
+ 1865 017f 1E       		.uleb128 0x1e
+ 1866 0180 34       		.uleb128 0x34
+ 1867 0181 00       		.byte	0
+ 1868 0182 03       		.uleb128 0x3
+ 1869 0183 0E       		.uleb128 0xe
+ 1870 0184 3A       		.uleb128 0x3a
+ 1871 0185 0B       		.uleb128 0xb
+ 1872 0186 3B       		.uleb128 0x3b
+ 1873 0187 0B       		.uleb128 0xb
+ 1874 0188 49       		.uleb128 0x49
+ 1875 0189 13       		.uleb128 0x13
+ 1876 018a 02       		.uleb128 0x2
+ 1877 018b 18       		.uleb128 0x18
+ 1878 018c 00       		.byte	0
+ 1879 018d 00       		.byte	0
+ 1880 018e 1F       		.uleb128 0x1f
+ 1881 018f 34       		.uleb128 0x34
+ 1882 0190 00       		.byte	0
+ 1883 0191 03       		.uleb128 0x3
+ 1884 0192 0E       		.uleb128 0xe
+ 1885 0193 3A       		.uleb128 0x3a
+ 1886 0194 0B       		.uleb128 0xb
+ 1887 0195 3B       		.uleb128 0x3b
+ 1888 0196 05       		.uleb128 0x5
+ 1889 0197 49       		.uleb128 0x49
+ 1890 0198 13       		.uleb128 0x13
+ 1891 0199 3F       		.uleb128 0x3f
+ 1892 019a 19       		.uleb128 0x19
+ 1893 019b 3C       		.uleb128 0x3c
+ 1894 019c 19       		.uleb128 0x19
+ 1895 019d 00       		.byte	0
+ 1896 019e 00       		.byte	0
+ 1897 019f 20       		.uleb128 0x20
+ 1898 01a0 2E       		.uleb128 0x2e
+ 1899 01a1 00       		.byte	0
+ 1900 01a2 3F       		.uleb128 0x3f
+ 1901 01a3 19       		.uleb128 0x19
+ 1902 01a4 3C       		.uleb128 0x3c
+ 1903 01a5 19       		.uleb128 0x19
+ 1904 01a6 6E       		.uleb128 0x6e
+ 1905 01a7 0E       		.uleb128 0xe
+ 1906 01a8 03       		.uleb128 0x3
+ 1907 01a9 0E       		.uleb128 0xe
+ 1908 01aa 3A       		.uleb128 0x3a
+ 1909 01ab 0B       		.uleb128 0xb
+ 1910 01ac 3B       		.uleb128 0x3b
+ 1911 01ad 0B       		.uleb128 0xb
+ 1912 01ae 00       		.byte	0
+ 1913 01af 00       		.byte	0
+ 1914 01b0 00       		.byte	0
+ 1915              		.section	.debug_loc,"",%progbits
+ 1916              	.Ldebug_loc0:
+ 1917              	.LLST0:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 41
+
+
+ 1918 0000 00000000 		.4byte	.LVL0
+ 1919 0004 0A000000 		.4byte	.LVL1
+ 1920 0008 0100     		.2byte	0x1
+ 1921 000a 50       		.byte	0x50
+ 1922 000b 0A000000 		.4byte	.LVL1
+ 1923 000f 12000000 		.4byte	.LVL2
+ 1924 0013 0400     		.2byte	0x4
+ 1925 0015 70       		.byte	0x70
+ 1926 0016 8160     		.sleb128 -4095
+ 1927 0018 9F       		.byte	0x9f
+ 1928 0019 12000000 		.4byte	.LVL2
+ 1929 001d 1A000000 		.4byte	.LVL4
+ 1930 0021 0400     		.2byte	0x4
+ 1931 0023 F3       		.byte	0xf3
+ 1932 0024 01       		.uleb128 0x1
+ 1933 0025 50       		.byte	0x50
+ 1934 0026 9F       		.byte	0x9f
+ 1935 0027 1A000000 		.4byte	.LVL4
+ 1936 002b 1C000000 		.4byte	.LVL5
+ 1937 002f 0100     		.2byte	0x1
+ 1938 0031 50       		.byte	0x50
+ 1939 0032 1C000000 		.4byte	.LVL5
+ 1940 0036 24000000 		.4byte	.LFE69
+ 1941 003a 0400     		.2byte	0x4
+ 1942 003c F3       		.byte	0xf3
+ 1943 003d 01       		.uleb128 0x1
+ 1944 003e 50       		.byte	0x50
+ 1945 003f 9F       		.byte	0x9f
+ 1946 0040 00000000 		.4byte	0
+ 1947 0044 00000000 		.4byte	0
+ 1948              	.LLST1:
+ 1949 0048 00000000 		.4byte	.LVL0
+ 1950 004c 18000000 		.4byte	.LVL3
+ 1951 0050 0200     		.2byte	0x2
+ 1952 0052 31       		.byte	0x31
+ 1953 0053 9F       		.byte	0x9f
+ 1954 0054 18000000 		.4byte	.LVL3
+ 1955 0058 1A000000 		.4byte	.LVL4
+ 1956 005c 0100     		.2byte	0x1
+ 1957 005e 50       		.byte	0x50
+ 1958 005f 1A000000 		.4byte	.LVL4
+ 1959 0063 1C000000 		.4byte	.LVL5
+ 1960 0067 0200     		.2byte	0x2
+ 1961 0069 31       		.byte	0x31
+ 1962 006a 9F       		.byte	0x9f
+ 1963 006b 1C000000 		.4byte	.LVL5
+ 1964 006f 24000000 		.4byte	.LFE69
+ 1965 0073 0100     		.2byte	0x1
+ 1966 0075 50       		.byte	0x50
+ 1967 0076 00000000 		.4byte	0
+ 1968 007a 00000000 		.4byte	0
+ 1969              	.LLST2:
+ 1970 007e 00000000 		.4byte	.LVL7
+ 1971 0082 0E000000 		.4byte	.LVL9
+ 1972 0086 0100     		.2byte	0x1
+ 1973 0088 50       		.byte	0x50
+ 1974 0089 0E000000 		.4byte	.LVL9
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 42
+
+
+ 1975 008d 3E000000 		.4byte	.LVL17
+ 1976 0091 0100     		.2byte	0x1
+ 1977 0093 56       		.byte	0x56
+ 1978 0094 3E000000 		.4byte	.LVL17
+ 1979 0098 44000000 		.4byte	.LFE64
+ 1980 009c 0400     		.2byte	0x4
+ 1981 009e F3       		.byte	0xf3
+ 1982 009f 01       		.uleb128 0x1
+ 1983 00a0 50       		.byte	0x50
+ 1984 00a1 9F       		.byte	0x9f
+ 1985 00a2 00000000 		.4byte	0
+ 1986 00a6 00000000 		.4byte	0
+ 1987              	.LLST3:
+ 1988 00aa 00000000 		.4byte	.LVL7
+ 1989 00ae 11000000 		.4byte	.LVL10-1
+ 1990 00b2 0100     		.2byte	0x1
+ 1991 00b4 51       		.byte	0x51
+ 1992 00b5 11000000 		.4byte	.LVL10-1
+ 1993 00b9 3E000000 		.4byte	.LVL17
+ 1994 00bd 0100     		.2byte	0x1
+ 1995 00bf 55       		.byte	0x55
+ 1996 00c0 3E000000 		.4byte	.LVL17
+ 1997 00c4 44000000 		.4byte	.LFE64
+ 1998 00c8 0400     		.2byte	0x4
+ 1999 00ca F3       		.byte	0xf3
+ 2000 00cb 01       		.uleb128 0x1
+ 2001 00cc 51       		.byte	0x51
+ 2002 00cd 9F       		.byte	0x9f
+ 2003 00ce 00000000 		.4byte	0
+ 2004 00d2 00000000 		.4byte	0
+ 2005              	.LLST4:
+ 2006 00d6 06000000 		.4byte	.LVL8
+ 2007 00da 16000000 		.4byte	.LVL11
+ 2008 00de 0200     		.2byte	0x2
+ 2009 00e0 30       		.byte	0x30
+ 2010 00e1 9F       		.byte	0x9f
+ 2011 00e2 00000000 		.4byte	0
+ 2012 00e6 00000000 		.4byte	0
+ 2013              	.LLST5:
+ 2014 00ea 12000000 		.4byte	.LVL10
+ 2015 00ee 16000000 		.4byte	.LVL11
+ 2016 00f2 0200     		.2byte	0x2
+ 2017 00f4 30       		.byte	0x30
+ 2018 00f5 9F       		.byte	0x9f
+ 2019 00f6 16000000 		.4byte	.LVL11
+ 2020 00fa 3E000000 		.4byte	.LVL17
+ 2021 00fe 0100     		.2byte	0x1
+ 2022 0100 54       		.byte	0x54
+ 2023 0101 00000000 		.4byte	0
+ 2024 0105 00000000 		.4byte	0
+ 2025              	.LLST6:
+ 2026 0109 10000000 		.4byte	.LVL20
+ 2027 010d 14000000 		.4byte	.LVL21
+ 2028 0111 0100     		.2byte	0x1
+ 2029 0113 50       		.byte	0x50
+ 2030 0114 28000000 		.4byte	.LVL26
+ 2031 0118 2A000000 		.4byte	.LVL27
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 43
+
+
+ 2032 011c 0100     		.2byte	0x1
+ 2033 011e 50       		.byte	0x50
+ 2034 011f 00000000 		.4byte	0
+ 2035 0123 00000000 		.4byte	0
+ 2036              	.LLST7:
+ 2037 0127 1A000000 		.4byte	.LVL23
+ 2038 012b 28000000 		.4byte	.LVL26
+ 2039 012f 0100     		.2byte	0x1
+ 2040 0131 54       		.byte	0x54
+ 2041 0132 2A000000 		.4byte	.LVL27
+ 2042 0136 34000000 		.4byte	.LVL28
+ 2043 013a 0100     		.2byte	0x1
+ 2044 013c 54       		.byte	0x54
+ 2045 013d 00000000 		.4byte	0
+ 2046 0141 00000000 		.4byte	0
+ 2047              	.LLST8:
+ 2048 0145 00000000 		.4byte	.LVL29
+ 2049 0149 11000000 		.4byte	.LVL31-1
+ 2050 014d 0100     		.2byte	0x1
+ 2051 014f 50       		.byte	0x50
+ 2052 0150 11000000 		.4byte	.LVL31-1
+ 2053 0154 26010000 		.4byte	.LVL80
+ 2054 0158 0100     		.2byte	0x1
+ 2055 015a 55       		.byte	0x55
+ 2056 015b 26010000 		.4byte	.LVL80
+ 2057 015f 40010000 		.4byte	.LFE70
+ 2058 0163 0100     		.2byte	0x1
+ 2059 0165 50       		.byte	0x50
+ 2060 0166 00000000 		.4byte	0
+ 2061 016a 00000000 		.4byte	0
+ 2062              	.LLST9:
+ 2063 016e 00000000 		.4byte	.LVL29
+ 2064 0172 11000000 		.4byte	.LVL31-1
+ 2065 0176 0100     		.2byte	0x1
+ 2066 0178 51       		.byte	0x51
+ 2067 0179 11000000 		.4byte	.LVL31-1
+ 2068 017d 26010000 		.4byte	.LVL80
+ 2069 0181 0400     		.2byte	0x4
+ 2070 0183 F3       		.byte	0xf3
+ 2071 0184 01       		.uleb128 0x1
+ 2072 0185 51       		.byte	0x51
+ 2073 0186 9F       		.byte	0x9f
+ 2074 0187 26010000 		.4byte	.LVL80
+ 2075 018b 40010000 		.4byte	.LFE70
+ 2076 018f 0100     		.2byte	0x1
+ 2077 0191 51       		.byte	0x51
+ 2078 0192 00000000 		.4byte	0
+ 2079 0196 00000000 		.4byte	0
+ 2080              	.LLST10:
+ 2081 019a 00000000 		.4byte	.LVL29
+ 2082 019e 11000000 		.4byte	.LVL31-1
+ 2083 01a2 0100     		.2byte	0x1
+ 2084 01a4 52       		.byte	0x52
+ 2085 01a5 11000000 		.4byte	.LVL31-1
+ 2086 01a9 6E000000 		.4byte	.LVL47
+ 2087 01ad 0100     		.2byte	0x1
+ 2088 01af 54       		.byte	0x54
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 44
+
+
+ 2089 01b0 6E000000 		.4byte	.LVL47
+ 2090 01b4 26010000 		.4byte	.LVL80
+ 2091 01b8 0400     		.2byte	0x4
+ 2092 01ba F3       		.byte	0xf3
+ 2093 01bb 01       		.uleb128 0x1
+ 2094 01bc 52       		.byte	0x52
+ 2095 01bd 9F       		.byte	0x9f
+ 2096 01be 26010000 		.4byte	.LVL80
+ 2097 01c2 40010000 		.4byte	.LFE70
+ 2098 01c6 0100     		.2byte	0x1
+ 2099 01c8 52       		.byte	0x52
+ 2100 01c9 00000000 		.4byte	0
+ 2101 01cd 00000000 		.4byte	0
+ 2102              	.LLST11:
+ 2103 01d1 8C000000 		.4byte	.LVL51
+ 2104 01d5 90000000 		.4byte	.LVL52
+ 2105 01d9 0100     		.2byte	0x1
+ 2106 01db 50       		.byte	0x50
+ 2107 01dc 96000000 		.4byte	.LVL54
+ 2108 01e0 A4000000 		.4byte	.LVL56
+ 2109 01e4 0100     		.2byte	0x1
+ 2110 01e6 50       		.byte	0x50
+ 2111 01e7 A8000000 		.4byte	.LVL57
+ 2112 01eb AE000000 		.4byte	.LVL59
+ 2113 01ef 0100     		.2byte	0x1
+ 2114 01f1 50       		.byte	0x50
+ 2115 01f2 AE000000 		.4byte	.LVL59
+ 2116 01f6 BA000000 		.4byte	.LVL62
+ 2117 01fa 0100     		.2byte	0x1
+ 2118 01fc 54       		.byte	0x54
+ 2119 01fd D4000000 		.4byte	.LVL64
+ 2120 0201 D8000000 		.4byte	.LVL65
+ 2121 0205 0100     		.2byte	0x1
+ 2122 0207 50       		.byte	0x50
+ 2123 0208 DE000000 		.4byte	.LVL67
+ 2124 020c EC000000 		.4byte	.LVL69
+ 2125 0210 0100     		.2byte	0x1
+ 2126 0212 50       		.byte	0x50
+ 2127 0213 F0000000 		.4byte	.LVL70
+ 2128 0217 F4000000 		.4byte	.LVL71
+ 2129 021b 0100     		.2byte	0x1
+ 2130 021d 50       		.byte	0x50
+ 2131 021e FA000000 		.4byte	.LVL73
+ 2132 0222 00010000 		.4byte	.LVL75
+ 2133 0226 0100     		.2byte	0x1
+ 2134 0228 50       		.byte	0x50
+ 2135 0229 00000000 		.4byte	0
+ 2136 022d 00000000 		.4byte	0
+ 2137              	.LLST12:
+ 2138 0231 0E000000 		.4byte	.LVL30
+ 2139 0235 72000000 		.4byte	.LVL48
+ 2140 0239 0200     		.2byte	0x2
+ 2141 023b 30       		.byte	0x30
+ 2142 023c 9F       		.byte	0x9f
+ 2143 023d 72000000 		.4byte	.LVL48
+ 2144 0241 26010000 		.4byte	.LVL80
+ 2145 0245 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 45
+
+
+ 2146 0247 57       		.byte	0x57
+ 2147 0248 00000000 		.4byte	0
+ 2148 024c 00000000 		.4byte	0
+ 2149              	.LLST13:
+ 2150 0250 4C000000 		.4byte	.LVL40
+ 2151 0254 50000000 		.4byte	.LVL41
+ 2152 0258 0100     		.2byte	0x1
+ 2153 025a 50       		.byte	0x50
+ 2154 025b 56000000 		.4byte	.LVL43
+ 2155 025f 72000000 		.4byte	.LVL48
+ 2156 0263 0100     		.2byte	0x1
+ 2157 0265 50       		.byte	0x50
+ 2158 0266 00000000 		.4byte	0
+ 2159 026a 00000000 		.4byte	0
+ 2160              	.LLST14:
+ 2161 026e 64000000 		.4byte	.LVL44
+ 2162 0272 68000000 		.4byte	.LVL45
+ 2163 0276 0100     		.2byte	0x1
+ 2164 0278 53       		.byte	0x53
+ 2165 0279 68000000 		.4byte	.LVL45
+ 2166 027d 6E000000 		.4byte	.LVL47
+ 2167 0281 1D00     		.2byte	0x1d
+ 2168 0283 72       		.byte	0x72
+ 2169 0284 00       		.sleb128 0
+ 2170 0285 31       		.byte	0x31
+ 2171 0286 25       		.byte	0x25
+ 2172 0287 74       		.byte	0x74
+ 2173 0288 00       		.sleb128 0
+ 2174 0289 F7       		.byte	0xf7
+ 2175 028a 2C       		.uleb128 0x2c
+ 2176 028b F7       		.byte	0xf7
+ 2177 028c 25       		.uleb128 0x25
+ 2178 028d 0C       		.byte	0xc
+ 2179 028e 01011000 		.4byte	0x100101
+ 2180 0292 F7       		.byte	0xf7
+ 2181 0293 25       		.uleb128 0x25
+ 2182 0294 1E       		.byte	0x1e
+ 2183 0295 08       		.byte	0x8
+ 2184 0296 20       		.byte	0x20
+ 2185 0297 F7       		.byte	0xf7
+ 2186 0298 25       		.uleb128 0x25
+ 2187 0299 25       		.byte	0x25
+ 2188 029a F7       		.byte	0xf7
+ 2189 029b 2C       		.uleb128 0x2c
+ 2190 029c 22       		.byte	0x22
+ 2191 029d 3B       		.byte	0x3b
+ 2192 029e 25       		.byte	0x25
+ 2193 029f 9F       		.byte	0x9f
+ 2194 02a0 6E000000 		.4byte	.LVL47
+ 2195 02a4 72000000 		.4byte	.LVL48
+ 2196 02a8 1E00     		.2byte	0x1e
+ 2197 02aa 72       		.byte	0x72
+ 2198 02ab 00       		.sleb128 0
+ 2199 02ac 31       		.byte	0x31
+ 2200 02ad 25       		.byte	0x25
+ 2201 02ae F3       		.byte	0xf3
+ 2202 02af 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 46
+
+
+ 2203 02b0 52       		.byte	0x52
+ 2204 02b1 F7       		.byte	0xf7
+ 2205 02b2 2C       		.uleb128 0x2c
+ 2206 02b3 F7       		.byte	0xf7
+ 2207 02b4 25       		.uleb128 0x25
+ 2208 02b5 0C       		.byte	0xc
+ 2209 02b6 01011000 		.4byte	0x100101
+ 2210 02ba F7       		.byte	0xf7
+ 2211 02bb 25       		.uleb128 0x25
+ 2212 02bc 1E       		.byte	0x1e
+ 2213 02bd 08       		.byte	0x8
+ 2214 02be 20       		.byte	0x20
+ 2215 02bf F7       		.byte	0xf7
+ 2216 02c0 25       		.uleb128 0x25
+ 2217 02c1 25       		.byte	0x25
+ 2218 02c2 F7       		.byte	0xf7
+ 2219 02c3 2C       		.uleb128 0x2c
+ 2220 02c4 22       		.byte	0x22
+ 2221 02c5 3B       		.byte	0x3b
+ 2222 02c6 25       		.byte	0x25
+ 2223 02c7 9F       		.byte	0x9f
+ 2224 02c8 72000000 		.4byte	.LVL48
+ 2225 02cc 26010000 		.4byte	.LVL80
+ 2226 02d0 3600     		.2byte	0x36
+ 2227 02d2 F3       		.byte	0xf3
+ 2228 02d3 01       		.uleb128 0x1
+ 2229 02d4 52       		.byte	0x52
+ 2230 02d5 F3       		.byte	0xf3
+ 2231 02d6 01       		.uleb128 0x1
+ 2232 02d7 52       		.byte	0x52
+ 2233 02d8 F7       		.byte	0xf7
+ 2234 02d9 2C       		.uleb128 0x2c
+ 2235 02da F7       		.byte	0xf7
+ 2236 02db 25       		.uleb128 0x25
+ 2237 02dc 0C       		.byte	0xc
+ 2238 02dd 01011000 		.4byte	0x100101
+ 2239 02e1 F7       		.byte	0xf7
+ 2240 02e2 25       		.uleb128 0x25
+ 2241 02e3 1E       		.byte	0x1e
+ 2242 02e4 08       		.byte	0x8
+ 2243 02e5 20       		.byte	0x20
+ 2244 02e6 F7       		.byte	0xf7
+ 2245 02e7 25       		.uleb128 0x25
+ 2246 02e8 25       		.byte	0x25
+ 2247 02e9 F7       		.byte	0xf7
+ 2248 02ea 2C       		.uleb128 0x2c
+ 2249 02eb 1C       		.byte	0x1c
+ 2250 02ec 31       		.byte	0x31
+ 2251 02ed 25       		.byte	0x25
+ 2252 02ee F3       		.byte	0xf3
+ 2253 02ef 01       		.uleb128 0x1
+ 2254 02f0 52       		.byte	0x52
+ 2255 02f1 F7       		.byte	0xf7
+ 2256 02f2 2C       		.uleb128 0x2c
+ 2257 02f3 F7       		.byte	0xf7
+ 2258 02f4 25       		.uleb128 0x25
+ 2259 02f5 0C       		.byte	0xc
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 47
+
+
+ 2260 02f6 01011000 		.4byte	0x100101
+ 2261 02fa F7       		.byte	0xf7
+ 2262 02fb 25       		.uleb128 0x25
+ 2263 02fc 1E       		.byte	0x1e
+ 2264 02fd 08       		.byte	0x8
+ 2265 02fe 20       		.byte	0x20
+ 2266 02ff F7       		.byte	0xf7
+ 2267 0300 25       		.uleb128 0x25
+ 2268 0301 25       		.byte	0x25
+ 2269 0302 F7       		.byte	0xf7
+ 2270 0303 2C       		.uleb128 0x2c
+ 2271 0304 22       		.byte	0x22
+ 2272 0305 3B       		.byte	0x3b
+ 2273 0306 25       		.byte	0x25
+ 2274 0307 9F       		.byte	0x9f
+ 2275 0308 00000000 		.4byte	0
+ 2276 030c 00000000 		.4byte	0
+ 2277              	.LLST15:
+ 2278 0310 6C000000 		.4byte	.LVL46
+ 2279 0314 26010000 		.4byte	.LVL80
+ 2280 0318 0100     		.2byte	0x1
+ 2281 031a 56       		.byte	0x56
+ 2282 031b 00000000 		.4byte	0
+ 2283 031f 00000000 		.4byte	0
+ 2284              	.LLST16:
+ 2285 0323 1C000000 		.4byte	.LVL33
+ 2286 0327 20000000 		.4byte	.LVL34
+ 2287 032b 0200     		.2byte	0x2
+ 2288 032d 30       		.byte	0x30
+ 2289 032e 9F       		.byte	0x9f
+ 2290 032f 20000000 		.4byte	.LVL34
+ 2291 0333 6C000000 		.4byte	.LVL46
+ 2292 0337 0100     		.2byte	0x1
+ 2293 0339 56       		.byte	0x56
+ 2294 033a 00000000 		.4byte	0
+ 2295 033e 00000000 		.4byte	0
+ 2296              	.LLST17:
+ 2297 0342 24000000 		.4byte	.LVL35
+ 2298 0346 34000000 		.4byte	.LVL37
+ 2299 034a 0100     		.2byte	0x1
+ 2300 034c 50       		.byte	0x50
+ 2301 034d 00000000 		.4byte	0
+ 2302 0351 00000000 		.4byte	0
+ 2303              	.LLST18:
+ 2304 0355 6C000000 		.4byte	.LVL46
+ 2305 0359 72000000 		.4byte	.LVL48
+ 2306 035d 0200     		.2byte	0x2
+ 2307 035f 30       		.byte	0x30
+ 2308 0360 9F       		.byte	0x9f
+ 2309 0361 72000000 		.4byte	.LVL48
+ 2310 0365 9A000000 		.4byte	.LVL55
+ 2311 0369 0100     		.2byte	0x1
+ 2312 036b 54       		.byte	0x54
+ 2313 036c 9A000000 		.4byte	.LVL55
+ 2314 0370 AA000000 		.4byte	.LVL58
+ 2315 0374 0900     		.2byte	0x9
+ 2316 0376 74       		.byte	0x74
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 48
+
+
+ 2317 0377 00       		.sleb128 0
+ 2318 0378 03       		.byte	0x3
+ 2319 0379 00000000 		.4byte	.LANCHOR0
+ 2320 037d 1C       		.byte	0x1c
+ 2321 037e 9F       		.byte	0x9f
+ 2322 037f BA000000 		.4byte	.LVL62
+ 2323 0383 E2000000 		.4byte	.LVL68
+ 2324 0387 0100     		.2byte	0x1
+ 2325 0389 54       		.byte	0x54
+ 2326 038a E2000000 		.4byte	.LVL68
+ 2327 038e FE000000 		.4byte	.LVL74
+ 2328 0392 0300     		.2byte	0x3
+ 2329 0394 78       		.byte	0x78
+ 2330 0395 7F       		.sleb128 -1
+ 2331 0396 9F       		.byte	0x9f
+ 2332 0397 FE000000 		.4byte	.LVL74
+ 2333 039b 00010000 		.4byte	.LVL75
+ 2334 039f 0100     		.2byte	0x1
+ 2335 03a1 58       		.byte	0x58
+ 2336 03a2 00010000 		.4byte	.LVL75
+ 2337 03a6 08010000 		.4byte	.LVL76
+ 2338 03aa 0100     		.2byte	0x1
+ 2339 03ac 54       		.byte	0x54
+ 2340 03ad 00000000 		.4byte	0
+ 2341 03b1 00000000 		.4byte	0
+ 2342              	.LLST19:
+ 2343 03b5 78000000 		.4byte	.LVL49
+ 2344 03b9 82000000 		.4byte	.LVL50
+ 2345 03bd 0600     		.2byte	0x6
+ 2346 03bf 74       		.byte	0x74
+ 2347 03c0 00       		.sleb128 0
+ 2348 03c1 73       		.byte	0x73
+ 2349 03c2 00       		.sleb128 0
+ 2350 03c3 29       		.byte	0x29
+ 2351 03c4 9F       		.byte	0x9f
+ 2352 03c5 BA000000 		.4byte	.LVL62
+ 2353 03c9 BC000000 		.4byte	.LVL63
+ 2354 03cd 0600     		.2byte	0x6
+ 2355 03cf 74       		.byte	0x74
+ 2356 03d0 00       		.sleb128 0
+ 2357 03d1 73       		.byte	0x73
+ 2358 03d2 00       		.sleb128 0
+ 2359 03d3 29       		.byte	0x29
+ 2360 03d4 9F       		.byte	0x9f
+ 2361 03d5 00000000 		.4byte	0
+ 2362 03d9 00000000 		.4byte	0
+ 2363              		.section	.debug_aranges,"",%progbits
+ 2364 0000 54000000 		.4byte	0x54
+ 2365 0004 0200     		.2byte	0x2
+ 2366 0006 00000000 		.4byte	.Ldebug_info0
+ 2367 000a 04       		.byte	0x4
+ 2368 000b 00       		.byte	0
+ 2369 000c 0000     		.2byte	0
+ 2370 000e 0000     		.2byte	0
+ 2371 0010 00000000 		.4byte	.LFB69
+ 2372 0014 24000000 		.4byte	.LFE69-.LFB69
+ 2373 0018 00000000 		.4byte	.LFB63
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 49
+
+
+ 2374 001c 1C000000 		.4byte	.LFE63-.LFB63
+ 2375 0020 00000000 		.4byte	.LFB64
+ 2376 0024 44000000 		.4byte	.LFE64-.LFB64
+ 2377 0028 00000000 		.4byte	.LFB66
+ 2378 002c 14000000 		.4byte	.LFE66-.LFB66
+ 2379 0030 00000000 		.4byte	.LFB67
+ 2380 0034 0C000000 		.4byte	.LFE67-.LFB67
+ 2381 0038 00000000 		.4byte	.LFB65
+ 2382 003c 3C000000 		.4byte	.LFE65-.LFB65
+ 2383 0040 00000000 		.4byte	.LFB68
+ 2384 0044 0C000000 		.4byte	.LFE68-.LFB68
+ 2385 0048 00000000 		.4byte	.LFB70
+ 2386 004c 40010000 		.4byte	.LFE70-.LFB70
+ 2387 0050 00000000 		.4byte	0
+ 2388 0054 00000000 		.4byte	0
+ 2389              		.section	.debug_ranges,"",%progbits
+ 2390              	.Ldebug_ranges0:
+ 2391 0000 1A000000 		.4byte	.LBB3
+ 2392 0004 28000000 		.4byte	.LBE3
+ 2393 0008 2A000000 		.4byte	.LBB4
+ 2394 000c 32000000 		.4byte	.LBE4
+ 2395 0010 00000000 		.4byte	0
+ 2396 0014 00000000 		.4byte	0
+ 2397 0018 20000000 		.4byte	.LBB6
+ 2398 001c 2E000000 		.4byte	.LBE6
+ 2399 0020 32000000 		.4byte	.LBB7
+ 2400 0024 3A000000 		.4byte	.LBE7
+ 2401 0028 00000000 		.4byte	0
+ 2402 002c 00000000 		.4byte	0
+ 2403 0030 6C000000 		.4byte	.LBB8
+ 2404 0034 6E000000 		.4byte	.LBE8
+ 2405 0038 70000000 		.4byte	.LBB10
+ 2406 003c 08010000 		.4byte	.LBE10
+ 2407 0040 00000000 		.4byte	0
+ 2408 0044 00000000 		.4byte	0
+ 2409 0048 00000000 		.4byte	.LFB69
+ 2410 004c 24000000 		.4byte	.LFE69
+ 2411 0050 00000000 		.4byte	.LFB63
+ 2412 0054 1C000000 		.4byte	.LFE63
+ 2413 0058 00000000 		.4byte	.LFB64
+ 2414 005c 44000000 		.4byte	.LFE64
+ 2415 0060 00000000 		.4byte	.LFB66
+ 2416 0064 14000000 		.4byte	.LFE66
+ 2417 0068 00000000 		.4byte	.LFB67
+ 2418 006c 0C000000 		.4byte	.LFE67
+ 2419 0070 00000000 		.4byte	.LFB65
+ 2420 0074 3C000000 		.4byte	.LFE65
+ 2421 0078 00000000 		.4byte	.LFB68
+ 2422 007c 0C000000 		.4byte	.LFE68
+ 2423 0080 00000000 		.4byte	.LFB70
+ 2424 0084 40010000 		.4byte	.LFE70
+ 2425 0088 00000000 		.4byte	0
+ 2426 008c 00000000 		.4byte	0
+ 2427              		.section	.debug_line,"",%progbits
+ 2428              	.Ldebug_line0:
+ 2429 0000 41030000 		.section	.debug_str,"MS",%progbits,1
+ 2429      02001502 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 50
+
+
+ 2429      00000201 
+ 2429      FB0E0D00 
+ 2429      01010101 
+ 2430              	.LASF69:
+ 2431 0000 4379446D 		.ascii	"CyDmaTdAllocate\000"
+ 2431      61546441 
+ 2431      6C6C6F63 
+ 2431      61746500 
+ 2432              	.LASF29:
+ 2433 0010 5350495F 		.ascii	"SPI_XFER_DONE\000"
+ 2433      58464552 
+ 2433      5F444F4E 
+ 2433      4500
+ 2434              	.LASF71:
+ 2435 001e 4379446D 		.ascii	"CyDmaTdSetAddress\000"
+ 2435      61546453 
+ 2435      65744164 
+ 2435      64726573 
+ 2435      7300
+ 2436              	.LASF4:
+ 2437 0030 73686F72 		.ascii	"short int\000"
+ 2437      7420696E 
+ 2437      7400
+ 2438              	.LASF25:
+ 2439 003a 73697A65 		.ascii	"size_t\000"
+ 2439      5F7400
+ 2440              	.LASF70:
+ 2441 0041 4379446D 		.ascii	"CyDmaTdSetConfiguration\000"
+ 2441      61546453 
+ 2441      6574436F 
+ 2441      6E666967 
+ 2441      75726174 
+ 2442              	.LASF75:
+ 2443 0059 4379446D 		.ascii	"CyDmaChEnable\000"
+ 2443      61436845 
+ 2443      6E61626C 
+ 2443      6500
+ 2444              	.LASF27:
+ 2445 0067 73697A65 		.ascii	"sizetype\000"
+ 2445      74797065 
+ 2445      00
+ 2446              	.LASF64:
+ 2447 0070 5350495F 		.ascii	"SPI_ReadRxData\000"
+ 2447      52656164 
+ 2447      52784461 
+ 2447      746100
+ 2448              	.LASF48:
+ 2449 007f 74785F61 		.ascii	"tx_addr_offset\000"
+ 2449      6464725F 
+ 2449      6F666673 
+ 2449      657400
+ 2450              	.LASF26:
+ 2451 008e 6C6F6E67 		.ascii	"long double\000"
+ 2451      20646F75 
+ 2451      626C6500 
+ 2452              	.LASF10:
+ 2453 009a 5F5F7569 		.ascii	"__uint32_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 51
+
+
+ 2453      6E743332 
+ 2453      5F7400
+ 2454              	.LASF50:
+ 2455 00a5 74645F6D 		.ascii	"td_max_bytes\000"
+ 2455      61785F62 
+ 2455      79746573 
+ 2455      00
+ 2456              	.LASF6:
+ 2457 00b2 5F5F7569 		.ascii	"__uint16_t\000"
+ 2457      6E743136 
+ 2457      5F7400
+ 2458              	.LASF37:
+ 2459 00bd 72657476 		.ascii	"retval\000"
+ 2459      616C00
+ 2460              	.LASF72:
+ 2461 00c4 55415254 		.ascii	"UART_PutHexByte\000"
+ 2461      5F507574 
+ 2461      48657842 
+ 2461      79746500 
+ 2462              	.LASF68:
+ 2463 00d4 55415254 		.ascii	"UART_PutString\000"
+ 2463      5F507574 
+ 2463      53747269 
+ 2463      6E6700
+ 2464              	.LASF74:
+ 2465 00e3 4379446D 		.ascii	"CyDmaChSetInitialTd\000"
+ 2465      61436853 
+ 2465      6574496E 
+ 2465      69746961 
+ 2465      6C546400 
+ 2466              	.LASF18:
+ 2467 00f7 75696E74 		.ascii	"uint16\000"
+ 2467      313600
+ 2468              	.LASF73:
+ 2469 00fe 5350495F 		.ascii	"SPI_ClearTxBuffer\000"
+ 2469      436C6561 
+ 2469      72547842 
+ 2469      75666665 
+ 2469      7200
+ 2470              	.LASF13:
+ 2471 0110 75696E74 		.ascii	"uint8_t\000"
+ 2471      385F7400 
+ 2472              	.LASF42:
+ 2473 0118 63685F64 		.ascii	"ch_disable_sts\000"
+ 2473      69736162 
+ 2473      6C655F73 
+ 2473      747300
+ 2474              	.LASF17:
+ 2475 0127 75696E74 		.ascii	"uint8\000"
+ 2475      3800
+ 2476              	.LASF41:
+ 2477 012d 7370695F 		.ascii	"spi_xfer_on_completion\000"
+ 2477      78666572 
+ 2477      5F6F6E5F 
+ 2477      636F6D70 
+ 2477      6C657469 
+ 2478              	.LASF53:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 52
+
+
+ 2479 0144 69735F6C 		.ascii	"is_last_td_to_configure\000"
+ 2479      6173745F 
+ 2479      74645F74 
+ 2479      6F5F636F 
+ 2479      6E666967 
+ 2480              	.LASF51:
+ 2481 015c 62797465 		.ascii	"bytes_for_last_td\000"
+ 2481      735F666F 
+ 2481      725F6C61 
+ 2481      73745F74 
+ 2481      6400
+ 2482              	.LASF20:
+ 2483 016e 666C6F61 		.ascii	"float\000"
+ 2483      7400
+ 2484              	.LASF78:
+ 2485 0174 7370695F 		.ascii	"spi_dma.c\000"
+ 2485      646D612E 
+ 2485      6300
+ 2486              	.LASF12:
+ 2487 017e 6C6F6E67 		.ascii	"long long int\000"
+ 2487      206C6F6E 
+ 2487      6720696E 
+ 2487      7400
+ 2488              	.LASF65:
+ 2489 018c 53535F57 		.ascii	"SS_Write\000"
+ 2489      72697465 
+ 2489      00
+ 2490              	.LASF45:
+ 2491 0195 73656E64 		.ascii	"send_spi_dma\000"
+ 2491      5F737069 
+ 2491      5F646D61 
+ 2491      00
+ 2492              	.LASF61:
+ 2493 01a2 444D415F 		.ascii	"DMA_Tx_DmaInitialize\000"
+ 2493      54785F44 
+ 2493      6D61496E 
+ 2493      69746961 
+ 2493      6C697A65 
+ 2494              	.LASF54:
+ 2495 01b7 444D415F 		.ascii	"DMA_REQUEST_PER_BURST\000"
+ 2495      52455155 
+ 2495      4553545F 
+ 2495      5045525F 
+ 2495      42555253 
+ 2496              	.LASF30:
+ 2497 01cd 5350495F 		.ascii	"SPI_XFER_ONGOING\000"
+ 2497      58464552 
+ 2497      5F4F4E47 
+ 2497      4F494E47 
+ 2497      00
+ 2498              	.LASF38:
+ 2499 01de 64756D6D 		.ascii	"dummy\000"
+ 2499      7900
+ 2500              	.LASF5:
+ 2501 01e4 5F5F7569 		.ascii	"__uint8_t\000"
+ 2501      6E74385F 
+ 2501      7400
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 53
+
+
+ 2502              	.LASF43:
+ 2503 01ee 7370695F 		.ascii	"spi_xfer_is_ongoing\000"
+ 2503      78666572 
+ 2503      5F69735F 
+ 2503      6F6E676F 
+ 2503      696E6700 
+ 2504              	.LASF32:
+ 2505 0202 7370695F 		.ascii	"spi_initialize_dma\000"
+ 2505      696E6974 
+ 2505      69616C69 
+ 2505      7A655F64 
+ 2505      6D6100
+ 2506              	.LASF76:
+ 2507 0215 5350495F 		.ascii	"SPI_SetTxInterruptMode\000"
+ 2507      53657454 
+ 2507      78496E74 
+ 2507      65727275 
+ 2507      70744D6F 
+ 2508              	.LASF31:
+ 2509 022c 7370695F 		.ascii	"spi_xfer_status_t\000"
+ 2509      78666572 
+ 2509      5F737461 
+ 2509      7475735F 
+ 2509      7400
+ 2510              	.LASF34:
+ 2511 023e 62797465 		.ascii	"bytes_to_transfer\000"
+ 2511      735F746F 
+ 2511      5F747261 
+ 2511      6E736665 
+ 2511      7200
+ 2512              	.LASF3:
+ 2513 0250 756E7369 		.ascii	"unsigned char\000"
+ 2513      676E6564 
+ 2513      20636861 
+ 2513      7200
+ 2514              	.LASF60:
+ 2515 025e 675F7464 		.ascii	"g_tds_needed\000"
+ 2515      735F6E65 
+ 2515      65646564 
+ 2515      00
+ 2516              	.LASF39:
+ 2517 026b 7370695F 		.ascii	"spi_xfer_set_status\000"
+ 2517      78666572 
+ 2517      5F736574 
+ 2517      5F737461 
+ 2517      74757300 
+ 2518              	.LASF79:
+ 2519 027f 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 2519      73657273 
+ 2519      5C737472 
+ 2519      61705C44 
+ 2519      6F63756D 
+ 2520 02ac 69393334 		.ascii	"i9341_master.cydsn\000"
+ 2520      315F6D61 
+ 2520      73746572 
+ 2520      2E637964 
+ 2520      736E00
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 54
+
+
+ 2521              	.LASF2:
+ 2522 02bf 7369676E 		.ascii	"signed char\000"
+ 2522      65642063 
+ 2522      68617200 
+ 2523              	.LASF15:
+ 2524 02cb 696E7433 		.ascii	"int32_t\000"
+ 2524      325F7400 
+ 2525              	.LASF0:
+ 2526 02d3 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2526      206C6F6E 
+ 2526      6720756E 
+ 2526      7369676E 
+ 2526      65642069 
+ 2527              	.LASF16:
+ 2528 02ea 75696E74 		.ascii	"uint32_t\000"
+ 2528      33325F74 
+ 2528      00
+ 2529              	.LASF1:
+ 2530 02f3 756E7369 		.ascii	"unsigned int\000"
+ 2530      676E6564 
+ 2530      20696E74 
+ 2530      00
+ 2531              	.LASF14:
+ 2532 0300 75696E74 		.ascii	"uint16_t\000"
+ 2532      31365F74 
+ 2532      00
+ 2533              	.LASF67:
+ 2534 0309 4379446D 		.ascii	"CyDmaChDisable\000"
+ 2534      61436844 
+ 2534      69736162 
+ 2534      6C6500
+ 2535              	.LASF23:
+ 2536 0318 63797374 		.ascii	"cystatus\000"
+ 2536      61747573 
+ 2536      00
+ 2537              	.LASF47:
+ 2538 0321 74785F74 		.ascii	"tx_td_sts\000"
+ 2538      645F7374 
+ 2538      7300
+ 2539              	.LASF59:
+ 2540 032b 7370695F 		.ascii	"spi_xfer_status\000"
+ 2540      78666572 
+ 2540      5F737461 
+ 2540      74757300 
+ 2541              	.LASF40:
+ 2542 033b 73746174 		.ascii	"status\000"
+ 2542      757300
+ 2543              	.LASF7:
+ 2544 0342 73686F72 		.ascii	"short unsigned int\000"
+ 2544      7420756E 
+ 2544      7369676E 
+ 2544      65642069 
+ 2544      6E7400
+ 2545              	.LASF66:
+ 2546 0355 4379446D 		.ascii	"CyDmaTdFree\000"
+ 2546      61546446 
+ 2546      72656500 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 55
+
+
+ 2547              	.LASF22:
+ 2548 0361 63686172 		.ascii	"char\000"
+ 2548      00
+ 2549              	.LASF57:
+ 2550 0366 444D415F 		.ascii	"DMA_Tx_TD_pool\000"
+ 2550      54785F54 
+ 2550      445F706F 
+ 2550      6F6C00
+ 2551              	.LASF9:
+ 2552 0375 6C6F6E67 		.ascii	"long int\000"
+ 2552      20696E74 
+ 2552      00
+ 2553              	.LASF28:
+ 2554 037e 5350495F 		.ascii	"SPI_XFER_IDLE\000"
+ 2554      58464552 
+ 2554      5F49444C 
+ 2554      4500
+ 2555              	.LASF56:
+ 2556 038c 4D41585F 		.ascii	"MAX_BYTES_PER_TD\000"
+ 2556      42595445 
+ 2556      535F5045 
+ 2556      525F5444 
+ 2556      00
+ 2557              	.LASF80:
+ 2558 039d 63616C63 		.ascii	"calculate_needed_tds\000"
+ 2558      756C6174 
+ 2558      655F6E65 
+ 2558      65646564 
+ 2558      5F746473 
+ 2559              	.LASF58:
+ 2560 03b2 444D415F 		.ascii	"DMA_Tx_Chan\000"
+ 2560      54785F43 
+ 2560      68616E00 
+ 2561              	.LASF52:
+ 2562 03be 74645F69 		.ascii	"td_idx\000"
+ 2562      647800
+ 2563              	.LASF19:
+ 2564 03c5 75696E74 		.ascii	"uint32\000"
+ 2564      333200
+ 2565              	.LASF24:
+ 2566 03cc 72656738 		.ascii	"reg8\000"
+ 2566      00
+ 2567              	.LASF11:
+ 2568 03d1 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2568      20756E73 
+ 2568      69676E65 
+ 2568      6420696E 
+ 2568      7400
+ 2569              	.LASF21:
+ 2570 03e3 646F7562 		.ascii	"double\000"
+ 2570      6C6500
+ 2571              	.LASF55:
+ 2572 03ea 444D415F 		.ascii	"DMA_BYTES_PER_BURST\000"
+ 2572      42595445 
+ 2572      535F5045 
+ 2572      525F4255 
+ 2572      52535400 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 56
+
+
+ 2573              	.LASF63:
+ 2574 03fe 5350495F 		.ascii	"SPI_ReadTxStatus\000"
+ 2574      52656164 
+ 2574      54785374 
+ 2574      61747573 
+ 2574      00
+ 2575              	.LASF44:
+ 2576 040f 7370695F 		.ascii	"spi_xfer_get_status\000"
+ 2576      78666572 
+ 2576      5F676574 
+ 2576      5F737461 
+ 2576      74757300 
+ 2577              	.LASF36:
+ 2578 0423 73697A65 		.ascii	"size\000"
+ 2578      00
+ 2579              	.LASF8:
+ 2580 0428 5F5F696E 		.ascii	"__int32_t\000"
+ 2580      7433325F 
+ 2580      7400
+ 2581              	.LASF49:
+ 2582 0432 74645F73 		.ascii	"td_sts\000"
+ 2582      747300
+ 2583              	.LASF62:
+ 2584 0439 5350495F 		.ascii	"SPI_WriteTxData\000"
+ 2584      57726974 
+ 2584      65547844 
+ 2584      61746100 
+ 2585              	.LASF46:
+ 2586 0449 72785F64 		.ascii	"rx_data\000"
+ 2586      61746100 
+ 2587              	.LASF81:
+ 2588 0451 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2588      52784275 
+ 2588      66666572 
+ 2588      00
+ 2589              	.LASF77:
+ 2590 045e 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2590      43313120 
+ 2590      352E342E 
+ 2590      31203230 
+ 2590      31363036 
+ 2591 0491 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2591      20726576 
+ 2591      6973696F 
+ 2591      6E203233 
+ 2591      37373135 
+ 2592 04c4 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2592      66756E63 
+ 2592      74696F6E 
+ 2592      2D736563 
+ 2592      74696F6E 
+ 2593              	.LASF33:
+ 2594 04ec 73656E64 		.ascii	"send_spi\000"
+ 2594      5F737069 
+ 2594      00
+ 2595              	.LASF35:
+ 2596 04f5 74785F64 		.ascii	"tx_data\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccTt4dNF.s 			page 57
+
+
+ 2596      61746100 
+ 2597              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

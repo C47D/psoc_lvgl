@@ -1,0 +1,1497 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_font.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.lv_font_get_glyph_bitmap,"ax",%progbits
+  20              		.align	2
+  21              		.global	lv_font_get_glyph_bitmap
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	lv_font_get_glyph_bitmap, %function
+  25              	lv_font_get_glyph_bitmap:
+  26              	.LFB5:
+  27              		.file 1 "lvgl\\src\\lv_font\\lv_font.c"
+   1:lvgl\src\lv_font/lv_font.c **** /**
+   2:lvgl\src\lv_font/lv_font.c ****  * @file lv_font.c
+   3:lvgl\src\lv_font/lv_font.c ****  *
+   4:lvgl\src\lv_font/lv_font.c ****  */
+   5:lvgl\src\lv_font/lv_font.c **** 
+   6:lvgl\src\lv_font/lv_font.c **** /*********************
+   7:lvgl\src\lv_font/lv_font.c ****  *      INCLUDES
+   8:lvgl\src\lv_font/lv_font.c ****  *********************/
+   9:lvgl\src\lv_font/lv_font.c **** 
+  10:lvgl\src\lv_font/lv_font.c **** #include "lv_font.h"
+  11:lvgl\src\lv_font/lv_font.c **** #include "../lv_misc/lv_utils.h"
+  12:lvgl\src\lv_font/lv_font.c **** #include "../lv_misc/lv_log.h"
+  13:lvgl\src\lv_font/lv_font.c **** 
+  14:lvgl\src\lv_font/lv_font.c **** /*********************
+  15:lvgl\src\lv_font/lv_font.c ****  *      DEFINES
+  16:lvgl\src\lv_font/lv_font.c ****  *********************/
+  17:lvgl\src\lv_font/lv_font.c **** 
+  18:lvgl\src\lv_font/lv_font.c **** /**********************
+  19:lvgl\src\lv_font/lv_font.c ****  *      TYPEDEFS
+  20:lvgl\src\lv_font/lv_font.c ****  **********************/
+  21:lvgl\src\lv_font/lv_font.c **** 
+  22:lvgl\src\lv_font/lv_font.c **** /**********************
+  23:lvgl\src\lv_font/lv_font.c ****  *  STATIC PROTOTYPES
+  24:lvgl\src\lv_font/lv_font.c ****  **********************/
+  25:lvgl\src\lv_font/lv_font.c **** 
+  26:lvgl\src\lv_font/lv_font.c **** /**********************
+  27:lvgl\src\lv_font/lv_font.c ****  *  STATIC VARIABLES
+  28:lvgl\src\lv_font/lv_font.c ****  **********************/
+  29:lvgl\src\lv_font/lv_font.c **** 
+  30:lvgl\src\lv_font/lv_font.c **** /**********************
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 2
+
+
+  31:lvgl\src\lv_font/lv_font.c ****  * GLOBAL PROTOTYPES
+  32:lvgl\src\lv_font/lv_font.c ****  **********************/
+  33:lvgl\src\lv_font/lv_font.c **** 
+  34:lvgl\src\lv_font/lv_font.c **** /**********************
+  35:lvgl\src\lv_font/lv_font.c ****  *      MACROS
+  36:lvgl\src\lv_font/lv_font.c ****  **********************/
+  37:lvgl\src\lv_font/lv_font.c **** 
+  38:lvgl\src\lv_font/lv_font.c **** /**********************
+  39:lvgl\src\lv_font/lv_font.c ****  *   GLOBAL FUNCTIONS
+  40:lvgl\src\lv_font/lv_font.c ****  **********************/
+  41:lvgl\src\lv_font/lv_font.c **** 
+  42:lvgl\src\lv_font/lv_font.c **** /**
+  43:lvgl\src\lv_font/lv_font.c ****  * Return with the bitmap of a font.
+  44:lvgl\src\lv_font/lv_font.c ****  * @param font_p pointer to a font
+  45:lvgl\src\lv_font/lv_font.c ****  * @param letter an UNICODE character code
+  46:lvgl\src\lv_font/lv_font.c ****  * @return  pointer to the bitmap of the letter
+  47:lvgl\src\lv_font/lv_font.c ****  */
+  48:lvgl\src\lv_font/lv_font.c **** const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
+  49:lvgl\src\lv_font/lv_font.c **** {
+  28              		.loc 1 49 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 08B5     		push	{r3, lr}
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  50:lvgl\src\lv_font/lv_font.c ****     return font_p->get_glyph_bitmap(font_p, letter);
+  37              		.loc 1 50 0
+  38 0002 4368     		ldr	r3, [r0, #4]
+  39 0004 9847     		blx	r3
+  40              	.LVL1:
+  51:lvgl\src\lv_font/lv_font.c **** }
+  41              		.loc 1 51 0
+  42 0006 08BD     		pop	{r3, pc}
+  43              		.cfi_endproc
+  44              	.LFE5:
+  45              		.size	lv_font_get_glyph_bitmap, .-lv_font_get_glyph_bitmap
+  46              		.section	.text.lv_font_get_glyph_dsc,"ax",%progbits
+  47              		.align	2
+  48              		.global	lv_font_get_glyph_dsc
+  49              		.thumb
+  50              		.thumb_func
+  51              		.type	lv_font_get_glyph_dsc, %function
+  52              	lv_font_get_glyph_dsc:
+  53              	.LFB6:
+  52:lvgl\src\lv_font/lv_font.c **** 
+  53:lvgl\src\lv_font/lv_font.c **** /**
+  54:lvgl\src\lv_font/lv_font.c ****  * Get the descriptor of a glyph
+  55:lvgl\src\lv_font/lv_font.c ****  * @param font_p pointer to font
+  56:lvgl\src\lv_font/lv_font.c ****  * @param dsc_out store the result descriptor here
+  57:lvgl\src\lv_font/lv_font.c ****  * @param letter an UNICODE letter code
+  58:lvgl\src\lv_font/lv_font.c ****  * @return true: descriptor is successfully loaded into `dsc_out`.
+  59:lvgl\src\lv_font/lv_font.c ****  *         false: the letter was not found, no data is loaded to `dsc_out`
+  60:lvgl\src\lv_font/lv_font.c ****  */
+  61:lvgl\src\lv_font/lv_font.c **** bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 3
+
+
+  62:lvgl\src\lv_font/lv_font.c ****                            uint32_t letter_next)
+  63:lvgl\src\lv_font/lv_font.c **** {
+  54              		.loc 1 63 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              	.LVL2:
+  59 0000 10B5     		push	{r4, lr}
+  60              		.cfi_def_cfa_offset 8
+  61              		.cfi_offset 4, -8
+  62              		.cfi_offset 14, -4
+  64:lvgl\src\lv_font/lv_font.c ****     return font_p->get_glyph_dsc(font_p, dsc_out, letter, letter_next);
+  63              		.loc 1 64 0
+  64 0002 0468     		ldr	r4, [r0]
+  65 0004 A047     		blx	r4
+  66              	.LVL3:
+  65:lvgl\src\lv_font/lv_font.c **** }
+  67              		.loc 1 65 0
+  68 0006 10BD     		pop	{r4, pc}
+  69              		.cfi_endproc
+  70              	.LFE6:
+  71              		.size	lv_font_get_glyph_dsc, .-lv_font_get_glyph_dsc
+  72              		.section	.text.lv_font_get_glyph_width,"ax",%progbits
+  73              		.align	2
+  74              		.global	lv_font_get_glyph_width
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	lv_font_get_glyph_width, %function
+  78              	lv_font_get_glyph_width:
+  79              	.LFB7:
+  66:lvgl\src\lv_font/lv_font.c **** 
+  67:lvgl\src\lv_font/lv_font.c **** /**
+  68:lvgl\src\lv_font/lv_font.c ****  * Get the width of a glyph with kerning
+  69:lvgl\src\lv_font/lv_font.c ****  * @param font pointer to a font
+  70:lvgl\src\lv_font/lv_font.c ****  * @param letter an UNICODE letter
+  71:lvgl\src\lv_font/lv_font.c ****  * @param letter_next the next letter after `letter`. Used for kerning
+  72:lvgl\src\lv_font/lv_font.c ****  * @return the width of the glyph
+  73:lvgl\src\lv_font/lv_font.c ****  */
+  74:lvgl\src\lv_font/lv_font.c **** uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
+  75:lvgl\src\lv_font/lv_font.c **** {
+  80              		.loc 1 75 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 16
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              	.LVL4:
+  85 0000 00B5     		push	{lr}
+  86              		.cfi_def_cfa_offset 4
+  87              		.cfi_offset 14, -4
+  88 0002 85B0     		sub	sp, sp, #20
+  89              		.cfi_def_cfa_offset 24
+  76:lvgl\src\lv_font/lv_font.c ****     lv_font_glyph_dsc_t g;
+  77:lvgl\src\lv_font/lv_font.c ****     bool ret;
+  78:lvgl\src\lv_font/lv_font.c ****     ret = lv_font_get_glyph_dsc(font, &g, letter, letter_next);
+  90              		.loc 1 78 0
+  91 0004 1346     		mov	r3, r2
+  92 0006 0A46     		mov	r2, r1
+  93              	.LVL5:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 4
+
+
+  94 0008 01A9     		add	r1, sp, #4
+  95              	.LVL6:
+  96 000a FFF7FEFF 		bl	lv_font_get_glyph_dsc
+  97              	.LVL7:
+  79:lvgl\src\lv_font/lv_font.c ****     if(ret) return g.adv_w;
+  98              		.loc 1 79 0
+  99 000e 10B1     		cbz	r0, .L7
+ 100              		.loc 1 79 0 is_stmt 0 discriminator 1
+ 101 0010 BDF80400 		ldrh	r0, [sp, #4]
+ 102              	.LVL8:
+ 103 0014 00E0     		b	.L6
+ 104              	.LVL9:
+ 105              	.L7:
+  80:lvgl\src\lv_font/lv_font.c ****     else return 0;
+ 106              		.loc 1 80 0 is_stmt 1
+ 107 0016 0020     		movs	r0, #0
+ 108              	.LVL10:
+ 109              	.L6:
+  81:lvgl\src\lv_font/lv_font.c **** }
+ 110              		.loc 1 81 0
+ 111 0018 05B0     		add	sp, sp, #20
+ 112              		.cfi_def_cfa_offset 4
+ 113              		@ sp needed
+ 114 001a 5DF804FB 		ldr	pc, [sp], #4
+ 115              		.cfi_endproc
+ 116              	.LFE7:
+ 117              		.size	lv_font_get_glyph_width, .-lv_font_get_glyph_width
+ 118 001e 00BF     		.text
+ 119              	.Letext0:
+ 120              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 121              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 122              		.file 4 "lvgl\\src\\lv_font\\../../../lv_conf.h"
+ 123              		.file 5 "lvgl\\src\\lv_font\\lv_font.h"
+ 124              		.section	.debug_info,"",%progbits
+ 125              	.Ldebug_info0:
+ 126 0000 9D030000 		.4byte	0x39d
+ 127 0004 0400     		.2byte	0x4
+ 128 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 129 000a 04       		.byte	0x4
+ 130 000b 01       		.uleb128 0x1
+ 131 000c F0000000 		.4byte	.LASF46
+ 132 0010 0C       		.byte	0xc
+ 133 0011 72000000 		.4byte	.LASF47
+ 134 0015 2F020000 		.4byte	.LASF48
+ 135 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 136 001d 00000000 		.4byte	0
+ 137 0021 00000000 		.4byte	.Ldebug_line0
+ 138 0025 02       		.uleb128 0x2
+ 139 0026 0B000000 		.4byte	.LASF0
+ 140 002a 02       		.byte	0x2
+ 141 002b 1B       		.byte	0x1b
+ 142 002c 30000000 		.4byte	0x30
+ 143 0030 03       		.uleb128 0x3
+ 144 0031 01       		.byte	0x1
+ 145 0032 06       		.byte	0x6
+ 146 0033 0B030000 		.4byte	.LASF2
+ 147 0037 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 5
+
+
+ 148 0038 14000000 		.4byte	.LASF1
+ 149 003c 02       		.byte	0x2
+ 150 003d 1D       		.byte	0x1d
+ 151 003e 42000000 		.4byte	0x42
+ 152 0042 03       		.uleb128 0x3
+ 153 0043 01       		.byte	0x1
+ 154 0044 08       		.byte	0x8
+ 155 0045 A3010000 		.4byte	.LASF3
+ 156 0049 02       		.uleb128 0x2
+ 157 004a 1E000000 		.4byte	.LASF4
+ 158 004e 02       		.byte	0x2
+ 159 004f 29       		.byte	0x29
+ 160 0050 54000000 		.4byte	0x54
+ 161 0054 03       		.uleb128 0x3
+ 162 0055 02       		.byte	0x2
+ 163 0056 05       		.byte	0x5
+ 164 0057 DC020000 		.4byte	.LASF5
+ 165 005b 02       		.uleb128 0x2
+ 166 005c B7010000 		.4byte	.LASF6
+ 167 0060 02       		.byte	0x2
+ 168 0061 2B       		.byte	0x2b
+ 169 0062 66000000 		.4byte	0x66
+ 170 0066 03       		.uleb128 0x3
+ 171 0067 02       		.byte	0x2
+ 172 0068 07       		.byte	0x7
+ 173 0069 90010000 		.4byte	.LASF7
+ 174 006d 03       		.uleb128 0x3
+ 175 006e 04       		.byte	0x4
+ 176 006f 05       		.byte	0x5
+ 177 0070 EF020000 		.4byte	.LASF8
+ 178 0074 02       		.uleb128 0x2
+ 179 0075 D0010000 		.4byte	.LASF9
+ 180 0079 02       		.byte	0x2
+ 181 007a 41       		.byte	0x41
+ 182 007b 7F000000 		.4byte	0x7f
+ 183 007f 03       		.uleb128 0x3
+ 184 0080 04       		.byte	0x4
+ 185 0081 07       		.byte	0x7
+ 186 0082 7E010000 		.4byte	.LASF10
+ 187 0086 03       		.uleb128 0x3
+ 188 0087 08       		.byte	0x8
+ 189 0088 05       		.byte	0x5
+ 190 0089 7E020000 		.4byte	.LASF11
+ 191 008d 03       		.uleb128 0x3
+ 192 008e 08       		.byte	0x8
+ 193 008f 07       		.byte	0x7
+ 194 0090 FC010000 		.4byte	.LASF12
+ 195 0094 04       		.uleb128 0x4
+ 196 0095 04       		.byte	0x4
+ 197 0096 05       		.byte	0x5
+ 198 0097 696E7400 		.ascii	"int\000"
+ 199 009b 03       		.uleb128 0x3
+ 200 009c 04       		.byte	0x4
+ 201 009d 07       		.byte	0x7
+ 202 009e 65000000 		.4byte	.LASF13
+ 203 00a2 02       		.uleb128 0x2
+ 204 00a3 CB000000 		.4byte	.LASF14
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 6
+
+
+ 205 00a7 03       		.byte	0x3
+ 206 00a8 14       		.byte	0x14
+ 207 00a9 25000000 		.4byte	0x25
+ 208 00ad 02       		.uleb128 0x2
+ 209 00ae 13020000 		.4byte	.LASF15
+ 210 00b2 03       		.byte	0x3
+ 211 00b3 18       		.byte	0x18
+ 212 00b4 37000000 		.4byte	0x37
+ 213 00b8 02       		.uleb128 0x2
+ 214 00b9 1B020000 		.4byte	.LASF16
+ 215 00bd 03       		.byte	0x3
+ 216 00be 20       		.byte	0x20
+ 217 00bf 49000000 		.4byte	0x49
+ 218 00c3 02       		.uleb128 0x2
+ 219 00c4 D3020000 		.4byte	.LASF17
+ 220 00c8 03       		.byte	0x3
+ 221 00c9 24       		.byte	0x24
+ 222 00ca 5B000000 		.4byte	0x5b
+ 223 00ce 02       		.uleb128 0x2
+ 224 00cf E6020000 		.4byte	.LASF18
+ 225 00d3 03       		.byte	0x3
+ 226 00d4 30       		.byte	0x30
+ 227 00d5 74000000 		.4byte	0x74
+ 228 00d9 02       		.uleb128 0x2
+ 229 00da 00000000 		.4byte	.LASF19
+ 230 00de 04       		.byte	0x4
+ 231 00df 46       		.byte	0x46
+ 232 00e0 B8000000 		.4byte	0xb8
+ 233 00e4 05       		.uleb128 0x5
+ 234 00e5 04       		.byte	0x4
+ 235 00e6 06       		.uleb128 0x6
+ 236 00e7 28000000 		.4byte	.LASF20
+ 237 00eb 04       		.byte	0x4
+ 238 00ec A901     		.2byte	0x1a9
+ 239 00ee E4000000 		.4byte	0xe4
+ 240 00f2 03       		.uleb128 0x3
+ 241 00f3 08       		.byte	0x8
+ 242 00f4 04       		.byte	0x4
+ 243 00f5 F8020000 		.4byte	.LASF21
+ 244 00f9 03       		.uleb128 0x3
+ 245 00fa 04       		.byte	0x4
+ 246 00fb 07       		.byte	0x7
+ 247 00fc 75020000 		.4byte	.LASF22
+ 248 0100 03       		.uleb128 0x3
+ 249 0101 01       		.byte	0x1
+ 250 0102 08       		.byte	0x8
+ 251 0103 9C020000 		.4byte	.LASF23
+ 252 0107 07       		.uleb128 0x7
+ 253 0108 0C       		.byte	0xc
+ 254 0109 05       		.byte	0x5
+ 255 010a 2A       		.byte	0x2a
+ 256 010b 58010000 		.4byte	0x158
+ 257 010f 08       		.uleb128 0x8
+ 258 0110 B1000000 		.4byte	.LASF24
+ 259 0114 05       		.byte	0x5
+ 260 0115 2B       		.byte	0x2b
+ 261 0116 C3000000 		.4byte	0xc3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 7
+
+
+ 262 011a 00       		.byte	0
+ 263 011b 08       		.uleb128 0x8
+ 264 011c B1010000 		.4byte	.LASF25
+ 265 0120 05       		.byte	0x5
+ 266 0121 2C       		.byte	0x2c
+ 267 0122 C3000000 		.4byte	0xc3
+ 268 0126 02       		.byte	0x2
+ 269 0127 08       		.uleb128 0x8
+ 270 0128 DB010000 		.4byte	.LASF26
+ 271 012c 05       		.byte	0x5
+ 272 012d 2D       		.byte	0x2d
+ 273 012e C3000000 		.4byte	0xc3
+ 274 0132 04       		.byte	0x4
+ 275 0133 08       		.uleb128 0x8
+ 276 0134 F6010000 		.4byte	.LASF27
+ 277 0138 05       		.byte	0x5
+ 278 0139 2E       		.byte	0x2e
+ 279 013a B8000000 		.4byte	0xb8
+ 280 013e 06       		.byte	0x6
+ 281 013f 08       		.uleb128 0x8
+ 282 0140 F0010000 		.4byte	.LASF28
+ 283 0144 05       		.byte	0x5
+ 284 0145 2F       		.byte	0x2f
+ 285 0146 B8000000 		.4byte	0xb8
+ 286 014a 08       		.byte	0x8
+ 287 014b 09       		.uleb128 0x9
+ 288 014c 62707000 		.ascii	"bpp\000"
+ 289 0150 05       		.byte	0x5
+ 290 0151 30       		.byte	0x30
+ 291 0152 AD000000 		.4byte	0xad
+ 292 0156 0A       		.byte	0xa
+ 293 0157 00       		.byte	0
+ 294 0158 02       		.uleb128 0x2
+ 295 0159 DC000000 		.4byte	.LASF29
+ 296 015d 05       		.byte	0x5
+ 297 015e 31       		.byte	0x31
+ 298 015f 07010000 		.4byte	0x107
+ 299 0163 0A       		.uleb128 0xa
+ 300 0164 8C020000 		.4byte	.LASF49
+ 301 0168 18       		.byte	0x18
+ 302 0169 05       		.byte	0x5
+ 303 016a 3F       		.byte	0x3f
+ 304 016b DF010000 		.4byte	0x1df
+ 305 016f 08       		.uleb128 0x8
+ 306 0170 C2010000 		.4byte	.LASF30
+ 307 0174 05       		.byte	0x5
+ 308 0175 41       		.byte	0x41
+ 309 0176 15020000 		.4byte	0x215
+ 310 017a 00       		.byte	0
+ 311 017b 08       		.uleb128 0x8
+ 312 017c 17030000 		.4byte	.LASF31
+ 313 0180 05       		.byte	0x5
+ 314 0181 44       		.byte	0x44
+ 315 0182 3A020000 		.4byte	0x23a
+ 316 0186 04       		.byte	0x4
+ 317 0187 08       		.uleb128 0x8
+ 318 0188 A5000000 		.4byte	.LASF32
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 8
+
+
+ 319 018c 05       		.byte	0x5
+ 320 018d 47       		.byte	0x47
+ 321 018e D9000000 		.4byte	0xd9
+ 322 0192 08       		.byte	0x8
+ 323 0193 08       		.uleb128 0x8
+ 324 0194 BA020000 		.4byte	.LASF33
+ 325 0198 05       		.byte	0x5
+ 326 0199 48       		.byte	0x48
+ 327 019a D9000000 		.4byte	0xd9
+ 328 019e 0A       		.byte	0xa
+ 329 019f 0B       		.uleb128 0xb
+ 330 01a0 6F020000 		.4byte	.LASF50
+ 331 01a4 05       		.byte	0x5
+ 332 01a5 49       		.byte	0x49
+ 333 01a6 AD000000 		.4byte	0xad
+ 334 01aa 01       		.byte	0x1
+ 335 01ab 02       		.byte	0x2
+ 336 01ac 06       		.byte	0x6
+ 337 01ad 0C       		.byte	0xc
+ 338 01ae 08       		.uleb128 0x8
+ 339 01af 3C000000 		.4byte	.LASF34
+ 340 01b3 05       		.byte	0x5
+ 341 01b4 4B       		.byte	0x4b
+ 342 01b5 A2000000 		.4byte	0xa2
+ 343 01b9 0D       		.byte	0xd
+ 344 01ba 08       		.uleb128 0x8
+ 345 01bb B7000000 		.4byte	.LASF35
+ 346 01bf 05       		.byte	0x5
+ 347 01c0 4C       		.byte	0x4c
+ 348 01c1 A2000000 		.4byte	0xa2
+ 349 01c5 0E       		.byte	0xe
+ 350 01c6 09       		.uleb128 0x9
+ 351 01c7 64736300 		.ascii	"dsc\000"
+ 352 01cb 05       		.byte	0x5
+ 353 01cc 4E       		.byte	0x4e
+ 354 01cd E4000000 		.4byte	0xe4
+ 355 01d1 10       		.byte	0x10
+ 356 01d2 08       		.uleb128 0x8
+ 357 01d3 D2000000 		.4byte	.LASF36
+ 358 01d7 05       		.byte	0x5
+ 359 01d8 50       		.byte	0x50
+ 360 01d9 E6000000 		.4byte	0xe6
+ 361 01dd 14       		.byte	0x14
+ 362 01de 00       		.byte	0
+ 363 01df 0C       		.uleb128 0xc
+ 364 01e0 FD010000 		.4byte	0x1fd
+ 365 01e4 FD010000 		.4byte	0x1fd
+ 366 01e8 0D       		.uleb128 0xd
+ 367 01e9 04020000 		.4byte	0x204
+ 368 01ed 0D       		.uleb128 0xd
+ 369 01ee 0F020000 		.4byte	0x20f
+ 370 01f2 0D       		.uleb128 0xd
+ 371 01f3 CE000000 		.4byte	0xce
+ 372 01f7 0D       		.uleb128 0xd
+ 373 01f8 CE000000 		.4byte	0xce
+ 374 01fc 00       		.byte	0
+ 375 01fd 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 9
+
+
+ 376 01fe 01       		.byte	0x1
+ 377 01ff 02       		.byte	0x2
+ 378 0200 28030000 		.4byte	.LASF37
+ 379 0204 0E       		.uleb128 0xe
+ 380 0205 04       		.byte	0x4
+ 381 0206 0A020000 		.4byte	0x20a
+ 382 020a 0F       		.uleb128 0xf
+ 383 020b 63010000 		.4byte	0x163
+ 384 020f 0E       		.uleb128 0xe
+ 385 0210 04       		.byte	0x4
+ 386 0211 58010000 		.4byte	0x158
+ 387 0215 0E       		.uleb128 0xe
+ 388 0216 04       		.byte	0x4
+ 389 0217 DF010000 		.4byte	0x1df
+ 390 021b 0C       		.uleb128 0xc
+ 391 021c 2F020000 		.4byte	0x22f
+ 392 0220 2F020000 		.4byte	0x22f
+ 393 0224 0D       		.uleb128 0xd
+ 394 0225 04020000 		.4byte	0x204
+ 395 0229 0D       		.uleb128 0xd
+ 396 022a CE000000 		.4byte	0xce
+ 397 022e 00       		.byte	0
+ 398 022f 0E       		.uleb128 0xe
+ 399 0230 04       		.byte	0x4
+ 400 0231 35020000 		.4byte	0x235
+ 401 0235 0F       		.uleb128 0xf
+ 402 0236 AD000000 		.4byte	0xad
+ 403 023a 0E       		.uleb128 0xe
+ 404 023b 04       		.byte	0x4
+ 405 023c 1B020000 		.4byte	0x21b
+ 406 0240 02       		.uleb128 0x2
+ 407 0241 E6010000 		.4byte	.LASF38
+ 408 0245 05       		.byte	0x5
+ 409 0246 54       		.byte	0x54
+ 410 0247 63010000 		.4byte	0x163
+ 411 024b 10       		.uleb128 0x10
+ 412 024c A1020000 		.4byte	.LASF41
+ 413 0250 01       		.byte	0x1
+ 414 0251 30       		.byte	0x30
+ 415 0252 2F020000 		.4byte	0x22f
+ 416 0256 00000000 		.4byte	.LFB5
+ 417 025a 08000000 		.4byte	.LFE5-.LFB5
+ 418 025e 01       		.uleb128 0x1
+ 419 025f 9C       		.byte	0x9c
+ 420 0260 97020000 		.4byte	0x297
+ 421 0264 11       		.uleb128 0x11
+ 422 0265 C4020000 		.4byte	.LASF39
+ 423 0269 01       		.byte	0x1
+ 424 026a 30       		.byte	0x30
+ 425 026b 97020000 		.4byte	0x297
+ 426 026f 00000000 		.4byte	.LLST0
+ 427 0273 11       		.uleb128 0x11
+ 428 0274 04030000 		.4byte	.LASF40
+ 429 0278 01       		.byte	0x1
+ 430 0279 30       		.byte	0x30
+ 431 027a CE000000 		.4byte	0xce
+ 432 027e 21000000 		.4byte	.LLST1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 10
+
+
+ 433 0282 12       		.uleb128 0x12
+ 434 0283 06000000 		.4byte	.LVL1
+ 435 0287 13       		.uleb128 0x13
+ 436 0288 01       		.uleb128 0x1
+ 437 0289 50       		.byte	0x50
+ 438 028a 03       		.uleb128 0x3
+ 439 028b F3       		.byte	0xf3
+ 440 028c 01       		.uleb128 0x1
+ 441 028d 50       		.byte	0x50
+ 442 028e 13       		.uleb128 0x13
+ 443 028f 01       		.uleb128 0x1
+ 444 0290 51       		.byte	0x51
+ 445 0291 03       		.uleb128 0x3
+ 446 0292 F3       		.byte	0xf3
+ 447 0293 01       		.uleb128 0x1
+ 448 0294 51       		.byte	0x51
+ 449 0295 00       		.byte	0
+ 450 0296 00       		.byte	0
+ 451 0297 0E       		.uleb128 0xe
+ 452 0298 04       		.byte	0x4
+ 453 0299 9D020000 		.4byte	0x29d
+ 454 029d 0F       		.uleb128 0xf
+ 455 029e 40020000 		.4byte	0x240
+ 456 02a2 10       		.uleb128 0x10
+ 457 02a3 4F000000 		.4byte	.LASF42
+ 458 02a7 01       		.byte	0x1
+ 459 02a8 3D       		.byte	0x3d
+ 460 02a9 FD010000 		.4byte	0x1fd
+ 461 02ad 00000000 		.4byte	.LFB6
+ 462 02b1 08000000 		.4byte	.LFE6-.LFB6
+ 463 02b5 01       		.uleb128 0x1
+ 464 02b6 9C       		.byte	0x9c
+ 465 02b7 1D030000 		.4byte	0x31d
+ 466 02bb 11       		.uleb128 0x11
+ 467 02bc C4020000 		.4byte	.LASF39
+ 468 02c0 01       		.byte	0x1
+ 469 02c1 3D       		.byte	0x3d
+ 470 02c2 97020000 		.4byte	0x297
+ 471 02c6 42000000 		.4byte	.LLST2
+ 472 02ca 11       		.uleb128 0x11
+ 473 02cb CB020000 		.4byte	.LASF43
+ 474 02cf 01       		.byte	0x1
+ 475 02d0 3D       		.byte	0x3d
+ 476 02d1 0F020000 		.4byte	0x20f
+ 477 02d5 63000000 		.4byte	.LLST3
+ 478 02d9 11       		.uleb128 0x11
+ 479 02da 04030000 		.4byte	.LASF40
+ 480 02de 01       		.byte	0x1
+ 481 02df 3D       		.byte	0x3d
+ 482 02e0 CE000000 		.4byte	0xce
+ 483 02e4 84000000 		.4byte	.LLST4
+ 484 02e8 11       		.uleb128 0x11
+ 485 02e9 23020000 		.4byte	.LASF44
+ 486 02ed 01       		.byte	0x1
+ 487 02ee 3E       		.byte	0x3e
+ 488 02ef CE000000 		.4byte	0xce
+ 489 02f3 A5000000 		.4byte	.LLST5
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 11
+
+
+ 490 02f7 14       		.uleb128 0x14
+ 491 02f8 06000000 		.4byte	.LVL3
+ 492 02fc 02       		.uleb128 0x2
+ 493 02fd 74       		.byte	0x74
+ 494 02fe 00       		.sleb128 0
+ 495 02ff 13       		.uleb128 0x13
+ 496 0300 01       		.uleb128 0x1
+ 497 0301 50       		.byte	0x50
+ 498 0302 03       		.uleb128 0x3
+ 499 0303 F3       		.byte	0xf3
+ 500 0304 01       		.uleb128 0x1
+ 501 0305 50       		.byte	0x50
+ 502 0306 13       		.uleb128 0x13
+ 503 0307 01       		.uleb128 0x1
+ 504 0308 51       		.byte	0x51
+ 505 0309 03       		.uleb128 0x3
+ 506 030a F3       		.byte	0xf3
+ 507 030b 01       		.uleb128 0x1
+ 508 030c 51       		.byte	0x51
+ 509 030d 13       		.uleb128 0x13
+ 510 030e 01       		.uleb128 0x1
+ 511 030f 52       		.byte	0x52
+ 512 0310 03       		.uleb128 0x3
+ 513 0311 F3       		.byte	0xf3
+ 514 0312 01       		.uleb128 0x1
+ 515 0313 52       		.byte	0x52
+ 516 0314 13       		.uleb128 0x13
+ 517 0315 01       		.uleb128 0x1
+ 518 0316 53       		.byte	0x53
+ 519 0317 03       		.uleb128 0x3
+ 520 0318 F3       		.byte	0xf3
+ 521 0319 01       		.uleb128 0x1
+ 522 031a 53       		.byte	0x53
+ 523 031b 00       		.byte	0
+ 524 031c 00       		.byte	0
+ 525 031d 15       		.uleb128 0x15
+ 526 031e 8D000000 		.4byte	.LASF51
+ 527 0322 01       		.byte	0x1
+ 528 0323 4A       		.byte	0x4a
+ 529 0324 C3000000 		.4byte	0xc3
+ 530 0328 00000000 		.4byte	.LFB7
+ 531 032c 1E000000 		.4byte	.LFE7-.LFB7
+ 532 0330 01       		.uleb128 0x1
+ 533 0331 9C       		.byte	0x9c
+ 534 0332 11       		.uleb128 0x11
+ 535 0333 E1010000 		.4byte	.LASF45
+ 536 0337 01       		.byte	0x1
+ 537 0338 4A       		.byte	0x4a
+ 538 0339 97020000 		.4byte	0x297
+ 539 033d C6000000 		.4byte	.LLST6
+ 540 0341 11       		.uleb128 0x11
+ 541 0342 04030000 		.4byte	.LASF40
+ 542 0346 01       		.byte	0x1
+ 543 0347 4A       		.byte	0x4a
+ 544 0348 CE000000 		.4byte	0xce
+ 545 034c E7000000 		.4byte	.LLST7
+ 546 0350 11       		.uleb128 0x11
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 12
+
+
+ 547 0351 23020000 		.4byte	.LASF44
+ 548 0355 01       		.byte	0x1
+ 549 0356 4A       		.byte	0x4a
+ 550 0357 CE000000 		.4byte	0xce
+ 551 035b 13010000 		.4byte	.LLST8
+ 552 035f 16       		.uleb128 0x16
+ 553 0360 6700     		.ascii	"g\000"
+ 554 0362 01       		.byte	0x1
+ 555 0363 4C       		.byte	0x4c
+ 556 0364 58010000 		.4byte	0x158
+ 557 0368 02       		.uleb128 0x2
+ 558 0369 91       		.byte	0x91
+ 559 036a 6C       		.sleb128 -20
+ 560 036b 17       		.uleb128 0x17
+ 561 036c 72657400 		.ascii	"ret\000"
+ 562 0370 01       		.byte	0x1
+ 563 0371 4D       		.byte	0x4d
+ 564 0372 FD010000 		.4byte	0x1fd
+ 565 0376 3F010000 		.4byte	.LLST9
+ 566 037a 18       		.uleb128 0x18
+ 567 037b 0E000000 		.4byte	.LVL7
+ 568 037f A2020000 		.4byte	0x2a2
+ 569 0383 13       		.uleb128 0x13
+ 570 0384 01       		.uleb128 0x1
+ 571 0385 50       		.byte	0x50
+ 572 0386 03       		.uleb128 0x3
+ 573 0387 F3       		.byte	0xf3
+ 574 0388 01       		.uleb128 0x1
+ 575 0389 50       		.byte	0x50
+ 576 038a 13       		.uleb128 0x13
+ 577 038b 01       		.uleb128 0x1
+ 578 038c 51       		.byte	0x51
+ 579 038d 02       		.uleb128 0x2
+ 580 038e 91       		.byte	0x91
+ 581 038f 6C       		.sleb128 -20
+ 582 0390 13       		.uleb128 0x13
+ 583 0391 01       		.uleb128 0x1
+ 584 0392 52       		.byte	0x52
+ 585 0393 03       		.uleb128 0x3
+ 586 0394 F3       		.byte	0xf3
+ 587 0395 01       		.uleb128 0x1
+ 588 0396 51       		.byte	0x51
+ 589 0397 13       		.uleb128 0x13
+ 590 0398 01       		.uleb128 0x1
+ 591 0399 53       		.byte	0x53
+ 592 039a 03       		.uleb128 0x3
+ 593 039b F3       		.byte	0xf3
+ 594 039c 01       		.uleb128 0x1
+ 595 039d 52       		.byte	0x52
+ 596 039e 00       		.byte	0
+ 597 039f 00       		.byte	0
+ 598 03a0 00       		.byte	0
+ 599              		.section	.debug_abbrev,"",%progbits
+ 600              	.Ldebug_abbrev0:
+ 601 0000 01       		.uleb128 0x1
+ 602 0001 11       		.uleb128 0x11
+ 603 0002 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 13
+
+
+ 604 0003 25       		.uleb128 0x25
+ 605 0004 0E       		.uleb128 0xe
+ 606 0005 13       		.uleb128 0x13
+ 607 0006 0B       		.uleb128 0xb
+ 608 0007 03       		.uleb128 0x3
+ 609 0008 0E       		.uleb128 0xe
+ 610 0009 1B       		.uleb128 0x1b
+ 611 000a 0E       		.uleb128 0xe
+ 612 000b 55       		.uleb128 0x55
+ 613 000c 17       		.uleb128 0x17
+ 614 000d 11       		.uleb128 0x11
+ 615 000e 01       		.uleb128 0x1
+ 616 000f 10       		.uleb128 0x10
+ 617 0010 17       		.uleb128 0x17
+ 618 0011 00       		.byte	0
+ 619 0012 00       		.byte	0
+ 620 0013 02       		.uleb128 0x2
+ 621 0014 16       		.uleb128 0x16
+ 622 0015 00       		.byte	0
+ 623 0016 03       		.uleb128 0x3
+ 624 0017 0E       		.uleb128 0xe
+ 625 0018 3A       		.uleb128 0x3a
+ 626 0019 0B       		.uleb128 0xb
+ 627 001a 3B       		.uleb128 0x3b
+ 628 001b 0B       		.uleb128 0xb
+ 629 001c 49       		.uleb128 0x49
+ 630 001d 13       		.uleb128 0x13
+ 631 001e 00       		.byte	0
+ 632 001f 00       		.byte	0
+ 633 0020 03       		.uleb128 0x3
+ 634 0021 24       		.uleb128 0x24
+ 635 0022 00       		.byte	0
+ 636 0023 0B       		.uleb128 0xb
+ 637 0024 0B       		.uleb128 0xb
+ 638 0025 3E       		.uleb128 0x3e
+ 639 0026 0B       		.uleb128 0xb
+ 640 0027 03       		.uleb128 0x3
+ 641 0028 0E       		.uleb128 0xe
+ 642 0029 00       		.byte	0
+ 643 002a 00       		.byte	0
+ 644 002b 04       		.uleb128 0x4
+ 645 002c 24       		.uleb128 0x24
+ 646 002d 00       		.byte	0
+ 647 002e 0B       		.uleb128 0xb
+ 648 002f 0B       		.uleb128 0xb
+ 649 0030 3E       		.uleb128 0x3e
+ 650 0031 0B       		.uleb128 0xb
+ 651 0032 03       		.uleb128 0x3
+ 652 0033 08       		.uleb128 0x8
+ 653 0034 00       		.byte	0
+ 654 0035 00       		.byte	0
+ 655 0036 05       		.uleb128 0x5
+ 656 0037 0F       		.uleb128 0xf
+ 657 0038 00       		.byte	0
+ 658 0039 0B       		.uleb128 0xb
+ 659 003a 0B       		.uleb128 0xb
+ 660 003b 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 14
+
+
+ 661 003c 00       		.byte	0
+ 662 003d 06       		.uleb128 0x6
+ 663 003e 16       		.uleb128 0x16
+ 664 003f 00       		.byte	0
+ 665 0040 03       		.uleb128 0x3
+ 666 0041 0E       		.uleb128 0xe
+ 667 0042 3A       		.uleb128 0x3a
+ 668 0043 0B       		.uleb128 0xb
+ 669 0044 3B       		.uleb128 0x3b
+ 670 0045 05       		.uleb128 0x5
+ 671 0046 49       		.uleb128 0x49
+ 672 0047 13       		.uleb128 0x13
+ 673 0048 00       		.byte	0
+ 674 0049 00       		.byte	0
+ 675 004a 07       		.uleb128 0x7
+ 676 004b 13       		.uleb128 0x13
+ 677 004c 01       		.byte	0x1
+ 678 004d 0B       		.uleb128 0xb
+ 679 004e 0B       		.uleb128 0xb
+ 680 004f 3A       		.uleb128 0x3a
+ 681 0050 0B       		.uleb128 0xb
+ 682 0051 3B       		.uleb128 0x3b
+ 683 0052 0B       		.uleb128 0xb
+ 684 0053 01       		.uleb128 0x1
+ 685 0054 13       		.uleb128 0x13
+ 686 0055 00       		.byte	0
+ 687 0056 00       		.byte	0
+ 688 0057 08       		.uleb128 0x8
+ 689 0058 0D       		.uleb128 0xd
+ 690 0059 00       		.byte	0
+ 691 005a 03       		.uleb128 0x3
+ 692 005b 0E       		.uleb128 0xe
+ 693 005c 3A       		.uleb128 0x3a
+ 694 005d 0B       		.uleb128 0xb
+ 695 005e 3B       		.uleb128 0x3b
+ 696 005f 0B       		.uleb128 0xb
+ 697 0060 49       		.uleb128 0x49
+ 698 0061 13       		.uleb128 0x13
+ 699 0062 38       		.uleb128 0x38
+ 700 0063 0B       		.uleb128 0xb
+ 701 0064 00       		.byte	0
+ 702 0065 00       		.byte	0
+ 703 0066 09       		.uleb128 0x9
+ 704 0067 0D       		.uleb128 0xd
+ 705 0068 00       		.byte	0
+ 706 0069 03       		.uleb128 0x3
+ 707 006a 08       		.uleb128 0x8
+ 708 006b 3A       		.uleb128 0x3a
+ 709 006c 0B       		.uleb128 0xb
+ 710 006d 3B       		.uleb128 0x3b
+ 711 006e 0B       		.uleb128 0xb
+ 712 006f 49       		.uleb128 0x49
+ 713 0070 13       		.uleb128 0x13
+ 714 0071 38       		.uleb128 0x38
+ 715 0072 0B       		.uleb128 0xb
+ 716 0073 00       		.byte	0
+ 717 0074 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 15
+
+
+ 718 0075 0A       		.uleb128 0xa
+ 719 0076 13       		.uleb128 0x13
+ 720 0077 01       		.byte	0x1
+ 721 0078 03       		.uleb128 0x3
+ 722 0079 0E       		.uleb128 0xe
+ 723 007a 0B       		.uleb128 0xb
+ 724 007b 0B       		.uleb128 0xb
+ 725 007c 3A       		.uleb128 0x3a
+ 726 007d 0B       		.uleb128 0xb
+ 727 007e 3B       		.uleb128 0x3b
+ 728 007f 0B       		.uleb128 0xb
+ 729 0080 01       		.uleb128 0x1
+ 730 0081 13       		.uleb128 0x13
+ 731 0082 00       		.byte	0
+ 732 0083 00       		.byte	0
+ 733 0084 0B       		.uleb128 0xb
+ 734 0085 0D       		.uleb128 0xd
+ 735 0086 00       		.byte	0
+ 736 0087 03       		.uleb128 0x3
+ 737 0088 0E       		.uleb128 0xe
+ 738 0089 3A       		.uleb128 0x3a
+ 739 008a 0B       		.uleb128 0xb
+ 740 008b 3B       		.uleb128 0x3b
+ 741 008c 0B       		.uleb128 0xb
+ 742 008d 49       		.uleb128 0x49
+ 743 008e 13       		.uleb128 0x13
+ 744 008f 0B       		.uleb128 0xb
+ 745 0090 0B       		.uleb128 0xb
+ 746 0091 0D       		.uleb128 0xd
+ 747 0092 0B       		.uleb128 0xb
+ 748 0093 0C       		.uleb128 0xc
+ 749 0094 0B       		.uleb128 0xb
+ 750 0095 38       		.uleb128 0x38
+ 751 0096 0B       		.uleb128 0xb
+ 752 0097 00       		.byte	0
+ 753 0098 00       		.byte	0
+ 754 0099 0C       		.uleb128 0xc
+ 755 009a 15       		.uleb128 0x15
+ 756 009b 01       		.byte	0x1
+ 757 009c 27       		.uleb128 0x27
+ 758 009d 19       		.uleb128 0x19
+ 759 009e 49       		.uleb128 0x49
+ 760 009f 13       		.uleb128 0x13
+ 761 00a0 01       		.uleb128 0x1
+ 762 00a1 13       		.uleb128 0x13
+ 763 00a2 00       		.byte	0
+ 764 00a3 00       		.byte	0
+ 765 00a4 0D       		.uleb128 0xd
+ 766 00a5 05       		.uleb128 0x5
+ 767 00a6 00       		.byte	0
+ 768 00a7 49       		.uleb128 0x49
+ 769 00a8 13       		.uleb128 0x13
+ 770 00a9 00       		.byte	0
+ 771 00aa 00       		.byte	0
+ 772 00ab 0E       		.uleb128 0xe
+ 773 00ac 0F       		.uleb128 0xf
+ 774 00ad 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 16
+
+
+ 775 00ae 0B       		.uleb128 0xb
+ 776 00af 0B       		.uleb128 0xb
+ 777 00b0 49       		.uleb128 0x49
+ 778 00b1 13       		.uleb128 0x13
+ 779 00b2 00       		.byte	0
+ 780 00b3 00       		.byte	0
+ 781 00b4 0F       		.uleb128 0xf
+ 782 00b5 26       		.uleb128 0x26
+ 783 00b6 00       		.byte	0
+ 784 00b7 49       		.uleb128 0x49
+ 785 00b8 13       		.uleb128 0x13
+ 786 00b9 00       		.byte	0
+ 787 00ba 00       		.byte	0
+ 788 00bb 10       		.uleb128 0x10
+ 789 00bc 2E       		.uleb128 0x2e
+ 790 00bd 01       		.byte	0x1
+ 791 00be 3F       		.uleb128 0x3f
+ 792 00bf 19       		.uleb128 0x19
+ 793 00c0 03       		.uleb128 0x3
+ 794 00c1 0E       		.uleb128 0xe
+ 795 00c2 3A       		.uleb128 0x3a
+ 796 00c3 0B       		.uleb128 0xb
+ 797 00c4 3B       		.uleb128 0x3b
+ 798 00c5 0B       		.uleb128 0xb
+ 799 00c6 27       		.uleb128 0x27
+ 800 00c7 19       		.uleb128 0x19
+ 801 00c8 49       		.uleb128 0x49
+ 802 00c9 13       		.uleb128 0x13
+ 803 00ca 11       		.uleb128 0x11
+ 804 00cb 01       		.uleb128 0x1
+ 805 00cc 12       		.uleb128 0x12
+ 806 00cd 06       		.uleb128 0x6
+ 807 00ce 40       		.uleb128 0x40
+ 808 00cf 18       		.uleb128 0x18
+ 809 00d0 9742     		.uleb128 0x2117
+ 810 00d2 19       		.uleb128 0x19
+ 811 00d3 01       		.uleb128 0x1
+ 812 00d4 13       		.uleb128 0x13
+ 813 00d5 00       		.byte	0
+ 814 00d6 00       		.byte	0
+ 815 00d7 11       		.uleb128 0x11
+ 816 00d8 05       		.uleb128 0x5
+ 817 00d9 00       		.byte	0
+ 818 00da 03       		.uleb128 0x3
+ 819 00db 0E       		.uleb128 0xe
+ 820 00dc 3A       		.uleb128 0x3a
+ 821 00dd 0B       		.uleb128 0xb
+ 822 00de 3B       		.uleb128 0x3b
+ 823 00df 0B       		.uleb128 0xb
+ 824 00e0 49       		.uleb128 0x49
+ 825 00e1 13       		.uleb128 0x13
+ 826 00e2 02       		.uleb128 0x2
+ 827 00e3 17       		.uleb128 0x17
+ 828 00e4 00       		.byte	0
+ 829 00e5 00       		.byte	0
+ 830 00e6 12       		.uleb128 0x12
+ 831 00e7 898201   		.uleb128 0x4109
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 17
+
+
+ 832 00ea 01       		.byte	0x1
+ 833 00eb 11       		.uleb128 0x11
+ 834 00ec 01       		.uleb128 0x1
+ 835 00ed 00       		.byte	0
+ 836 00ee 00       		.byte	0
+ 837 00ef 13       		.uleb128 0x13
+ 838 00f0 8A8201   		.uleb128 0x410a
+ 839 00f3 00       		.byte	0
+ 840 00f4 02       		.uleb128 0x2
+ 841 00f5 18       		.uleb128 0x18
+ 842 00f6 9142     		.uleb128 0x2111
+ 843 00f8 18       		.uleb128 0x18
+ 844 00f9 00       		.byte	0
+ 845 00fa 00       		.byte	0
+ 846 00fb 14       		.uleb128 0x14
+ 847 00fc 898201   		.uleb128 0x4109
+ 848 00ff 01       		.byte	0x1
+ 849 0100 11       		.uleb128 0x11
+ 850 0101 01       		.uleb128 0x1
+ 851 0102 9342     		.uleb128 0x2113
+ 852 0104 18       		.uleb128 0x18
+ 853 0105 00       		.byte	0
+ 854 0106 00       		.byte	0
+ 855 0107 15       		.uleb128 0x15
+ 856 0108 2E       		.uleb128 0x2e
+ 857 0109 01       		.byte	0x1
+ 858 010a 3F       		.uleb128 0x3f
+ 859 010b 19       		.uleb128 0x19
+ 860 010c 03       		.uleb128 0x3
+ 861 010d 0E       		.uleb128 0xe
+ 862 010e 3A       		.uleb128 0x3a
+ 863 010f 0B       		.uleb128 0xb
+ 864 0110 3B       		.uleb128 0x3b
+ 865 0111 0B       		.uleb128 0xb
+ 866 0112 27       		.uleb128 0x27
+ 867 0113 19       		.uleb128 0x19
+ 868 0114 49       		.uleb128 0x49
+ 869 0115 13       		.uleb128 0x13
+ 870 0116 11       		.uleb128 0x11
+ 871 0117 01       		.uleb128 0x1
+ 872 0118 12       		.uleb128 0x12
+ 873 0119 06       		.uleb128 0x6
+ 874 011a 40       		.uleb128 0x40
+ 875 011b 18       		.uleb128 0x18
+ 876 011c 9742     		.uleb128 0x2117
+ 877 011e 19       		.uleb128 0x19
+ 878 011f 00       		.byte	0
+ 879 0120 00       		.byte	0
+ 880 0121 16       		.uleb128 0x16
+ 881 0122 34       		.uleb128 0x34
+ 882 0123 00       		.byte	0
+ 883 0124 03       		.uleb128 0x3
+ 884 0125 08       		.uleb128 0x8
+ 885 0126 3A       		.uleb128 0x3a
+ 886 0127 0B       		.uleb128 0xb
+ 887 0128 3B       		.uleb128 0x3b
+ 888 0129 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 18
+
+
+ 889 012a 49       		.uleb128 0x49
+ 890 012b 13       		.uleb128 0x13
+ 891 012c 02       		.uleb128 0x2
+ 892 012d 18       		.uleb128 0x18
+ 893 012e 00       		.byte	0
+ 894 012f 00       		.byte	0
+ 895 0130 17       		.uleb128 0x17
+ 896 0131 34       		.uleb128 0x34
+ 897 0132 00       		.byte	0
+ 898 0133 03       		.uleb128 0x3
+ 899 0134 08       		.uleb128 0x8
+ 900 0135 3A       		.uleb128 0x3a
+ 901 0136 0B       		.uleb128 0xb
+ 902 0137 3B       		.uleb128 0x3b
+ 903 0138 0B       		.uleb128 0xb
+ 904 0139 49       		.uleb128 0x49
+ 905 013a 13       		.uleb128 0x13
+ 906 013b 02       		.uleb128 0x2
+ 907 013c 17       		.uleb128 0x17
+ 908 013d 00       		.byte	0
+ 909 013e 00       		.byte	0
+ 910 013f 18       		.uleb128 0x18
+ 911 0140 898201   		.uleb128 0x4109
+ 912 0143 01       		.byte	0x1
+ 913 0144 11       		.uleb128 0x11
+ 914 0145 01       		.uleb128 0x1
+ 915 0146 31       		.uleb128 0x31
+ 916 0147 13       		.uleb128 0x13
+ 917 0148 00       		.byte	0
+ 918 0149 00       		.byte	0
+ 919 014a 00       		.byte	0
+ 920              		.section	.debug_loc,"",%progbits
+ 921              	.Ldebug_loc0:
+ 922              	.LLST0:
+ 923 0000 00000000 		.4byte	.LVL0
+ 924 0004 05000000 		.4byte	.LVL1-1
+ 925 0008 0100     		.2byte	0x1
+ 926 000a 50       		.byte	0x50
+ 927 000b 05000000 		.4byte	.LVL1-1
+ 928 000f 08000000 		.4byte	.LFE5
+ 929 0013 0400     		.2byte	0x4
+ 930 0015 F3       		.byte	0xf3
+ 931 0016 01       		.uleb128 0x1
+ 932 0017 50       		.byte	0x50
+ 933 0018 9F       		.byte	0x9f
+ 934 0019 00000000 		.4byte	0
+ 935 001d 00000000 		.4byte	0
+ 936              	.LLST1:
+ 937 0021 00000000 		.4byte	.LVL0
+ 938 0025 05000000 		.4byte	.LVL1-1
+ 939 0029 0100     		.2byte	0x1
+ 940 002b 51       		.byte	0x51
+ 941 002c 05000000 		.4byte	.LVL1-1
+ 942 0030 08000000 		.4byte	.LFE5
+ 943 0034 0400     		.2byte	0x4
+ 944 0036 F3       		.byte	0xf3
+ 945 0037 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 19
+
+
+ 946 0038 51       		.byte	0x51
+ 947 0039 9F       		.byte	0x9f
+ 948 003a 00000000 		.4byte	0
+ 949 003e 00000000 		.4byte	0
+ 950              	.LLST2:
+ 951 0042 00000000 		.4byte	.LVL2
+ 952 0046 05000000 		.4byte	.LVL3-1
+ 953 004a 0100     		.2byte	0x1
+ 954 004c 50       		.byte	0x50
+ 955 004d 05000000 		.4byte	.LVL3-1
+ 956 0051 08000000 		.4byte	.LFE6
+ 957 0055 0400     		.2byte	0x4
+ 958 0057 F3       		.byte	0xf3
+ 959 0058 01       		.uleb128 0x1
+ 960 0059 50       		.byte	0x50
+ 961 005a 9F       		.byte	0x9f
+ 962 005b 00000000 		.4byte	0
+ 963 005f 00000000 		.4byte	0
+ 964              	.LLST3:
+ 965 0063 00000000 		.4byte	.LVL2
+ 966 0067 05000000 		.4byte	.LVL3-1
+ 967 006b 0100     		.2byte	0x1
+ 968 006d 51       		.byte	0x51
+ 969 006e 05000000 		.4byte	.LVL3-1
+ 970 0072 08000000 		.4byte	.LFE6
+ 971 0076 0400     		.2byte	0x4
+ 972 0078 F3       		.byte	0xf3
+ 973 0079 01       		.uleb128 0x1
+ 974 007a 51       		.byte	0x51
+ 975 007b 9F       		.byte	0x9f
+ 976 007c 00000000 		.4byte	0
+ 977 0080 00000000 		.4byte	0
+ 978              	.LLST4:
+ 979 0084 00000000 		.4byte	.LVL2
+ 980 0088 05000000 		.4byte	.LVL3-1
+ 981 008c 0100     		.2byte	0x1
+ 982 008e 52       		.byte	0x52
+ 983 008f 05000000 		.4byte	.LVL3-1
+ 984 0093 08000000 		.4byte	.LFE6
+ 985 0097 0400     		.2byte	0x4
+ 986 0099 F3       		.byte	0xf3
+ 987 009a 01       		.uleb128 0x1
+ 988 009b 52       		.byte	0x52
+ 989 009c 9F       		.byte	0x9f
+ 990 009d 00000000 		.4byte	0
+ 991 00a1 00000000 		.4byte	0
+ 992              	.LLST5:
+ 993 00a5 00000000 		.4byte	.LVL2
+ 994 00a9 05000000 		.4byte	.LVL3-1
+ 995 00ad 0100     		.2byte	0x1
+ 996 00af 53       		.byte	0x53
+ 997 00b0 05000000 		.4byte	.LVL3-1
+ 998 00b4 08000000 		.4byte	.LFE6
+ 999 00b8 0400     		.2byte	0x4
+ 1000 00ba F3       		.byte	0xf3
+ 1001 00bb 01       		.uleb128 0x1
+ 1002 00bc 53       		.byte	0x53
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 20
+
+
+ 1003 00bd 9F       		.byte	0x9f
+ 1004 00be 00000000 		.4byte	0
+ 1005 00c2 00000000 		.4byte	0
+ 1006              	.LLST6:
+ 1007 00c6 00000000 		.4byte	.LVL4
+ 1008 00ca 0D000000 		.4byte	.LVL7-1
+ 1009 00ce 0100     		.2byte	0x1
+ 1010 00d0 50       		.byte	0x50
+ 1011 00d1 0D000000 		.4byte	.LVL7-1
+ 1012 00d5 1E000000 		.4byte	.LFE7
+ 1013 00d9 0400     		.2byte	0x4
+ 1014 00db F3       		.byte	0xf3
+ 1015 00dc 01       		.uleb128 0x1
+ 1016 00dd 50       		.byte	0x50
+ 1017 00de 9F       		.byte	0x9f
+ 1018 00df 00000000 		.4byte	0
+ 1019 00e3 00000000 		.4byte	0
+ 1020              	.LLST7:
+ 1021 00e7 00000000 		.4byte	.LVL4
+ 1022 00eb 0A000000 		.4byte	.LVL6
+ 1023 00ef 0100     		.2byte	0x1
+ 1024 00f1 51       		.byte	0x51
+ 1025 00f2 0A000000 		.4byte	.LVL6
+ 1026 00f6 0D000000 		.4byte	.LVL7-1
+ 1027 00fa 0100     		.2byte	0x1
+ 1028 00fc 52       		.byte	0x52
+ 1029 00fd 0D000000 		.4byte	.LVL7-1
+ 1030 0101 1E000000 		.4byte	.LFE7
+ 1031 0105 0400     		.2byte	0x4
+ 1032 0107 F3       		.byte	0xf3
+ 1033 0108 01       		.uleb128 0x1
+ 1034 0109 51       		.byte	0x51
+ 1035 010a 9F       		.byte	0x9f
+ 1036 010b 00000000 		.4byte	0
+ 1037 010f 00000000 		.4byte	0
+ 1038              	.LLST8:
+ 1039 0113 00000000 		.4byte	.LVL4
+ 1040 0117 08000000 		.4byte	.LVL5
+ 1041 011b 0100     		.2byte	0x1
+ 1042 011d 52       		.byte	0x52
+ 1043 011e 08000000 		.4byte	.LVL5
+ 1044 0122 0D000000 		.4byte	.LVL7-1
+ 1045 0126 0100     		.2byte	0x1
+ 1046 0128 53       		.byte	0x53
+ 1047 0129 0D000000 		.4byte	.LVL7-1
+ 1048 012d 1E000000 		.4byte	.LFE7
+ 1049 0131 0400     		.2byte	0x4
+ 1050 0133 F3       		.byte	0xf3
+ 1051 0134 01       		.uleb128 0x1
+ 1052 0135 52       		.byte	0x52
+ 1053 0136 9F       		.byte	0x9f
+ 1054 0137 00000000 		.4byte	0
+ 1055 013b 00000000 		.4byte	0
+ 1056              	.LLST9:
+ 1057 013f 0E000000 		.4byte	.LVL7
+ 1058 0143 14000000 		.4byte	.LVL8
+ 1059 0147 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 21
+
+
+ 1060 0149 50       		.byte	0x50
+ 1061 014a 16000000 		.4byte	.LVL9
+ 1062 014e 18000000 		.4byte	.LVL10
+ 1063 0152 0100     		.2byte	0x1
+ 1064 0154 50       		.byte	0x50
+ 1065 0155 00000000 		.4byte	0
+ 1066 0159 00000000 		.4byte	0
+ 1067              		.section	.debug_aranges,"",%progbits
+ 1068 0000 2C000000 		.4byte	0x2c
+ 1069 0004 0200     		.2byte	0x2
+ 1070 0006 00000000 		.4byte	.Ldebug_info0
+ 1071 000a 04       		.byte	0x4
+ 1072 000b 00       		.byte	0
+ 1073 000c 0000     		.2byte	0
+ 1074 000e 0000     		.2byte	0
+ 1075 0010 00000000 		.4byte	.LFB5
+ 1076 0014 08000000 		.4byte	.LFE5-.LFB5
+ 1077 0018 00000000 		.4byte	.LFB6
+ 1078 001c 08000000 		.4byte	.LFE6-.LFB6
+ 1079 0020 00000000 		.4byte	.LFB7
+ 1080 0024 1E000000 		.4byte	.LFE7-.LFB7
+ 1081 0028 00000000 		.4byte	0
+ 1082 002c 00000000 		.4byte	0
+ 1083              		.section	.debug_ranges,"",%progbits
+ 1084              	.Ldebug_ranges0:
+ 1085 0000 00000000 		.4byte	.LFB5
+ 1086 0004 08000000 		.4byte	.LFE5
+ 1087 0008 00000000 		.4byte	.LFB6
+ 1088 000c 08000000 		.4byte	.LFE6
+ 1089 0010 00000000 		.4byte	.LFB7
+ 1090 0014 1E000000 		.4byte	.LFE7
+ 1091 0018 00000000 		.4byte	0
+ 1092 001c 00000000 		.4byte	0
+ 1093              		.section	.debug_line,"",%progbits
+ 1094              	.Ldebug_line0:
+ 1095 0000 A5010000 		.section	.debug_str,"MS",%progbits,1
+ 1095      02006201 
+ 1095      00000201 
+ 1095      FB0E0D00 
+ 1095      01010101 
+ 1096              	.LASF19:
+ 1097 0000 6C765F63 		.ascii	"lv_coord_t\000"
+ 1097      6F6F7264 
+ 1097      5F7400
+ 1098              	.LASF0:
+ 1099 000b 5F5F696E 		.ascii	"__int8_t\000"
+ 1099      74385F74 
+ 1099      00
+ 1100              	.LASF1:
+ 1101 0014 5F5F7569 		.ascii	"__uint8_t\000"
+ 1101      6E74385F 
+ 1101      7400
+ 1102              	.LASF4:
+ 1103 001e 5F5F696E 		.ascii	"__int16_t\000"
+ 1103      7431365F 
+ 1103      7400
+ 1104              	.LASF20:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 22
+
+
+ 1105 0028 6C765F66 		.ascii	"lv_font_user_data_t\000"
+ 1105      6F6E745F 
+ 1105      75736572 
+ 1105      5F646174 
+ 1105      615F7400 
+ 1106              	.LASF34:
+ 1107 003c 756E6465 		.ascii	"underline_position\000"
+ 1107      726C696E 
+ 1107      655F706F 
+ 1107      73697469 
+ 1107      6F6E00
+ 1108              	.LASF42:
+ 1109 004f 6C765F66 		.ascii	"lv_font_get_glyph_dsc\000"
+ 1109      6F6E745F 
+ 1109      6765745F 
+ 1109      676C7970 
+ 1109      685F6473 
+ 1110              	.LASF13:
+ 1111 0065 756E7369 		.ascii	"unsigned int\000"
+ 1111      676E6564 
+ 1111      20696E74 
+ 1111      00
+ 1112              	.LASF47:
+ 1113 0072 6C76676C 		.ascii	"lvgl\\src\\lv_font\\lv_font.c\000"
+ 1113      5C737263 
+ 1113      5C6C765F 
+ 1113      666F6E74 
+ 1113      5C6C765F 
+ 1114              	.LASF51:
+ 1115 008d 6C765F66 		.ascii	"lv_font_get_glyph_width\000"
+ 1115      6F6E745F 
+ 1115      6765745F 
+ 1115      676C7970 
+ 1115      685F7769 
+ 1116              	.LASF32:
+ 1117 00a5 6C696E65 		.ascii	"line_height\000"
+ 1117      5F686569 
+ 1117      67687400 
+ 1118              	.LASF24:
+ 1119 00b1 6164765F 		.ascii	"adv_w\000"
+ 1119      7700
+ 1120              	.LASF35:
+ 1121 00b7 756E6465 		.ascii	"underline_thickness\000"
+ 1121      726C696E 
+ 1121      655F7468 
+ 1121      69636B6E 
+ 1121      65737300 
+ 1122              	.LASF14:
+ 1123 00cb 696E7438 		.ascii	"int8_t\000"
+ 1123      5F7400
+ 1124              	.LASF36:
+ 1125 00d2 75736572 		.ascii	"user_data\000"
+ 1125      5F646174 
+ 1125      6100
+ 1126              	.LASF29:
+ 1127 00dc 6C765F66 		.ascii	"lv_font_glyph_dsc_t\000"
+ 1127      6F6E745F 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 23
+
+
+ 1127      676C7970 
+ 1127      685F6473 
+ 1127      635F7400 
+ 1128              	.LASF46:
+ 1129 00f0 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1129      43313120 
+ 1129      352E342E 
+ 1129      31203230 
+ 1129      31363036 
+ 1130 0123 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1130      20726576 
+ 1130      6973696F 
+ 1130      6E203233 
+ 1130      37373135 
+ 1131 0156 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1131      66756E63 
+ 1131      74696F6E 
+ 1131      2D736563 
+ 1131      74696F6E 
+ 1132              	.LASF10:
+ 1133 017e 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1133      20756E73 
+ 1133      69676E65 
+ 1133      6420696E 
+ 1133      7400
+ 1134              	.LASF7:
+ 1135 0190 73686F72 		.ascii	"short unsigned int\000"
+ 1135      7420756E 
+ 1135      7369676E 
+ 1135      65642069 
+ 1135      6E7400
+ 1136              	.LASF3:
+ 1137 01a3 756E7369 		.ascii	"unsigned char\000"
+ 1137      676E6564 
+ 1137      20636861 
+ 1137      7200
+ 1138              	.LASF25:
+ 1139 01b1 626F785F 		.ascii	"box_w\000"
+ 1139      7700
+ 1140              	.LASF6:
+ 1141 01b7 5F5F7569 		.ascii	"__uint16_t\000"
+ 1141      6E743136 
+ 1141      5F7400
+ 1142              	.LASF30:
+ 1143 01c2 6765745F 		.ascii	"get_glyph_dsc\000"
+ 1143      676C7970 
+ 1143      685F6473 
+ 1143      6300
+ 1144              	.LASF9:
+ 1145 01d0 5F5F7569 		.ascii	"__uint32_t\000"
+ 1145      6E743332 
+ 1145      5F7400
+ 1146              	.LASF26:
+ 1147 01db 626F785F 		.ascii	"box_h\000"
+ 1147      6800
+ 1148              	.LASF45:
+ 1149 01e1 666F6E74 		.ascii	"font\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 24
+
+
+ 1149      00
+ 1150              	.LASF38:
+ 1151 01e6 6C765F66 		.ascii	"lv_font_t\000"
+ 1151      6F6E745F 
+ 1151      7400
+ 1152              	.LASF28:
+ 1153 01f0 6F66735F 		.ascii	"ofs_y\000"
+ 1153      7900
+ 1154              	.LASF27:
+ 1155 01f6 6F66735F 		.ascii	"ofs_x\000"
+ 1155      7800
+ 1156              	.LASF12:
+ 1157 01fc 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1157      206C6F6E 
+ 1157      6720756E 
+ 1157      7369676E 
+ 1157      65642069 
+ 1158              	.LASF15:
+ 1159 0213 75696E74 		.ascii	"uint8_t\000"
+ 1159      385F7400 
+ 1160              	.LASF16:
+ 1161 021b 696E7431 		.ascii	"int16_t\000"
+ 1161      365F7400 
+ 1162              	.LASF44:
+ 1163 0223 6C657474 		.ascii	"letter_next\000"
+ 1163      65725F6E 
+ 1163      65787400 
+ 1164              	.LASF48:
+ 1165 022f 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 1165      73657273 
+ 1165      5C737472 
+ 1165      61705C44 
+ 1165      6F63756D 
+ 1166 025c 69393334 		.ascii	"i9341_master.cydsn\000"
+ 1166      315F6D61 
+ 1166      73746572 
+ 1166      2E637964 
+ 1166      736E00
+ 1167              	.LASF50:
+ 1168 026f 73756270 		.ascii	"subpx\000"
+ 1168      7800
+ 1169              	.LASF22:
+ 1170 0275 73697A65 		.ascii	"sizetype\000"
+ 1170      74797065 
+ 1170      00
+ 1171              	.LASF11:
+ 1172 027e 6C6F6E67 		.ascii	"long long int\000"
+ 1172      206C6F6E 
+ 1172      6720696E 
+ 1172      7400
+ 1173              	.LASF49:
+ 1174 028c 5F6C765F 		.ascii	"_lv_font_struct\000"
+ 1174      666F6E74 
+ 1174      5F737472 
+ 1174      75637400 
+ 1175              	.LASF23:
+ 1176 029c 63686172 		.ascii	"char\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccZbKdR4.s 			page 25
+
+
+ 1176      00
+ 1177              	.LASF41:
+ 1178 02a1 6C765F66 		.ascii	"lv_font_get_glyph_bitmap\000"
+ 1178      6F6E745F 
+ 1178      6765745F 
+ 1178      676C7970 
+ 1178      685F6269 
+ 1179              	.LASF33:
+ 1180 02ba 62617365 		.ascii	"base_line\000"
+ 1180      5F6C696E 
+ 1180      6500
+ 1181              	.LASF39:
+ 1182 02c4 666F6E74 		.ascii	"font_p\000"
+ 1182      5F7000
+ 1183              	.LASF43:
+ 1184 02cb 6473635F 		.ascii	"dsc_out\000"
+ 1184      6F757400 
+ 1185              	.LASF17:
+ 1186 02d3 75696E74 		.ascii	"uint16_t\000"
+ 1186      31365F74 
+ 1186      00
+ 1187              	.LASF5:
+ 1188 02dc 73686F72 		.ascii	"short int\000"
+ 1188      7420696E 
+ 1188      7400
+ 1189              	.LASF18:
+ 1190 02e6 75696E74 		.ascii	"uint32_t\000"
+ 1190      33325F74 
+ 1190      00
+ 1191              	.LASF8:
+ 1192 02ef 6C6F6E67 		.ascii	"long int\000"
+ 1192      20696E74 
+ 1192      00
+ 1193              	.LASF21:
+ 1194 02f8 6C6F6E67 		.ascii	"long double\000"
+ 1194      20646F75 
+ 1194      626C6500 
+ 1195              	.LASF40:
+ 1196 0304 6C657474 		.ascii	"letter\000"
+ 1196      657200
+ 1197              	.LASF2:
+ 1198 030b 7369676E 		.ascii	"signed char\000"
+ 1198      65642063 
+ 1198      68617200 
+ 1199              	.LASF31:
+ 1200 0317 6765745F 		.ascii	"get_glyph_bitmap\000"
+ 1200      676C7970 
+ 1200      685F6269 
+ 1200      746D6170 
+ 1200      00
+ 1201              	.LASF37:
+ 1202 0328 5F426F6F 		.ascii	"_Bool\000"
+ 1202      6C00
+ 1203              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

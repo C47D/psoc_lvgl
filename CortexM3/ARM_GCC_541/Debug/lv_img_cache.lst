@@ -1,0 +1,3134 @@
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"lv_img_cache.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text._lv_img_cache_open,"ax",%progbits
+  20              		.align	2
+  21              		.global	_lv_img_cache_open
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	_lv_img_cache_open, %function
+  25              	_lv_img_cache_open:
+  26              	.LFB37:
+  27              		.file 1 "lvgl\\src\\lv_draw\\lv_img_cache.c"
+   1:lvgl\src\lv_draw/lv_img_cache.c **** /**
+   2:lvgl\src\lv_draw/lv_img_cache.c ****  * @file lv_img_cache.c
+   3:lvgl\src\lv_draw/lv_img_cache.c ****  *
+   4:lvgl\src\lv_draw/lv_img_cache.c ****  */
+   5:lvgl\src\lv_draw/lv_img_cache.c **** 
+   6:lvgl\src\lv_draw/lv_img_cache.c **** /*********************
+   7:lvgl\src\lv_draw/lv_img_cache.c ****  *      INCLUDES
+   8:lvgl\src\lv_draw/lv_img_cache.c ****  *********************/
+   9:lvgl\src\lv_draw/lv_img_cache.c **** #include "../lv_misc/lv_debug.h"
+  10:lvgl\src\lv_draw/lv_img_cache.c **** #include "lv_img_cache.h"
+  11:lvgl\src\lv_draw/lv_img_cache.c **** #include "lv_img_decoder.h"
+  12:lvgl\src\lv_draw/lv_img_cache.c **** #include "lv_draw_img.h"
+  13:lvgl\src\lv_draw/lv_img_cache.c **** #include "../lv_hal/lv_hal_tick.h"
+  14:lvgl\src\lv_draw/lv_img_cache.c **** #include "../lv_misc/lv_gc.h"
+  15:lvgl\src\lv_draw/lv_img_cache.c **** 
+  16:lvgl\src\lv_draw/lv_img_cache.c **** #if defined(LV_GC_INCLUDE)
+  17:lvgl\src\lv_draw/lv_img_cache.c ****     #include LV_GC_INCLUDE
+  18:lvgl\src\lv_draw/lv_img_cache.c **** #endif /* LV_ENABLE_GC */
+  19:lvgl\src\lv_draw/lv_img_cache.c **** /*********************
+  20:lvgl\src\lv_draw/lv_img_cache.c ****  *      DEFINES
+  21:lvgl\src\lv_draw/lv_img_cache.c ****  *********************/
+  22:lvgl\src\lv_draw/lv_img_cache.c **** /*Decrement life with this value in every open*/
+  23:lvgl\src\lv_draw/lv_img_cache.c **** #define LV_IMG_CACHE_AGING 1
+  24:lvgl\src\lv_draw/lv_img_cache.c **** 
+  25:lvgl\src\lv_draw/lv_img_cache.c **** /*Boost life by this factor (multiply time_to_open with this value)*/
+  26:lvgl\src\lv_draw/lv_img_cache.c **** #define LV_IMG_CACHE_LIFE_GAIN 1
+  27:lvgl\src\lv_draw/lv_img_cache.c **** 
+  28:lvgl\src\lv_draw/lv_img_cache.c **** /*Don't let life to be greater than this limit because it would require a lot of time to
+  29:lvgl\src\lv_draw/lv_img_cache.c ****  * "die" from very high values */
+  30:lvgl\src\lv_draw/lv_img_cache.c **** #define LV_IMG_CACHE_LIFE_LIMIT 1000
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 2
+
+
+  31:lvgl\src\lv_draw/lv_img_cache.c **** 
+  32:lvgl\src\lv_draw/lv_img_cache.c **** #if LV_IMG_CACHE_DEF_SIZE < 1
+  33:lvgl\src\lv_draw/lv_img_cache.c ****     #error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
+  34:lvgl\src\lv_draw/lv_img_cache.c **** #endif
+  35:lvgl\src\lv_draw/lv_img_cache.c **** 
+  36:lvgl\src\lv_draw/lv_img_cache.c **** /**********************
+  37:lvgl\src\lv_draw/lv_img_cache.c ****  *      TYPEDEFS
+  38:lvgl\src\lv_draw/lv_img_cache.c ****  **********************/
+  39:lvgl\src\lv_draw/lv_img_cache.c **** 
+  40:lvgl\src\lv_draw/lv_img_cache.c **** /**********************
+  41:lvgl\src\lv_draw/lv_img_cache.c ****  *  STATIC PROTOTYPES
+  42:lvgl\src\lv_draw/lv_img_cache.c ****  **********************/
+  43:lvgl\src\lv_draw/lv_img_cache.c **** 
+  44:lvgl\src\lv_draw/lv_img_cache.c **** /**********************
+  45:lvgl\src\lv_draw/lv_img_cache.c ****  *  STATIC VARIABLES
+  46:lvgl\src\lv_draw/lv_img_cache.c ****  **********************/
+  47:lvgl\src\lv_draw/lv_img_cache.c **** static uint16_t entry_cnt;
+  48:lvgl\src\lv_draw/lv_img_cache.c **** 
+  49:lvgl\src\lv_draw/lv_img_cache.c **** /**********************
+  50:lvgl\src\lv_draw/lv_img_cache.c ****  *      MACROS
+  51:lvgl\src\lv_draw/lv_img_cache.c ****  **********************/
+  52:lvgl\src\lv_draw/lv_img_cache.c **** 
+  53:lvgl\src\lv_draw/lv_img_cache.c **** /**********************
+  54:lvgl\src\lv_draw/lv_img_cache.c ****  *   GLOBAL FUNCTIONS
+  55:lvgl\src\lv_draw/lv_img_cache.c ****  **********************/
+  56:lvgl\src\lv_draw/lv_img_cache.c **** 
+  57:lvgl\src\lv_draw/lv_img_cache.c **** /**
+  58:lvgl\src\lv_draw/lv_img_cache.c ****  * Open an image using the image decoder interface and cache it.
+  59:lvgl\src\lv_draw/lv_img_cache.c ****  * The image will be left open meaning if the image decoder open callback allocated memory then it 
+  60:lvgl\src\lv_draw/lv_img_cache.c ****  * The image is closed if a new image is opened and the new image takes its place in the cache.
+  61:lvgl\src\lv_draw/lv_img_cache.c ****  * @param src source of the image. Path to file or pointer to an `lv_img_dsc_t` variable
+  62:lvgl\src\lv_draw/lv_img_cache.c ****  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
+  63:lvgl\src\lv_draw/lv_img_cache.c ****  * @return pointer to the cache entry or NULL if can open the image
+  64:lvgl\src\lv_draw/lv_img_cache.c ****  */
+  65:lvgl\src\lv_draw/lv_img_cache.c **** lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
+  66:lvgl\src\lv_draw/lv_img_cache.c **** {
+  28              		.loc 1 66 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 4, -24
+  36              		.cfi_offset 5, -20
+  37              		.cfi_offset 6, -16
+  38              		.cfi_offset 7, -12
+  39              		.cfi_offset 8, -8
+  40              		.cfi_offset 14, -4
+  67:lvgl\src\lv_draw/lv_img_cache.c ****     if(entry_cnt == 0) {
+  41              		.loc 1 67 0
+  42 0004 4D4B     		ldr	r3, .L27
+  43 0006 1F88     		ldrh	r7, [r3]
+  44 0008 002F     		cmp	r7, #0
+  45 000a 00F09180 		beq	.L18
+  68:lvgl\src\lv_draw/lv_img_cache.c ****         LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
+  69:lvgl\src\lv_draw/lv_img_cache.c ****         return NULL;
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 3
+
+
+  70:lvgl\src\lv_draw/lv_img_cache.c ****     }
+  71:lvgl\src\lv_draw/lv_img_cache.c **** 
+  72:lvgl\src\lv_draw/lv_img_cache.c ****     lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+  46              		.loc 1 72 0
+  47 000e 4C4B     		ldr	r3, .L27+4
+  48 0010 1E68     		ldr	r6, [r3]
+  49              	.LVL1:
+  73:lvgl\src\lv_draw/lv_img_cache.c **** 
+  74:lvgl\src\lv_draw/lv_img_cache.c ****     /*Decrement all lifes. Make the entries older*/
+  75:lvgl\src\lv_draw/lv_img_cache.c ****     uint16_t i;
+  76:lvgl\src\lv_draw/lv_img_cache.c ****     for(i = 0; i < entry_cnt; i++) {
+  50              		.loc 1 76 0
+  51 0012 0023     		movs	r3, #0
+  52 0014 0BE0     		b	.L3
+  53              	.LVL2:
+  54              	.L5:
+  77:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
+  55              		.loc 1 77 0
+  56 0016 03EBC305 		add	r5, r3, r3, lsl #3
+  57 001a AC00     		lsls	r4, r5, #2
+  58 001c 3444     		add	r4, r4, r6
+  59 001e 256A     		ldr	r5, [r4, #32]
+  60 0020 484A     		ldr	r2, .L27+8
+  61 0022 9542     		cmp	r5, r2
+  62 0024 01DB     		blt	.L4
+  78:lvgl\src\lv_draw/lv_img_cache.c ****             cache[i].life -= LV_IMG_CACHE_AGING;
+  63              		.loc 1 78 0
+  64 0026 013D     		subs	r5, r5, #1
+  65 0028 2562     		str	r5, [r4, #32]
+  66              	.L4:
+  76:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
+  67              		.loc 1 76 0 discriminator 2
+  68 002a 0133     		adds	r3, r3, #1
+  69              	.LVL3:
+  70 002c 9BB2     		uxth	r3, r3
+  71              	.LVL4:
+  72              	.L3:
+  76:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
+  73              		.loc 1 76 0 is_stmt 0 discriminator 1
+  74 002e BB42     		cmp	r3, r7
+  75 0030 F1D3     		bcc	.L5
+  76 0032 8846     		mov	r8, r1	@ movhi
+  77 0034 0746     		mov	r7, r0
+  78 0036 0024     		movs	r4, #0
+  79 0038 2FE0     		b	.L6
+  80              	.LVL5:
+  81              	.L11:
+  82              	.LBB2:
+  79:lvgl\src\lv_draw/lv_img_cache.c ****         }
+  80:lvgl\src\lv_draw/lv_img_cache.c ****     }
+  81:lvgl\src\lv_draw/lv_img_cache.c **** 
+  82:lvgl\src\lv_draw/lv_img_cache.c ****     /*Is the image cached?*/
+  83:lvgl\src\lv_draw/lv_img_cache.c ****     lv_img_cache_entry_t * cached_src = NULL;
+  84:lvgl\src\lv_draw/lv_img_cache.c ****     for(i = 0; i < entry_cnt; i++) {
+  85:lvgl\src\lv_draw/lv_img_cache.c ****         bool match = false;
+  86:lvgl\src\lv_draw/lv_img_cache.c ****         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
+  83              		.loc 1 86 0 is_stmt 1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 4
+
+
+  84 003a 04EBC403 		add	r3, r4, r4, lsl #3
+  85 003e 9800     		lsls	r0, r3, #2
+  86 0040 3518     		adds	r5, r6, r0
+  87 0042 6868     		ldr	r0, [r5, #4]
+  88 0044 FFF7FEFF 		bl	lv_img_src_get_type
+  89              	.LVL6:
+  87:lvgl\src\lv_draw/lv_img_cache.c ****         if(src_type == LV_IMG_SRC_VARIABLE) {
+  90              		.loc 1 87 0
+  91 0048 48B9     		cbnz	r0, .L7
+  88:lvgl\src\lv_draw/lv_img_cache.c ****             if(cache[i].dec_dsc.src == src && cache[i].dec_dsc.color.full == color.full) match = tr
+  92              		.loc 1 88 0
+  93 004a 6B68     		ldr	r3, [r5, #4]
+  94 004c BB42     		cmp	r3, r7
+  95 004e 0FD1     		bne	.L19
+  96              		.loc 1 88 0 is_stmt 0 discriminator 1
+  97 0050 2A89     		ldrh	r2, [r5, #8]
+  98 0052 1FFA88F3 		uxth	r3, r8
+  99 0056 9A42     		cmp	r2, r3
+ 100 0058 0CD0     		beq	.L20
+  85:lvgl\src\lv_draw/lv_img_cache.c ****         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
+ 101              		.loc 1 85 0 is_stmt 1
+ 102 005a 0023     		movs	r3, #0
+ 103 005c 0FE0     		b	.L8
+ 104              	.L7:
+  89:lvgl\src\lv_draw/lv_img_cache.c ****         }
+  90:lvgl\src\lv_draw/lv_img_cache.c ****         else if(src_type == LV_IMG_SRC_FILE) {
+ 105              		.loc 1 90 0
+ 106 005e 0128     		cmp	r0, #1
+ 107 0060 0AD1     		bne	.L21
+  91:lvgl\src\lv_draw/lv_img_cache.c ****             if(strcmp(cache[i].dec_dsc.src, src) == 0) match = true;
+ 108              		.loc 1 91 0
+ 109 0062 3946     		mov	r1, r7
+ 110 0064 6868     		ldr	r0, [r5, #4]
+ 111              	.LVL7:
+ 112 0066 FFF7FEFF 		bl	strcmp
+ 113              	.LVL8:
+ 114 006a 38B1     		cbz	r0, .L22
+  85:lvgl\src\lv_draw/lv_img_cache.c ****         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
+ 115              		.loc 1 85 0
+ 116 006c 0023     		movs	r3, #0
+ 117 006e 06E0     		b	.L8
+ 118              	.LVL9:
+ 119              	.L19:
+ 120 0070 0023     		movs	r3, #0
+ 121 0072 04E0     		b	.L8
+ 122              	.L20:
+  88:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 123              		.loc 1 88 0
+ 124 0074 0123     		movs	r3, #1
+ 125 0076 02E0     		b	.L8
+ 126              	.L21:
+  85:lvgl\src\lv_draw/lv_img_cache.c ****         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
+ 127              		.loc 1 85 0
+ 128 0078 0023     		movs	r3, #0
+ 129 007a 00E0     		b	.L8
+ 130              	.LVL10:
+ 131              	.L22:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 5
+
+
+ 132              		.loc 1 91 0
+ 133 007c 0123     		movs	r3, #1
+ 134              	.L8:
+ 135              	.LVL11:
+  92:lvgl\src\lv_draw/lv_img_cache.c ****         }
+  93:lvgl\src\lv_draw/lv_img_cache.c **** 
+  94:lvgl\src\lv_draw/lv_img_cache.c ****         if(match) {
+ 136              		.loc 1 94 0
+ 137 007e 53B1     		cbz	r3, .L9
+ 138              	.LVL12:
+  95:lvgl\src\lv_draw/lv_img_cache.c ****             /* If opened increment its life.
+  96:lvgl\src\lv_draw/lv_img_cache.c ****              * Image difficult to open should live longer to keep avoid frequent their recaching.
+  97:lvgl\src\lv_draw/lv_img_cache.c ****              * Therefore increase `life` with `time_to_open`*/
+  98:lvgl\src\lv_draw/lv_img_cache.c ****             cached_src = &cache[i];
+  99:lvgl\src\lv_draw/lv_img_cache.c ****             cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
+ 139              		.loc 1 99 0
+ 140 0080 6A69     		ldr	r2, [r5, #20]
+ 141 0082 2B6A     		ldr	r3, [r5, #32]
+ 142              	.LVL13:
+ 143 0084 1344     		add	r3, r3, r2
+ 144 0086 2B62     		str	r3, [r5, #32]
+ 100:lvgl\src\lv_draw/lv_img_cache.c ****             if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIM
+ 145              		.loc 1 100 0
+ 146 0088 B3F57A7F 		cmp	r3, #1000
+ 147 008c 0ADD     		ble	.L10
+ 148              		.loc 1 100 0 is_stmt 0 discriminator 1
+ 149 008e 4FF47A73 		mov	r3, #1000
+ 150 0092 2B62     		str	r3, [r5, #32]
+ 151 0094 06E0     		b	.L10
+ 152              	.LVL14:
+ 153              	.L9:
+ 154              	.LBE2:
+  84:lvgl\src\lv_draw/lv_img_cache.c ****         bool match = false;
+ 155              		.loc 1 84 0 is_stmt 1 discriminator 2
+ 156 0096 0134     		adds	r4, r4, #1
+ 157              	.LVL15:
+ 158 0098 A4B2     		uxth	r4, r4
+ 159              	.LVL16:
+ 160              	.L6:
+  84:lvgl\src\lv_draw/lv_img_cache.c ****         bool match = false;
+ 161              		.loc 1 84 0 is_stmt 0 discriminator 1
+ 162 009a 284B     		ldr	r3, .L27
+ 163 009c 1B88     		ldrh	r3, [r3]
+ 164 009e 9C42     		cmp	r4, r3
+ 165 00a0 CBD3     		bcc	.L11
+  83:lvgl\src\lv_draw/lv_img_cache.c ****     for(i = 0; i < entry_cnt; i++) {
+ 166              		.loc 1 83 0 is_stmt 1
+ 167 00a2 0025     		movs	r5, #0
+ 168              	.L10:
+ 169              	.LVL17:
+ 101:lvgl\src\lv_draw/lv_img_cache.c ****             LV_LOG_TRACE("image draw: image found in the cache");
+ 102:lvgl\src\lv_draw/lv_img_cache.c ****             break;
+ 103:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 104:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 105:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 106:lvgl\src\lv_draw/lv_img_cache.c ****     /*The image is not cached then cache it now*/
+ 107:lvgl\src\lv_draw/lv_img_cache.c ****     if(cached_src == NULL) {
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 6
+
+
+ 170              		.loc 1 107 0
+ 171 00a4 75B1     		cbz	r5, .L23
+ 172              	.LBB3:
+ 173 00a6 2846     		mov	r0, r5
+ 174 00a8 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 175              	.LVL18:
+ 176              	.L14:
+ 108:lvgl\src\lv_draw/lv_img_cache.c ****         /*Find an entry to reuse. Select the entry with the least life*/
+ 109:lvgl\src\lv_draw/lv_img_cache.c ****         cached_src = &cache[0];
+ 110:lvgl\src\lv_draw/lv_img_cache.c ****         for(i = 1; i < entry_cnt; i++) {
+ 111:lvgl\src\lv_draw/lv_img_cache.c ****             if(cache[i].life < cached_src->life) {
+ 177              		.loc 1 111 0
+ 178 00ac 03EBC301 		add	r1, r3, r3, lsl #3
+ 179 00b0 8A00     		lsls	r2, r1, #2
+ 180 00b2 3244     		add	r2, r2, r6
+ 181 00b4 106A     		ldr	r0, [r2, #32]
+ 182 00b6 216A     		ldr	r1, [r4, #32]
+ 183 00b8 8842     		cmp	r0, r1
+ 184 00ba 00DA     		bge	.L13
+ 112:lvgl\src\lv_draw/lv_img_cache.c ****                 cached_src = &cache[i];
+ 185              		.loc 1 112 0
+ 186 00bc 1446     		mov	r4, r2
+ 187              	.LVL19:
+ 188              	.L13:
+ 110:lvgl\src\lv_draw/lv_img_cache.c ****             if(cache[i].life < cached_src->life) {
+ 189              		.loc 1 110 0 discriminator 2
+ 190 00be 0133     		adds	r3, r3, #1
+ 191              	.LVL20:
+ 192 00c0 9BB2     		uxth	r3, r3
+ 193              	.LVL21:
+ 194 00c2 01E0     		b	.L12
+ 195              	.LVL22:
+ 196              	.L23:
+ 197              	.LBE3:
+ 198 00c4 3446     		mov	r4, r6
+ 199              	.LVL23:
+ 200 00c6 0123     		movs	r3, #1
+ 201              	.LVL24:
+ 202              	.L12:
+ 203              	.LBB4:
+ 110:lvgl\src\lv_draw/lv_img_cache.c ****             if(cache[i].life < cached_src->life) {
+ 204              		.loc 1 110 0 is_stmt 0 discriminator 1
+ 205 00c8 1C4A     		ldr	r2, .L27
+ 206 00ca 1288     		ldrh	r2, [r2]
+ 207 00cc 9342     		cmp	r3, r2
+ 208 00ce EDD3     		bcc	.L14
+ 113:lvgl\src\lv_draw/lv_img_cache.c ****             }
+ 114:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 115:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 116:lvgl\src\lv_draw/lv_img_cache.c ****         /*Close the decoder to reuse if it was opened (has a valid source)*/
+ 117:lvgl\src\lv_draw/lv_img_cache.c ****         if(cached_src->dec_dsc.src) {
+ 209              		.loc 1 117 0 is_stmt 1
+ 210 00d0 6368     		ldr	r3, [r4, #4]
+ 211              	.LVL25:
+ 212 00d2 13B1     		cbz	r3, .L15
+ 118:lvgl\src\lv_draw/lv_img_cache.c ****             lv_img_decoder_close(&cached_src->dec_dsc);
+ 213              		.loc 1 118 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 7
+
+
+ 214 00d4 2046     		mov	r0, r4
+ 215 00d6 FFF7FEFF 		bl	lv_img_decoder_close
+ 216              	.LVL26:
+ 217              	.L15:
+ 119:lvgl\src\lv_draw/lv_img_cache.c ****             LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
+ 120:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 121:lvgl\src\lv_draw/lv_img_cache.c ****         else {
+ 122:lvgl\src\lv_draw/lv_img_cache.c ****             LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
+ 123:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 124:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 125:lvgl\src\lv_draw/lv_img_cache.c ****         /*Open the image and measure the time to open*/
+ 126:lvgl\src\lv_draw/lv_img_cache.c ****         uint32_t t_start;
+ 127:lvgl\src\lv_draw/lv_img_cache.c ****         t_start                          = lv_tick_get();
+ 218              		.loc 1 127 0
+ 219 00da FFF7FEFF 		bl	lv_tick_get
+ 220              	.LVL27:
+ 221 00de 0546     		mov	r5, r0
+ 222              	.LVL28:
+ 128:lvgl\src\lv_draw/lv_img_cache.c ****         cached_src->dec_dsc.time_to_open = 0;
+ 223              		.loc 1 128 0
+ 224 00e0 0023     		movs	r3, #0
+ 225 00e2 6361     		str	r3, [r4, #20]
+ 129:lvgl\src\lv_draw/lv_img_cache.c ****         lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, color);
+ 226              		.loc 1 129 0
+ 227 00e4 4246     		mov	r2, r8	@ movhi
+ 228 00e6 3946     		mov	r1, r7
+ 229 00e8 2046     		mov	r0, r4
+ 230              	.LVL29:
+ 231 00ea FFF7FEFF 		bl	lv_img_decoder_open
+ 232              	.LVL30:
+ 130:lvgl\src\lv_draw/lv_img_cache.c ****         if(open_res == LV_RES_INV) {
+ 233              		.loc 1 130 0
+ 234 00ee 80B9     		cbnz	r0, .L16
+ 131:lvgl\src\lv_draw/lv_img_cache.c ****             LV_LOG_WARN("Image draw cannot open the image resource");
+ 132:lvgl\src\lv_draw/lv_img_cache.c ****             lv_img_decoder_close(&cached_src->dec_dsc);
+ 235              		.loc 1 132 0
+ 236 00f0 2046     		mov	r0, r4
+ 237              	.LVL31:
+ 238 00f2 FFF7FEFF 		bl	lv_img_decoder_close
+ 239              	.LVL32:
+ 133:lvgl\src\lv_draw/lv_img_cache.c ****             _lv_memset_00(&cached_src->dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ 240              		.loc 1 133 0
+ 241 00f6 2021     		movs	r1, #32
+ 242 00f8 2046     		mov	r0, r4
+ 243 00fa FFF7FEFF 		bl	_lv_memset_00
+ 244              	.LVL33:
+ 134:lvgl\src\lv_draw/lv_img_cache.c ****             _lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
+ 245              		.loc 1 134 0
+ 246 00fe 2421     		movs	r1, #36
+ 247 0100 2046     		mov	r0, r4
+ 248 0102 FFF7FEFF 		bl	_lv_memset_00
+ 249              	.LVL34:
+ 135:lvgl\src\lv_draw/lv_img_cache.c ****             cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
+ 250              		.loc 1 135 0
+ 251 0106 4FF00043 		mov	r3, #-2147483648
+ 252 010a 2362     		str	r3, [r4, #32]
+ 136:lvgl\src\lv_draw/lv_img_cache.c ****             return NULL;
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 8
+
+
+ 253              		.loc 1 136 0
+ 254 010c 0020     		movs	r0, #0
+ 255 010e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 256              	.LVL35:
+ 257              	.L16:
+ 137:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 138:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 139:lvgl\src\lv_draw/lv_img_cache.c ****         cached_src->life = 0;
+ 258              		.loc 1 139 0
+ 259 0112 0023     		movs	r3, #0
+ 260 0114 2362     		str	r3, [r4, #32]
+ 140:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 141:lvgl\src\lv_draw/lv_img_cache.c ****         /*If `time_to_open` was not set in the open function set it here*/
+ 142:lvgl\src\lv_draw/lv_img_cache.c ****         if(cached_src->dec_dsc.time_to_open == 0) {
+ 261              		.loc 1 142 0
+ 262 0116 6369     		ldr	r3, [r4, #20]
+ 263 0118 1BB9     		cbnz	r3, .L17
+ 143:lvgl\src\lv_draw/lv_img_cache.c ****             cached_src->dec_dsc.time_to_open = lv_tick_elaps(t_start);
+ 264              		.loc 1 143 0
+ 265 011a 2846     		mov	r0, r5
+ 266              	.LVL36:
+ 267 011c FFF7FEFF 		bl	lv_tick_elaps
+ 268              	.LVL37:
+ 269 0120 6061     		str	r0, [r4, #20]
+ 270              	.L17:
+ 144:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 145:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 146:lvgl\src\lv_draw/lv_img_cache.c ****         if(cached_src->dec_dsc.time_to_open == 0) cached_src->dec_dsc.time_to_open = 1;
+ 271              		.loc 1 146 0
+ 272 0122 6369     		ldr	r3, [r4, #20]
+ 273 0124 3BB9     		cbnz	r3, .L25
+ 274              		.loc 1 146 0 is_stmt 0 discriminator 1
+ 275 0126 0123     		movs	r3, #1
+ 276 0128 6361     		str	r3, [r4, #20]
+ 277 012a 2046     		mov	r0, r4
+ 278 012c BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 279              	.LVL38:
+ 280              	.L18:
+ 281              	.LBE4:
+  69:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 282              		.loc 1 69 0 is_stmt 1
+ 283 0130 0020     		movs	r0, #0
+ 284              	.LVL39:
+ 285 0132 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 286              	.LVL40:
+ 287              	.L25:
+ 288              	.LBB5:
+ 289 0136 2046     		mov	r0, r4
+ 290              	.LBE5:
+ 147:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 148:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 149:lvgl\src\lv_draw/lv_img_cache.c ****     return cached_src;
+ 150:lvgl\src\lv_draw/lv_img_cache.c **** }
+ 291              		.loc 1 150 0
+ 292 0138 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 293              	.LVL41:
+ 294              	.L28:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 9
+
+
+ 295              		.align	2
+ 296              	.L27:
+ 297 013c 00000000 		.word	.LANCHOR0
+ 298 0140 00000000 		.word	_lv_img_cache_array
+ 299 0144 02000080 		.word	-2147483646
+ 300              		.cfi_endproc
+ 301              	.LFE37:
+ 302              		.size	_lv_img_cache_open, .-_lv_img_cache_open
+ 303              		.section	.text.lv_img_cache_invalidate_src,"ax",%progbits
+ 304              		.align	2
+ 305              		.global	lv_img_cache_invalidate_src
+ 306              		.thumb
+ 307              		.thumb_func
+ 308              		.type	lv_img_cache_invalidate_src, %function
+ 309              	lv_img_cache_invalidate_src:
+ 310              	.LFB39:
+ 151:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 152:lvgl\src\lv_draw/lv_img_cache.c **** /**
+ 153:lvgl\src\lv_draw/lv_img_cache.c ****  * Set the number of images to be cached.
+ 154:lvgl\src\lv_draw/lv_img_cache.c ****  * More cached images mean more opened image at same time which might mean more memory usage.
+ 155:lvgl\src\lv_draw/lv_img_cache.c ****  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
+ 156:lvgl\src\lv_draw/lv_img_cache.c ****  * @param new_entry_cnt number of image to cache
+ 157:lvgl\src\lv_draw/lv_img_cache.c ****  */
+ 158:lvgl\src\lv_draw/lv_img_cache.c **** void lv_img_cache_set_size(uint16_t new_entry_cnt)
+ 159:lvgl\src\lv_draw/lv_img_cache.c **** {
+ 160:lvgl\src\lv_draw/lv_img_cache.c ****     if(LV_GC_ROOT(_lv_img_cache_array) != NULL) {
+ 161:lvgl\src\lv_draw/lv_img_cache.c ****         /*Clean the cache before free it*/
+ 162:lvgl\src\lv_draw/lv_img_cache.c ****         lv_img_cache_invalidate_src(NULL);
+ 163:lvgl\src\lv_draw/lv_img_cache.c ****         lv_mem_free(LV_GC_ROOT(_lv_img_cache_array));
+ 164:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 165:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 166:lvgl\src\lv_draw/lv_img_cache.c ****     /*Reallocate the cache*/
+ 167:lvgl\src\lv_draw/lv_img_cache.c ****     LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(lv_img_cache_entry_t) * new_entry_cnt);
+ 168:lvgl\src\lv_draw/lv_img_cache.c ****     LV_ASSERT_MEM(LV_GC_ROOT(_lv_img_cache_array));
+ 169:lvgl\src\lv_draw/lv_img_cache.c ****     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
+ 170:lvgl\src\lv_draw/lv_img_cache.c ****         entry_cnt = 0;
+ 171:lvgl\src\lv_draw/lv_img_cache.c ****         return;
+ 172:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 173:lvgl\src\lv_draw/lv_img_cache.c ****     entry_cnt = new_entry_cnt;
+ 174:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 175:lvgl\src\lv_draw/lv_img_cache.c ****     /*Clean the cache*/
+ 176:lvgl\src\lv_draw/lv_img_cache.c ****     uint16_t i;
+ 177:lvgl\src\lv_draw/lv_img_cache.c ****     for(i = 0; i < entry_cnt; i++) {
+ 178:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ 179:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i], sizeof(lv_img_cache_entry_t));
+ 180:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 181:lvgl\src\lv_draw/lv_img_cache.c **** }
+ 182:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 183:lvgl\src\lv_draw/lv_img_cache.c **** /**
+ 184:lvgl\src\lv_draw/lv_img_cache.c ****  * Invalidate an image source in the cache.
+ 185:lvgl\src\lv_draw/lv_img_cache.c ****  * Useful if the image source is updated therefore it needs to be cached again.
+ 186:lvgl\src\lv_draw/lv_img_cache.c ****  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
+ 187:lvgl\src\lv_draw/lv_img_cache.c ****  */
+ 188:lvgl\src\lv_draw/lv_img_cache.c **** void lv_img_cache_invalidate_src(const void * src)
+ 189:lvgl\src\lv_draw/lv_img_cache.c **** {
+ 311              		.loc 1 189 0
+ 312              		.cfi_startproc
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 10
+
+
+ 313              		@ args = 0, pretend = 0, frame = 0
+ 314              		@ frame_needed = 0, uses_anonymous_args = 0
+ 315              	.LVL42:
+ 316 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 317              		.cfi_def_cfa_offset 24
+ 318              		.cfi_offset 3, -24
+ 319              		.cfi_offset 4, -20
+ 320              		.cfi_offset 5, -16
+ 321              		.cfi_offset 6, -12
+ 322              		.cfi_offset 7, -8
+ 323              		.cfi_offset 14, -4
+ 324 0002 0646     		mov	r6, r0
+ 190:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 191:lvgl\src\lv_draw/lv_img_cache.c ****     lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+ 325              		.loc 1 191 0
+ 326 0004 0F4B     		ldr	r3, .L36
+ 327 0006 1F68     		ldr	r7, [r3]
+ 328              	.LVL43:
+ 192:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 193:lvgl\src\lv_draw/lv_img_cache.c ****     uint16_t i;
+ 194:lvgl\src\lv_draw/lv_img_cache.c ****     for(i = 0; i < entry_cnt; i++) {
+ 329              		.loc 1 194 0
+ 330 0008 0024     		movs	r4, #0
+ 331 000a 15E0     		b	.L30
+ 332              	.LVL44:
+ 333              	.L34:
+ 195:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].dec_dsc.src == src || src == NULL) {
+ 334              		.loc 1 195 0
+ 335 000c 04EBC403 		add	r3, r4, r4, lsl #3
+ 336 0010 9800     		lsls	r0, r3, #2
+ 337 0012 3D18     		adds	r5, r7, r0
+ 338 0014 6B68     		ldr	r3, [r5, #4]
+ 339 0016 B342     		cmp	r3, r6
+ 340 0018 00D0     		beq	.L31
+ 341              		.loc 1 195 0 is_stmt 0 discriminator 1
+ 342 001a 5EB9     		cbnz	r6, .L32
+ 343              	.L31:
+ 196:lvgl\src\lv_draw/lv_img_cache.c ****             if(cache[i].dec_dsc.src != NULL) {
+ 344              		.loc 1 196 0 is_stmt 1
+ 345 001c 13B1     		cbz	r3, .L33
+ 197:lvgl\src\lv_draw/lv_img_cache.c ****                 lv_img_decoder_close(&cache[i].dec_dsc);
+ 346              		.loc 1 197 0
+ 347 001e 2846     		mov	r0, r5
+ 348 0020 FFF7FEFF 		bl	lv_img_decoder_close
+ 349              	.LVL45:
+ 350              	.L33:
+ 198:lvgl\src\lv_draw/lv_img_cache.c ****             }
+ 199:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 200:lvgl\src\lv_draw/lv_img_cache.c ****             _lv_memset_00(&cache[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ 351              		.loc 1 200 0
+ 352 0024 2021     		movs	r1, #32
+ 353 0026 2846     		mov	r0, r5
+ 354 0028 FFF7FEFF 		bl	_lv_memset_00
+ 355              	.LVL46:
+ 201:lvgl\src\lv_draw/lv_img_cache.c ****             _lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
+ 356              		.loc 1 201 0
+ 357 002c 2421     		movs	r1, #36
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 11
+
+
+ 358 002e 2846     		mov	r0, r5
+ 359 0030 FFF7FEFF 		bl	_lv_memset_00
+ 360              	.LVL47:
+ 361              	.L32:
+ 194:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].dec_dsc.src == src || src == NULL) {
+ 362              		.loc 1 194 0 discriminator 2
+ 363 0034 0134     		adds	r4, r4, #1
+ 364              	.LVL48:
+ 365 0036 A4B2     		uxth	r4, r4
+ 366              	.LVL49:
+ 367              	.L30:
+ 194:lvgl\src\lv_draw/lv_img_cache.c ****         if(cache[i].dec_dsc.src == src || src == NULL) {
+ 368              		.loc 1 194 0 is_stmt 0 discriminator 1
+ 369 0038 034B     		ldr	r3, .L36+4
+ 370 003a 1B88     		ldrh	r3, [r3]
+ 371 003c 9C42     		cmp	r4, r3
+ 372 003e E5D3     		bcc	.L34
+ 202:lvgl\src\lv_draw/lv_img_cache.c ****         }
+ 203:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 204:lvgl\src\lv_draw/lv_img_cache.c **** }
+ 373              		.loc 1 204 0 is_stmt 1
+ 374 0040 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 375              	.LVL50:
+ 376              	.L37:
+ 377 0042 00BF     		.align	2
+ 378              	.L36:
+ 379 0044 00000000 		.word	_lv_img_cache_array
+ 380 0048 00000000 		.word	.LANCHOR0
+ 381              		.cfi_endproc
+ 382              	.LFE39:
+ 383              		.size	lv_img_cache_invalidate_src, .-lv_img_cache_invalidate_src
+ 384              		.section	.text.lv_img_cache_set_size,"ax",%progbits
+ 385              		.align	2
+ 386              		.global	lv_img_cache_set_size
+ 387              		.thumb
+ 388              		.thumb_func
+ 389              		.type	lv_img_cache_set_size, %function
+ 390              	lv_img_cache_set_size:
+ 391              	.LFB38:
+ 159:lvgl\src\lv_draw/lv_img_cache.c ****     if(LV_GC_ROOT(_lv_img_cache_array) != NULL) {
+ 392              		.loc 1 159 0
+ 393              		.cfi_startproc
+ 394              		@ args = 0, pretend = 0, frame = 0
+ 395              		@ frame_needed = 0, uses_anonymous_args = 0
+ 396              	.LVL51:
+ 397 0000 70B5     		push	{r4, r5, r6, lr}
+ 398              		.cfi_def_cfa_offset 16
+ 399              		.cfi_offset 4, -16
+ 400              		.cfi_offset 5, -12
+ 401              		.cfi_offset 6, -8
+ 402              		.cfi_offset 14, -4
+ 403 0002 0446     		mov	r4, r0
+ 160:lvgl\src\lv_draw/lv_img_cache.c ****         /*Clean the cache before free it*/
+ 404              		.loc 1 160 0
+ 405 0004 1D4B     		ldr	r3, .L47
+ 406 0006 1B68     		ldr	r3, [r3]
+ 407 0008 33B1     		cbz	r3, .L39
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 12
+
+
+ 162:lvgl\src\lv_draw/lv_img_cache.c ****         lv_mem_free(LV_GC_ROOT(_lv_img_cache_array));
+ 408              		.loc 1 162 0
+ 409 000a 0020     		movs	r0, #0
+ 410              	.LVL52:
+ 411 000c FFF7FEFF 		bl	lv_img_cache_invalidate_src
+ 412              	.LVL53:
+ 163:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 413              		.loc 1 163 0
+ 414 0010 1A4B     		ldr	r3, .L47
+ 415 0012 1868     		ldr	r0, [r3]
+ 416 0014 FFF7FEFF 		bl	lv_mem_free
+ 417              	.LVL54:
+ 418              	.L39:
+ 167:lvgl\src\lv_draw/lv_img_cache.c ****     LV_ASSERT_MEM(LV_GC_ROOT(_lv_img_cache_array));
+ 419              		.loc 1 167 0
+ 420 0018 04EBC403 		add	r3, r4, r4, lsl #3
+ 421 001c 9800     		lsls	r0, r3, #2
+ 422 001e FFF7FEFF 		bl	lv_mem_alloc
+ 423              	.LVL55:
+ 424 0022 164B     		ldr	r3, .L47
+ 425 0024 1860     		str	r0, [r3]
+ 168:lvgl\src\lv_draw/lv_img_cache.c ****     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
+ 426              		.loc 1 168 0
+ 427 0026 FFF7FEFF 		bl	lv_debug_check_null
+ 428              	.LVL56:
+ 429 002a 30B9     		cbnz	r0, .L40
+ 168:lvgl\src\lv_draw/lv_img_cache.c ****     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
+ 430              		.loc 1 168 0 is_stmt 0 discriminator 1
+ 431 002c 134B     		ldr	r3, .L47
+ 432 002e 1A68     		ldr	r2, [r3]
+ 433 0030 0023     		movs	r3, #0
+ 434 0032 1348     		ldr	r0, .L47+4
+ 435 0034 FFF7FEFF 		bl	lv_debug_log_error
+ 436              	.LVL57:
+ 437              	.L41:
+ 438 0038 FEE7     		b	.L41
+ 439              	.L40:
+ 169:lvgl\src\lv_draw/lv_img_cache.c ****         entry_cnt = 0;
+ 440              		.loc 1 169 0 is_stmt 1
+ 441 003a 104B     		ldr	r3, .L47
+ 442 003c 1B68     		ldr	r3, [r3]
+ 443 003e 1BB9     		cbnz	r3, .L42
+ 170:lvgl\src\lv_draw/lv_img_cache.c ****         return;
+ 444              		.loc 1 170 0
+ 445 0040 0022     		movs	r2, #0
+ 446 0042 104B     		ldr	r3, .L47+8
+ 447 0044 1A80     		strh	r2, [r3]	@ movhi
+ 171:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 448              		.loc 1 171 0
+ 449 0046 70BD     		pop	{r4, r5, r6, pc}
+ 450              	.L42:
+ 173:lvgl\src\lv_draw/lv_img_cache.c **** 
+ 451              		.loc 1 173 0
+ 452 0048 0E4B     		ldr	r3, .L47+8
+ 453 004a 1C80     		strh	r4, [r3]	@ movhi
+ 454              	.LVL58:
+ 177:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 13
+
+
+ 455              		.loc 1 177 0
+ 456 004c 0024     		movs	r4, #0
+ 457 004e 0FE0     		b	.L44
+ 458              	.LVL59:
+ 459              	.L45:
+ 178:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i], sizeof(lv_img_cache_entry_t));
+ 460              		.loc 1 178 0 discriminator 3
+ 461 0050 04EBC403 		add	r3, r4, r4, lsl #3
+ 462 0054 9D00     		lsls	r5, r3, #2
+ 463 0056 094E     		ldr	r6, .L47
+ 464 0058 3068     		ldr	r0, [r6]
+ 465 005a 2021     		movs	r1, #32
+ 466 005c 2844     		add	r0, r0, r5
+ 467 005e FFF7FEFF 		bl	_lv_memset_00
+ 468              	.LVL60:
+ 179:lvgl\src\lv_draw/lv_img_cache.c ****     }
+ 469              		.loc 1 179 0 discriminator 3
+ 470 0062 3068     		ldr	r0, [r6]
+ 471 0064 2421     		movs	r1, #36
+ 472 0066 2844     		add	r0, r0, r5
+ 473 0068 FFF7FEFF 		bl	_lv_memset_00
+ 474              	.LVL61:
+ 177:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ 475              		.loc 1 177 0 discriminator 3
+ 476 006c 0134     		adds	r4, r4, #1
+ 477              	.LVL62:
+ 478 006e A4B2     		uxth	r4, r4
+ 479              	.LVL63:
+ 480              	.L44:
+ 177:lvgl\src\lv_draw/lv_img_cache.c ****         _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+ 481              		.loc 1 177 0 is_stmt 0 discriminator 1
+ 482 0070 044B     		ldr	r3, .L47+8
+ 483 0072 1B88     		ldrh	r3, [r3]
+ 484 0074 9C42     		cmp	r4, r3
+ 485 0076 EBD3     		bcc	.L45
+ 486 0078 70BD     		pop	{r4, r5, r6, pc}
+ 487              	.LVL64:
+ 488              	.L48:
+ 489 007a 00BF     		.align	2
+ 490              	.L47:
+ 491 007c 00000000 		.word	_lv_img_cache_array
+ 492 0080 00000000 		.word	.LC0
+ 493 0084 00000000 		.word	.LANCHOR0
+ 494              		.cfi_endproc
+ 495              	.LFE38:
+ 496              		.size	lv_img_cache_set_size, .-lv_img_cache_set_size
+ 497              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 498              		.align	2
+ 499              	.LC0:
+ 500 0000 4F757420 		.ascii	"Out of memory\000"
+ 500      6F66206D 
+ 500      656D6F72 
+ 500      7900
+ 501              		.bss
+ 502              		.align	1
+ 503              		.set	.LANCHOR0,. + 0
+ 504              		.type	entry_cnt, %object
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 14
+
+
+ 505              		.size	entry_cnt, 2
+ 506              	entry_cnt:
+ 507 0000 0000     		.space	2
+ 508              		.text
+ 509              	.Letext0:
+ 510              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 511              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 512              		.file 4 "lvgl\\src\\lv_draw\\../lv_misc/../../../lv_conf.h"
+ 513              		.file 5 "lvgl\\src\\lv_draw\\../lv_misc/lv_color.h"
+ 514              		.file 6 "lvgl\\src\\lv_draw\\../lv_misc/lv_types.h"
+ 515              		.file 7 "lvgl\\src\\lv_draw\\lv_img_buf.h"
+ 516              		.file 8 "lvgl\\src\\lv_draw\\lv_img_decoder.h"
+ 517              		.file 9 "lvgl\\src\\lv_draw\\lv_img_cache.h"
+ 518              		.file 10 "lvgl\\src\\lv_draw\\lv_draw_img.h"
+ 519              		.file 11 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4
+ 520              		.file 12 "lvgl\\src\\lv_draw\\../lv_hal/lv_hal_tick.h"
+ 521              		.file 13 "lvgl\\src\\lv_draw\\../lv_misc/lv_mem.h"
+ 522              		.file 14 "lvgl\\src\\lv_draw\\../lv_misc/lv_debug.h"
+ 523              		.file 15 "lvgl\\src\\lv_draw\\../lv_misc/lv_gc.h"
+ 524              		.section	.debug_info,"",%progbits
+ 525              	.Ldebug_info0:
+ 526 0000 74070000 		.4byte	0x774
+ 527 0004 0400     		.2byte	0x4
+ 528 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 529 000a 04       		.byte	0x4
+ 530 000b 01       		.uleb128 0x1
+ 531 000c CB040000 		.4byte	.LASF89
+ 532 0010 0C       		.byte	0xc
+ 533 0011 6A000000 		.4byte	.LASF90
+ 534 0015 B5030000 		.4byte	.LASF91
+ 535 0019 20000000 		.4byte	.Ldebug_ranges0+0x20
+ 536 001d 00000000 		.4byte	0
+ 537 0021 00000000 		.4byte	.Ldebug_line0
+ 538 0025 02       		.uleb128 0x2
+ 539 0026 01       		.byte	0x1
+ 540 0027 06       		.byte	0x6
+ 541 0028 75020000 		.4byte	.LASF0
+ 542 002c 03       		.uleb128 0x3
+ 543 002d 86050000 		.4byte	.LASF2
+ 544 0031 02       		.byte	0x2
+ 545 0032 1D       		.byte	0x1d
+ 546 0033 37000000 		.4byte	0x37
+ 547 0037 02       		.uleb128 0x2
+ 548 0038 01       		.byte	0x1
+ 549 0039 08       		.byte	0x8
+ 550 003a 62020000 		.4byte	.LASF1
+ 551 003e 03       		.uleb128 0x3
+ 552 003f 60040000 		.4byte	.LASF3
+ 553 0043 02       		.byte	0x2
+ 554 0044 29       		.byte	0x29
+ 555 0045 49000000 		.4byte	0x49
+ 556 0049 02       		.uleb128 0x2
+ 557 004a 02       		.byte	0x2
+ 558 004b 05       		.byte	0x5
+ 559 004c 60000000 		.4byte	.LASF4
+ 560 0050 03       		.uleb128 0x3
+ 561 0051 EB000000 		.4byte	.LASF5
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 15
+
+
+ 562 0055 02       		.byte	0x2
+ 563 0056 2B       		.byte	0x2b
+ 564 0057 5B000000 		.4byte	0x5b
+ 565 005b 02       		.uleb128 0x2
+ 566 005c 02       		.byte	0x2
+ 567 005d 07       		.byte	0x7
+ 568 005e 3F030000 		.4byte	.LASF6
+ 569 0062 03       		.uleb128 0x3
+ 570 0063 35030000 		.4byte	.LASF7
+ 571 0067 02       		.byte	0x2
+ 572 0068 3F       		.byte	0x3f
+ 573 0069 6D000000 		.4byte	0x6d
+ 574 006d 02       		.uleb128 0x2
+ 575 006e 04       		.byte	0x4
+ 576 006f 05       		.byte	0x5
+ 577 0070 FA010000 		.4byte	.LASF8
+ 578 0074 03       		.uleb128 0x3
+ 579 0075 22040000 		.4byte	.LASF9
+ 580 0079 02       		.byte	0x2
+ 581 007a 41       		.byte	0x41
+ 582 007b 7F000000 		.4byte	0x7f
+ 583 007f 02       		.uleb128 0x2
+ 584 0080 04       		.byte	0x4
+ 585 0081 07       		.byte	0x7
+ 586 0082 C7020000 		.4byte	.LASF10
+ 587 0086 02       		.uleb128 0x2
+ 588 0087 08       		.byte	0x8
+ 589 0088 05       		.byte	0x5
+ 590 0089 AA010000 		.4byte	.LASF11
+ 591 008d 03       		.uleb128 0x3
+ 592 008e 7E030000 		.4byte	.LASF12
+ 593 0092 02       		.byte	0x2
+ 594 0093 5B       		.byte	0x5b
+ 595 0094 98000000 		.4byte	0x98
+ 596 0098 02       		.uleb128 0x2
+ 597 0099 08       		.byte	0x8
+ 598 009a 07       		.byte	0x7
+ 599 009b 8A020000 		.4byte	.LASF13
+ 600 009f 04       		.uleb128 0x4
+ 601 00a0 04       		.byte	0x4
+ 602 00a1 05       		.byte	0x5
+ 603 00a2 696E7400 		.ascii	"int\000"
+ 604 00a6 03       		.uleb128 0x3
+ 605 00a7 A1030000 		.4byte	.LASF14
+ 606 00ab 02       		.byte	0x2
+ 607 00ac CA       		.byte	0xca
+ 608 00ad B1000000 		.4byte	0xb1
+ 609 00b1 02       		.uleb128 0x2
+ 610 00b2 04       		.byte	0x4
+ 611 00b3 07       		.byte	0x7
+ 612 00b4 59050000 		.4byte	.LASF15
+ 613 00b8 03       		.uleb128 0x3
+ 614 00b9 30010000 		.4byte	.LASF16
+ 615 00bd 03       		.byte	0x3
+ 616 00be 18       		.byte	0x18
+ 617 00bf 2C000000 		.4byte	0x2c
+ 618 00c3 03       		.uleb128 0x3
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 16
+
+
+ 619 00c4 52030000 		.4byte	.LASF17
+ 620 00c8 03       		.byte	0x3
+ 621 00c9 20       		.byte	0x20
+ 622 00ca 3E000000 		.4byte	0x3e
+ 623 00ce 03       		.uleb128 0x3
+ 624 00cf BE020000 		.4byte	.LASF18
+ 625 00d3 03       		.byte	0x3
+ 626 00d4 24       		.byte	0x24
+ 627 00d5 50000000 		.4byte	0x50
+ 628 00d9 03       		.uleb128 0x3
+ 629 00da 1F030000 		.4byte	.LASF19
+ 630 00de 03       		.byte	0x3
+ 631 00df 2C       		.byte	0x2c
+ 632 00e0 62000000 		.4byte	0x62
+ 633 00e4 03       		.uleb128 0x3
+ 634 00e5 A1020000 		.4byte	.LASF20
+ 635 00e9 03       		.byte	0x3
+ 636 00ea 30       		.byte	0x30
+ 637 00eb 74000000 		.4byte	0x74
+ 638 00ef 03       		.uleb128 0x3
+ 639 00f0 81020000 		.4byte	.LASF21
+ 640 00f4 03       		.byte	0x3
+ 641 00f5 3C       		.byte	0x3c
+ 642 00f6 8D000000 		.4byte	0x8d
+ 643 00fa 03       		.uleb128 0x3
+ 644 00fb 38010000 		.4byte	.LASF22
+ 645 00ff 03       		.byte	0x3
+ 646 0100 48       		.byte	0x48
+ 647 0101 A6000000 		.4byte	0xa6
+ 648 0105 03       		.uleb128 0x3
+ 649 0106 6A040000 		.4byte	.LASF23
+ 650 010a 04       		.byte	0x4
+ 651 010b 46       		.byte	0x46
+ 652 010c C3000000 		.4byte	0xc3
+ 653 0110 05       		.uleb128 0x5
+ 654 0111 04       		.byte	0x4
+ 655 0112 03       		.uleb128 0x3
+ 656 0113 3B020000 		.4byte	.LASF24
+ 657 0117 04       		.byte	0x4
+ 658 0118 EA       		.byte	0xea
+ 659 0119 10010000 		.4byte	0x110
+ 660 011d 06       		.uleb128 0x6
+ 661 011e 02       		.byte	0x2
+ 662 011f 05       		.byte	0x5
+ 663 0120 EA       		.byte	0xea
+ 664 0121 62010000 		.4byte	0x162
+ 665 0125 07       		.uleb128 0x7
+ 666 0126 99030000 		.4byte	.LASF25
+ 667 012a 05       		.byte	0x5
+ 668 012b F0       		.byte	0xf0
+ 669 012c CE000000 		.4byte	0xce
+ 670 0130 02       		.byte	0x2
+ 671 0131 03       		.byte	0x3
+ 672 0132 0D       		.byte	0xd
+ 673 0133 00       		.byte	0
+ 674 0134 08       		.uleb128 0x8
+ 675 0135 72656400 		.ascii	"red\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 17
+
+
+ 676 0139 05       		.byte	0x5
+ 677 013a F1       		.byte	0xf1
+ 678 013b CE000000 		.4byte	0xce
+ 679 013f 02       		.byte	0x2
+ 680 0140 05       		.byte	0x5
+ 681 0141 08       		.byte	0x8
+ 682 0142 00       		.byte	0
+ 683 0143 07       		.uleb128 0x7
+ 684 0144 0E010000 		.4byte	.LASF26
+ 685 0148 05       		.byte	0x5
+ 686 0149 F2       		.byte	0xf2
+ 687 014a CE000000 		.4byte	0xce
+ 688 014e 02       		.byte	0x2
+ 689 014f 05       		.byte	0x5
+ 690 0150 03       		.byte	0x3
+ 691 0151 00       		.byte	0
+ 692 0152 07       		.uleb128 0x7
+ 693 0153 AD030000 		.4byte	.LASF27
+ 694 0157 05       		.byte	0x5
+ 695 0158 F3       		.byte	0xf3
+ 696 0159 CE000000 		.4byte	0xce
+ 697 015d 02       		.byte	0x2
+ 698 015e 03       		.byte	0x3
+ 699 015f 00       		.byte	0
+ 700 0160 00       		.byte	0
+ 701 0161 00       		.byte	0
+ 702 0162 09       		.uleb128 0x9
+ 703 0163 02       		.byte	0x2
+ 704 0164 05       		.byte	0x5
+ 705 0165 E9       		.byte	0xe9
+ 706 0166 80010000 		.4byte	0x180
+ 707 016a 0A       		.uleb128 0xa
+ 708 016b 636800   		.ascii	"ch\000"
+ 709 016e 05       		.byte	0x5
+ 710 016f F5       		.byte	0xf5
+ 711 0170 1D010000 		.4byte	0x11d
+ 712 0174 0B       		.uleb128 0xb
+ 713 0175 70020000 		.4byte	.LASF28
+ 714 0179 05       		.byte	0x5
+ 715 017a F6       		.byte	0xf6
+ 716 017b CE000000 		.4byte	0xce
+ 717 017f 00       		.byte	0
+ 718 0180 03       		.uleb128 0x3
+ 719 0181 5F010000 		.4byte	.LASF29
+ 720 0185 05       		.byte	0x5
+ 721 0186 F7       		.byte	0xf7
+ 722 0187 62010000 		.4byte	0x162
+ 723 018b 0C       		.uleb128 0xc
+ 724 018c B3020000 		.4byte	.LASF30
+ 725 0190 05       		.byte	0x5
+ 726 0191 0D01     		.2byte	0x10d
+ 727 0193 80010000 		.4byte	0x180
+ 728 0197 02       		.uleb128 0x2
+ 729 0198 08       		.byte	0x8
+ 730 0199 04       		.byte	0x4
+ 731 019a 56020000 		.4byte	.LASF31
+ 732 019e 02       		.uleb128 0x2
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 18
+
+
+ 733 019f 04       		.byte	0x4
+ 734 01a0 07       		.byte	0x7
+ 735 01a1 8A000000 		.4byte	.LASF32
+ 736 01a5 02       		.uleb128 0x2
+ 737 01a6 01       		.byte	0x1
+ 738 01a7 08       		.byte	0x8
+ 739 01a8 1A030000 		.4byte	.LASF33
+ 740 01ac 0D       		.uleb128 0xd
+ 741 01ad 04       		.byte	0x4
+ 742 01ae B2010000 		.4byte	0x1b2
+ 743 01b2 0E       		.uleb128 0xe
+ 744 01b3 A5010000 		.4byte	0x1a5
+ 745 01b7 0F       		.uleb128 0xf
+ 746 01b8 01       		.byte	0x1
+ 747 01b9 37000000 		.4byte	0x37
+ 748 01bd 06       		.byte	0x6
+ 749 01be 2F       		.byte	0x2f
+ 750 01bf D0010000 		.4byte	0x1d0
+ 751 01c3 10       		.uleb128 0x10
+ 752 01c4 7B050000 		.4byte	.LASF34
+ 753 01c8 00       		.byte	0
+ 754 01c9 10       		.uleb128 0x10
+ 755 01ca 74030000 		.4byte	.LASF35
+ 756 01ce 01       		.byte	0x1
+ 757 01cf 00       		.byte	0
+ 758 01d0 03       		.uleb128 0x3
+ 759 01d1 B8010000 		.4byte	.LASF36
+ 760 01d5 06       		.byte	0x6
+ 761 01d6 34       		.byte	0x34
+ 762 01d7 B8000000 		.4byte	0xb8
+ 763 01db 06       		.uleb128 0x6
+ 764 01dc 04       		.byte	0x4
+ 765 01dd 07       		.byte	0x7
+ 766 01de 7E       		.byte	0x7e
+ 767 01df 2A020000 		.4byte	0x22a
+ 768 01e3 08       		.uleb128 0x8
+ 769 01e4 636600   		.ascii	"cf\000"
+ 770 01e7 07       		.byte	0x7
+ 771 01e8 80       		.byte	0x80
+ 772 01e9 E4000000 		.4byte	0xe4
+ 773 01ed 04       		.byte	0x4
+ 774 01ee 05       		.byte	0x5
+ 775 01ef 1B       		.byte	0x1b
+ 776 01f0 00       		.byte	0
+ 777 01f1 07       		.uleb128 0x7
+ 778 01f2 6C010000 		.4byte	.LASF37
+ 779 01f6 07       		.byte	0x7
+ 780 01f7 81       		.byte	0x81
+ 781 01f8 E4000000 		.4byte	0xe4
+ 782 01fc 04       		.byte	0x4
+ 783 01fd 03       		.byte	0x3
+ 784 01fe 18       		.byte	0x18
+ 785 01ff 00       		.byte	0
+ 786 0200 07       		.uleb128 0x7
+ 787 0201 66050000 		.4byte	.LASF38
+ 788 0205 07       		.byte	0x7
+ 789 0206 84       		.byte	0x84
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 19
+
+
+ 790 0207 E4000000 		.4byte	0xe4
+ 791 020b 04       		.byte	0x4
+ 792 020c 02       		.byte	0x2
+ 793 020d 16       		.byte	0x16
+ 794 020e 00       		.byte	0
+ 795 020f 08       		.uleb128 0x8
+ 796 0210 7700     		.ascii	"w\000"
+ 797 0212 07       		.byte	0x7
+ 798 0213 86       		.byte	0x86
+ 799 0214 E4000000 		.4byte	0xe4
+ 800 0218 04       		.byte	0x4
+ 801 0219 0B       		.byte	0xb
+ 802 021a 0B       		.byte	0xb
+ 803 021b 00       		.byte	0
+ 804 021c 08       		.uleb128 0x8
+ 805 021d 6800     		.ascii	"h\000"
+ 806 021f 07       		.byte	0x7
+ 807 0220 87       		.byte	0x87
+ 808 0221 E4000000 		.4byte	0xe4
+ 809 0225 04       		.byte	0x4
+ 810 0226 0B       		.byte	0xb
+ 811 0227 00       		.byte	0
+ 812 0228 00       		.byte	0
+ 813 0229 00       		.byte	0
+ 814 022a 03       		.uleb128 0x3
+ 815 022b E6020000 		.4byte	.LASF39
+ 816 022f 07       		.byte	0x7
+ 817 0230 88       		.byte	0x88
+ 818 0231 DB010000 		.4byte	0x1db
+ 819 0235 0D       		.uleb128 0xd
+ 820 0236 04       		.byte	0x4
+ 821 0237 3B020000 		.4byte	0x23b
+ 822 023b 0E       		.uleb128 0xe
+ 823 023c B8000000 		.4byte	0xb8
+ 824 0240 0D       		.uleb128 0xd
+ 825 0241 04       		.byte	0x4
+ 826 0242 46020000 		.4byte	0x246
+ 827 0246 11       		.uleb128 0x11
+ 828 0247 02       		.uleb128 0x2
+ 829 0248 01       		.byte	0x1
+ 830 0249 02       		.byte	0x2
+ 831 024a 5A030000 		.4byte	.LASF40
+ 832 024e 0D       		.uleb128 0xd
+ 833 024f 04       		.byte	0x4
+ 834 0250 B8000000 		.4byte	0xb8
+ 835 0254 0F       		.uleb128 0xf
+ 836 0255 01       		.byte	0x1
+ 837 0256 37000000 		.4byte	0x37
+ 838 025a 08       		.byte	0x8
+ 839 025b 23       		.byte	0x23
+ 840 025c 79020000 		.4byte	0x279
+ 841 0260 10       		.uleb128 0x10
+ 842 0261 D7000000 		.4byte	.LASF41
+ 843 0265 00       		.byte	0
+ 844 0266 10       		.uleb128 0x10
+ 845 0267 89030000 		.4byte	.LASF42
+ 846 026b 01       		.byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 20
+
+
+ 847 026c 10       		.uleb128 0x10
+ 848 026d 41040000 		.4byte	.LASF43
+ 849 0271 02       		.byte	0x2
+ 850 0272 10       		.uleb128 0x10
+ 851 0273 D2010000 		.4byte	.LASF44
+ 852 0277 03       		.byte	0x3
+ 853 0278 00       		.byte	0
+ 854 0279 03       		.uleb128 0x3
+ 855 027a 2E020000 		.4byte	.LASF45
+ 856 027e 08       		.byte	0x8
+ 857 027f 2A       		.byte	0x2a
+ 858 0280 B8000000 		.4byte	0xb8
+ 859 0284 03       		.uleb128 0x3
+ 860 0285 F6000000 		.4byte	.LASF46
+ 861 0289 08       		.byte	0x8
+ 862 028a 38       		.byte	0x38
+ 863 028b 8F020000 		.4byte	0x28f
+ 864 028f 0D       		.uleb128 0xd
+ 865 0290 04       		.byte	0x4
+ 866 0291 95020000 		.4byte	0x295
+ 867 0295 12       		.uleb128 0x12
+ 868 0296 D0010000 		.4byte	0x1d0
+ 869 029a AE020000 		.4byte	0x2ae
+ 870 029e 13       		.uleb128 0x13
+ 871 029f AE020000 		.4byte	0x2ae
+ 872 02a3 13       		.uleb128 0x13
+ 873 02a4 40020000 		.4byte	0x240
+ 874 02a8 13       		.uleb128 0x13
+ 875 02a9 FD020000 		.4byte	0x2fd
+ 876 02ad 00       		.byte	0
+ 877 02ae 0D       		.uleb128 0xd
+ 878 02af 04       		.byte	0x4
+ 879 02b0 B4020000 		.4byte	0x2b4
+ 880 02b4 14       		.uleb128 0x14
+ 881 02b5 03020000 		.4byte	.LASF53
+ 882 02b9 14       		.byte	0x14
+ 883 02ba 08       		.byte	0x8
+ 884 02bb 57       		.byte	0x57
+ 885 02bc FD020000 		.4byte	0x2fd
+ 886 02c0 15       		.uleb128 0x15
+ 887 02c1 58000000 		.4byte	.LASF47
+ 888 02c5 08       		.byte	0x8
+ 889 02c6 58       		.byte	0x58
+ 890 02c7 84020000 		.4byte	0x284
+ 891 02cb 00       		.byte	0
+ 892 02cc 15       		.uleb128 0x15
+ 893 02cd 13010000 		.4byte	.LASF48
+ 894 02d1 08       		.byte	0x8
+ 895 02d2 59       		.byte	0x59
+ 896 02d3 03030000 		.4byte	0x303
+ 897 02d7 04       		.byte	0x4
+ 898 02d8 15       		.uleb128 0x15
+ 899 02d9 D9020000 		.4byte	.LASF49
+ 900 02dd 08       		.byte	0x8
+ 901 02de 5A       		.byte	0x5a
+ 902 02df A7030000 		.4byte	0x3a7
+ 903 02e3 08       		.byte	0x8
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 21
+
+
+ 904 02e4 15       		.uleb128 0x15
+ 905 02e5 89040000 		.4byte	.LASF50
+ 906 02e9 08       		.byte	0x8
+ 907 02ea 5B       		.byte	0x5b
+ 908 02eb E0030000 		.4byte	0x3e0
+ 909 02ef 0C       		.byte	0xc
+ 910 02f0 15       		.uleb128 0x15
+ 911 02f1 78010000 		.4byte	.LASF51
+ 912 02f5 08       		.byte	0x8
+ 913 02f6 5E       		.byte	0x5e
+ 914 02f7 12010000 		.4byte	0x112
+ 915 02fb 10       		.byte	0x10
+ 916 02fc 00       		.byte	0
+ 917 02fd 0D       		.uleb128 0xd
+ 918 02fe 04       		.byte	0x4
+ 919 02ff 2A020000 		.4byte	0x22a
+ 920 0303 03       		.uleb128 0x3
+ 921 0304 00000000 		.4byte	.LASF52
+ 922 0308 08       		.byte	0x8
+ 923 0309 40       		.byte	0x40
+ 924 030a 0E030000 		.4byte	0x30e
+ 925 030e 0D       		.uleb128 0xd
+ 926 030f 04       		.byte	0x4
+ 927 0310 14030000 		.4byte	0x314
+ 928 0314 12       		.uleb128 0x12
+ 929 0315 D0010000 		.4byte	0x1d0
+ 930 0319 28030000 		.4byte	0x328
+ 931 031d 13       		.uleb128 0x13
+ 932 031e AE020000 		.4byte	0x2ae
+ 933 0322 13       		.uleb128 0x13
+ 934 0323 28030000 		.4byte	0x328
+ 935 0327 00       		.byte	0
+ 936 0328 0D       		.uleb128 0xd
+ 937 0329 04       		.byte	0x4
+ 938 032a 2E030000 		.4byte	0x32e
+ 939 032e 14       		.uleb128 0x14
+ 940 032f 44000000 		.4byte	.LASF54
+ 941 0333 20       		.byte	0x20
+ 942 0334 08       		.byte	0x8
+ 943 0335 63       		.byte	0x63
+ 944 0336 A7030000 		.4byte	0x3a7
+ 945 033a 15       		.uleb128 0x15
+ 946 033b 26020000 		.4byte	.LASF55
+ 947 033f 08       		.byte	0x8
+ 948 0340 65       		.byte	0x65
+ 949 0341 0C040000 		.4byte	0x40c
+ 950 0345 00       		.byte	0
+ 951 0346 16       		.uleb128 0x16
+ 952 0347 73726300 		.ascii	"src\000"
+ 953 034b 08       		.byte	0x8
+ 954 034c 68       		.byte	0x68
+ 955 034d 40020000 		.4byte	0x240
+ 956 0351 04       		.byte	0x4
+ 957 0352 15       		.uleb128 0x15
+ 958 0353 18000000 		.4byte	.LASF56
+ 959 0357 08       		.byte	0x8
+ 960 0358 6B       		.byte	0x6b
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 22
+
+
+ 961 0359 8B010000 		.4byte	0x18b
+ 962 035d 08       		.byte	0x8
+ 963 035e 15       		.uleb128 0x15
+ 964 035f F6020000 		.4byte	.LASF57
+ 965 0363 08       		.byte	0x8
+ 966 0364 6E       		.byte	0x6e
+ 967 0365 79020000 		.4byte	0x279
+ 968 0369 0A       		.byte	0xa
+ 969 036a 15       		.uleb128 0x15
+ 970 036b 1E000000 		.4byte	.LASF58
+ 971 036f 08       		.byte	0x8
+ 972 0370 71       		.byte	0x71
+ 973 0371 2A020000 		.4byte	0x22a
+ 974 0375 0C       		.byte	0xc
+ 975 0376 15       		.uleb128 0x15
+ 976 0377 AA020000 		.4byte	.LASF59
+ 977 037b 08       		.byte	0x8
+ 978 037c 75       		.byte	0x75
+ 979 037d 35020000 		.4byte	0x235
+ 980 0381 10       		.byte	0x10
+ 981 0382 15       		.uleb128 0x15
+ 982 0383 ED010000 		.4byte	.LASF60
+ 983 0387 08       		.byte	0x8
+ 984 0388 79       		.byte	0x79
+ 985 0389 E4000000 		.4byte	0xe4
+ 986 038d 14       		.byte	0x14
+ 987 038e 15       		.uleb128 0x15
+ 988 038f 05030000 		.4byte	.LASF61
+ 989 0393 08       		.byte	0x8
+ 990 0394 7D       		.byte	0x7d
+ 991 0395 AC010000 		.4byte	0x1ac
+ 992 0399 18       		.byte	0x18
+ 993 039a 15       		.uleb128 0x15
+ 994 039b 78010000 		.4byte	.LASF51
+ 995 039f 08       		.byte	0x8
+ 996 03a0 80       		.byte	0x80
+ 997 03a1 10010000 		.4byte	0x110
+ 998 03a5 1C       		.byte	0x1c
+ 999 03a6 00       		.byte	0
+ 1000 03a7 03       		.uleb128 0x3
+ 1001 03a8 42010000 		.4byte	.LASF62
+ 1002 03ac 08       		.byte	0x8
+ 1003 03ad 4D       		.byte	0x4d
+ 1004 03ae B2030000 		.4byte	0x3b2
+ 1005 03b2 0D       		.uleb128 0xd
+ 1006 03b3 04       		.byte	0x4
+ 1007 03b4 B8030000 		.4byte	0x3b8
+ 1008 03b8 12       		.uleb128 0x12
+ 1009 03b9 D0010000 		.4byte	0x1d0
+ 1010 03bd E0030000 		.4byte	0x3e0
+ 1011 03c1 13       		.uleb128 0x13
+ 1012 03c2 AE020000 		.4byte	0x2ae
+ 1013 03c6 13       		.uleb128 0x13
+ 1014 03c7 28030000 		.4byte	0x328
+ 1015 03cb 13       		.uleb128 0x13
+ 1016 03cc 05010000 		.4byte	0x105
+ 1017 03d0 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 23
+
+
+ 1018 03d1 05010000 		.4byte	0x105
+ 1019 03d5 13       		.uleb128 0x13
+ 1020 03d6 05010000 		.4byte	0x105
+ 1021 03da 13       		.uleb128 0x13
+ 1022 03db 4E020000 		.4byte	0x24e
+ 1023 03df 00       		.byte	0
+ 1024 03e0 03       		.uleb128 0x3
+ 1025 03e1 09040000 		.4byte	.LASF63
+ 1026 03e5 08       		.byte	0x8
+ 1027 03e6 55       		.byte	0x55
+ 1028 03e7 EB030000 		.4byte	0x3eb
+ 1029 03eb 0D       		.uleb128 0xd
+ 1030 03ec 04       		.byte	0x4
+ 1031 03ed F1030000 		.4byte	0x3f1
+ 1032 03f1 17       		.uleb128 0x17
+ 1033 03f2 01040000 		.4byte	0x401
+ 1034 03f6 13       		.uleb128 0x13
+ 1035 03f7 AE020000 		.4byte	0x2ae
+ 1036 03fb 13       		.uleb128 0x13
+ 1037 03fc 28030000 		.4byte	0x328
+ 1038 0400 00       		.byte	0
+ 1039 0401 03       		.uleb128 0x3
+ 1040 0402 C1010000 		.4byte	.LASF64
+ 1041 0406 08       		.byte	0x8
+ 1042 0407 60       		.byte	0x60
+ 1043 0408 B4020000 		.4byte	0x2b4
+ 1044 040c 0D       		.uleb128 0xd
+ 1045 040d 04       		.byte	0x4
+ 1046 040e 01040000 		.4byte	0x401
+ 1047 0412 03       		.uleb128 0x3
+ 1048 0413 1B010000 		.4byte	.LASF65
+ 1049 0417 08       		.byte	0x8
+ 1050 0418 81       		.byte	0x81
+ 1051 0419 2E030000 		.4byte	0x32e
+ 1052 041d 06       		.uleb128 0x6
+ 1053 041e 24       		.byte	0x24
+ 1054 041f 09       		.byte	0x9
+ 1055 0420 1F       		.byte	0x1f
+ 1056 0421 3E040000 		.4byte	0x43e
+ 1057 0425 15       		.uleb128 0x15
+ 1058 0426 9F040000 		.4byte	.LASF66
+ 1059 042a 09       		.byte	0x9
+ 1060 042b 20       		.byte	0x20
+ 1061 042c 12040000 		.4byte	0x412
+ 1062 0430 00       		.byte	0
+ 1063 0431 15       		.uleb128 0x15
+ 1064 0432 A1000000 		.4byte	.LASF67
+ 1065 0436 09       		.byte	0x9
+ 1066 0437 25       		.byte	0x25
+ 1067 0438 D9000000 		.4byte	0xd9
+ 1068 043c 20       		.byte	0x20
+ 1069 043d 00       		.byte	0
+ 1070 043e 03       		.uleb128 0x3
+ 1071 043f A6000000 		.4byte	.LASF68
+ 1072 0443 09       		.byte	0x9
+ 1073 0444 26       		.byte	0x26
+ 1074 0445 1D040000 		.4byte	0x41d
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 24
+
+
+ 1075 0449 18       		.uleb128 0x18
+ 1076 044a 82010000 		.4byte	.LASF92
+ 1077 044e 01       		.byte	0x1
+ 1078 044f 41       		.byte	0x41
+ 1079 0450 AA050000 		.4byte	0x5aa
+ 1080 0454 00000000 		.4byte	.LFB37
+ 1081 0458 48010000 		.4byte	.LFE37-.LFB37
+ 1082 045c 01       		.uleb128 0x1
+ 1083 045d 9C       		.byte	0x9c
+ 1084 045e AA050000 		.4byte	0x5aa
+ 1085 0462 19       		.uleb128 0x19
+ 1086 0463 73726300 		.ascii	"src\000"
+ 1087 0467 01       		.byte	0x1
+ 1088 0468 41       		.byte	0x41
+ 1089 0469 40020000 		.4byte	0x240
+ 1090 046d 00000000 		.4byte	.LLST0
+ 1091 0471 1A       		.uleb128 0x1a
+ 1092 0472 18000000 		.4byte	.LASF56
+ 1093 0476 01       		.byte	0x1
+ 1094 0477 41       		.byte	0x41
+ 1095 0478 8B010000 		.4byte	0x18b
+ 1096 047c 50000000 		.4byte	.LLST1
+ 1097 0480 1B       		.uleb128 0x1b
+ 1098 0481 FF020000 		.4byte	.LASF69
+ 1099 0485 01       		.byte	0x1
+ 1100 0486 48       		.byte	0x48
+ 1101 0487 AA050000 		.4byte	0x5aa
+ 1102 048b 9A000000 		.4byte	.LLST2
+ 1103 048f 1C       		.uleb128 0x1c
+ 1104 0490 6900     		.ascii	"i\000"
+ 1105 0492 01       		.byte	0x1
+ 1106 0493 4B       		.byte	0x4b
+ 1107 0494 CE000000 		.4byte	0xce
+ 1108 0498 B8000000 		.4byte	.LLST3
+ 1109 049c 1B       		.uleb128 0x1b
+ 1110 049d 0F030000 		.4byte	.LASF70
+ 1111 04a1 01       		.byte	0x1
+ 1112 04a2 53       		.byte	0x53
+ 1113 04a3 AA050000 		.4byte	0x5aa
+ 1114 04a7 24010000 		.4byte	.LLST4
+ 1115 04ab 1D       		.uleb128 0x1d
+ 1116 04ac 3A000000 		.4byte	.LBB2
+ 1117 04b0 5C000000 		.4byte	.LBE2-.LBB2
+ 1118 04b4 F0040000 		.4byte	0x4f0
+ 1119 04b8 1B       		.uleb128 0x1b
+ 1120 04b9 53040000 		.4byte	.LASF71
+ 1121 04bd 01       		.byte	0x1
+ 1122 04be 55       		.byte	0x55
+ 1123 04bf 47020000 		.4byte	0x247
+ 1124 04c3 79010000 		.4byte	.LLST5
+ 1125 04c7 1B       		.uleb128 0x1b
+ 1126 04c8 F6020000 		.4byte	.LASF57
+ 1127 04cc 01       		.byte	0x1
+ 1128 04cd 56       		.byte	0x56
+ 1129 04ce 79020000 		.4byte	0x279
+ 1130 04d2 A3010000 		.4byte	.LLST6
+ 1131 04d6 1E       		.uleb128 0x1e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 25
+
+
+ 1132 04d7 48000000 		.4byte	.LVL6
+ 1133 04db FE060000 		.4byte	0x6fe
+ 1134 04df 1F       		.uleb128 0x1f
+ 1135 04e0 6A000000 		.4byte	.LVL8
+ 1136 04e4 09070000 		.4byte	0x709
+ 1137 04e8 20       		.uleb128 0x20
+ 1138 04e9 01       		.uleb128 0x1
+ 1139 04ea 51       		.byte	0x51
+ 1140 04eb 02       		.uleb128 0x2
+ 1141 04ec 77       		.byte	0x77
+ 1142 04ed 00       		.sleb128 0
+ 1143 04ee 00       		.byte	0
+ 1144 04ef 00       		.byte	0
+ 1145 04f0 21       		.uleb128 0x21
+ 1146 04f1 00000000 		.4byte	.Ldebug_ranges0+0
+ 1147 04f5 1B       		.uleb128 0x1b
+ 1148 04f6 E5010000 		.4byte	.LASF72
+ 1149 04fa 01       		.byte	0x1
+ 1150 04fb 7E       		.byte	0x7e
+ 1151 04fc E4000000 		.4byte	0xe4
+ 1152 0500 C1010000 		.4byte	.LLST7
+ 1153 0504 1B       		.uleb128 0x1b
+ 1154 0505 95010000 		.4byte	.LASF73
+ 1155 0509 01       		.byte	0x1
+ 1156 050a 81       		.byte	0x81
+ 1157 050b D0010000 		.4byte	0x1d0
+ 1158 050f EA010000 		.4byte	.LLST8
+ 1159 0513 22       		.uleb128 0x22
+ 1160 0514 DA000000 		.4byte	.LVL26
+ 1161 0518 14070000 		.4byte	0x714
+ 1162 051c 27050000 		.4byte	0x527
+ 1163 0520 20       		.uleb128 0x20
+ 1164 0521 01       		.uleb128 0x1
+ 1165 0522 50       		.byte	0x50
+ 1166 0523 02       		.uleb128 0x2
+ 1167 0524 74       		.byte	0x74
+ 1168 0525 00       		.sleb128 0
+ 1169 0526 00       		.byte	0
+ 1170 0527 1E       		.uleb128 0x1e
+ 1171 0528 DE000000 		.4byte	.LVL27
+ 1172 052c 1F070000 		.4byte	0x71f
+ 1173 0530 22       		.uleb128 0x22
+ 1174 0531 EE000000 		.4byte	.LVL30
+ 1175 0535 2A070000 		.4byte	0x72a
+ 1176 0539 50050000 		.4byte	0x550
+ 1177 053d 20       		.uleb128 0x20
+ 1178 053e 01       		.uleb128 0x1
+ 1179 053f 50       		.byte	0x50
+ 1180 0540 02       		.uleb128 0x2
+ 1181 0541 74       		.byte	0x74
+ 1182 0542 00       		.sleb128 0
+ 1183 0543 20       		.uleb128 0x20
+ 1184 0544 01       		.uleb128 0x1
+ 1185 0545 51       		.byte	0x51
+ 1186 0546 02       		.uleb128 0x2
+ 1187 0547 77       		.byte	0x77
+ 1188 0548 00       		.sleb128 0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 26
+
+
+ 1189 0549 20       		.uleb128 0x20
+ 1190 054a 01       		.uleb128 0x1
+ 1191 054b 52       		.byte	0x52
+ 1192 054c 02       		.uleb128 0x2
+ 1193 054d 78       		.byte	0x78
+ 1194 054e 00       		.sleb128 0
+ 1195 054f 00       		.byte	0
+ 1196 0550 22       		.uleb128 0x22
+ 1197 0551 F6000000 		.4byte	.LVL32
+ 1198 0555 14070000 		.4byte	0x714
+ 1199 0559 64050000 		.4byte	0x564
+ 1200 055d 20       		.uleb128 0x20
+ 1201 055e 01       		.uleb128 0x1
+ 1202 055f 50       		.byte	0x50
+ 1203 0560 02       		.uleb128 0x2
+ 1204 0561 74       		.byte	0x74
+ 1205 0562 00       		.sleb128 0
+ 1206 0563 00       		.byte	0
+ 1207 0564 22       		.uleb128 0x22
+ 1208 0565 FE000000 		.4byte	.LVL33
+ 1209 0569 35070000 		.4byte	0x735
+ 1210 056d 7E050000 		.4byte	0x57e
+ 1211 0571 20       		.uleb128 0x20
+ 1212 0572 01       		.uleb128 0x1
+ 1213 0573 50       		.byte	0x50
+ 1214 0574 02       		.uleb128 0x2
+ 1215 0575 74       		.byte	0x74
+ 1216 0576 00       		.sleb128 0
+ 1217 0577 20       		.uleb128 0x20
+ 1218 0578 01       		.uleb128 0x1
+ 1219 0579 51       		.byte	0x51
+ 1220 057a 02       		.uleb128 0x2
+ 1221 057b 08       		.byte	0x8
+ 1222 057c 20       		.byte	0x20
+ 1223 057d 00       		.byte	0
+ 1224 057e 22       		.uleb128 0x22
+ 1225 057f 06010000 		.4byte	.LVL34
+ 1226 0583 35070000 		.4byte	0x735
+ 1227 0587 98050000 		.4byte	0x598
+ 1228 058b 20       		.uleb128 0x20
+ 1229 058c 01       		.uleb128 0x1
+ 1230 058d 50       		.byte	0x50
+ 1231 058e 02       		.uleb128 0x2
+ 1232 058f 74       		.byte	0x74
+ 1233 0590 00       		.sleb128 0
+ 1234 0591 20       		.uleb128 0x20
+ 1235 0592 01       		.uleb128 0x1
+ 1236 0593 51       		.byte	0x51
+ 1237 0594 02       		.uleb128 0x2
+ 1238 0595 08       		.byte	0x8
+ 1239 0596 24       		.byte	0x24
+ 1240 0597 00       		.byte	0
+ 1241 0598 1F       		.uleb128 0x1f
+ 1242 0599 20010000 		.4byte	.LVL37
+ 1243 059d 40070000 		.4byte	0x740
+ 1244 05a1 20       		.uleb128 0x20
+ 1245 05a2 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 27
+
+
+ 1246 05a3 50       		.byte	0x50
+ 1247 05a4 02       		.uleb128 0x2
+ 1248 05a5 75       		.byte	0x75
+ 1249 05a6 00       		.sleb128 0
+ 1250 05a7 00       		.byte	0
+ 1251 05a8 00       		.byte	0
+ 1252 05a9 00       		.byte	0
+ 1253 05aa 0D       		.uleb128 0xd
+ 1254 05ab 04       		.byte	0x4
+ 1255 05ac 3E040000 		.4byte	0x43e
+ 1256 05b0 23       		.uleb128 0x23
+ 1257 05b1 BB000000 		.4byte	.LASF74
+ 1258 05b5 01       		.byte	0x1
+ 1259 05b6 BC       		.byte	0xbc
+ 1260 05b7 00000000 		.4byte	.LFB39
+ 1261 05bb 4C000000 		.4byte	.LFE39-.LFB39
+ 1262 05bf 01       		.uleb128 0x1
+ 1263 05c0 9C       		.byte	0x9c
+ 1264 05c1 35060000 		.4byte	0x635
+ 1265 05c5 19       		.uleb128 0x19
+ 1266 05c6 73726300 		.ascii	"src\000"
+ 1267 05ca 01       		.byte	0x1
+ 1268 05cb BC       		.byte	0xbc
+ 1269 05cc 40020000 		.4byte	0x240
+ 1270 05d0 08020000 		.4byte	.LLST9
+ 1271 05d4 1B       		.uleb128 0x1b
+ 1272 05d5 FF020000 		.4byte	.LASF69
+ 1273 05d9 01       		.byte	0x1
+ 1274 05da BF       		.byte	0xbf
+ 1275 05db AA050000 		.4byte	0x5aa
+ 1276 05df 34020000 		.4byte	.LLST10
+ 1277 05e3 1C       		.uleb128 0x1c
+ 1278 05e4 6900     		.ascii	"i\000"
+ 1279 05e6 01       		.byte	0x1
+ 1280 05e7 C1       		.byte	0xc1
+ 1281 05e8 CE000000 		.4byte	0xce
+ 1282 05ec 47020000 		.4byte	.LLST11
+ 1283 05f0 22       		.uleb128 0x22
+ 1284 05f1 24000000 		.4byte	.LVL45
+ 1285 05f5 14070000 		.4byte	0x714
+ 1286 05f9 04060000 		.4byte	0x604
+ 1287 05fd 20       		.uleb128 0x20
+ 1288 05fe 01       		.uleb128 0x1
+ 1289 05ff 50       		.byte	0x50
+ 1290 0600 02       		.uleb128 0x2
+ 1291 0601 75       		.byte	0x75
+ 1292 0602 00       		.sleb128 0
+ 1293 0603 00       		.byte	0
+ 1294 0604 22       		.uleb128 0x22
+ 1295 0605 2C000000 		.4byte	.LVL46
+ 1296 0609 35070000 		.4byte	0x735
+ 1297 060d 1E060000 		.4byte	0x61e
+ 1298 0611 20       		.uleb128 0x20
+ 1299 0612 01       		.uleb128 0x1
+ 1300 0613 50       		.byte	0x50
+ 1301 0614 02       		.uleb128 0x2
+ 1302 0615 75       		.byte	0x75
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 28
+
+
+ 1303 0616 00       		.sleb128 0
+ 1304 0617 20       		.uleb128 0x20
+ 1305 0618 01       		.uleb128 0x1
+ 1306 0619 51       		.byte	0x51
+ 1307 061a 02       		.uleb128 0x2
+ 1308 061b 08       		.byte	0x8
+ 1309 061c 20       		.byte	0x20
+ 1310 061d 00       		.byte	0
+ 1311 061e 1F       		.uleb128 0x1f
+ 1312 061f 34000000 		.4byte	.LVL47
+ 1313 0623 35070000 		.4byte	0x735
+ 1314 0627 20       		.uleb128 0x20
+ 1315 0628 01       		.uleb128 0x1
+ 1316 0629 50       		.byte	0x50
+ 1317 062a 02       		.uleb128 0x2
+ 1318 062b 75       		.byte	0x75
+ 1319 062c 00       		.sleb128 0
+ 1320 062d 20       		.uleb128 0x20
+ 1321 062e 01       		.uleb128 0x1
+ 1322 062f 51       		.byte	0x51
+ 1323 0630 02       		.uleb128 0x2
+ 1324 0631 08       		.byte	0x8
+ 1325 0632 24       		.byte	0x24
+ 1326 0633 00       		.byte	0
+ 1327 0634 00       		.byte	0
+ 1328 0635 23       		.uleb128 0x23
+ 1329 0636 B5040000 		.4byte	.LASF75
+ 1330 063a 01       		.byte	0x1
+ 1331 063b 9E       		.byte	0x9e
+ 1332 063c 00000000 		.4byte	.LFB38
+ 1333 0640 88000000 		.4byte	.LFE38-.LFB38
+ 1334 0644 01       		.uleb128 0x1
+ 1335 0645 9C       		.byte	0x9c
+ 1336 0646 E2060000 		.4byte	0x6e2
+ 1337 064a 1A       		.uleb128 0x1a
+ 1338 064b 27030000 		.4byte	.LASF76
+ 1339 064f 01       		.byte	0x1
+ 1340 0650 9E       		.byte	0x9e
+ 1341 0651 CE000000 		.4byte	0xce
+ 1342 0655 71020000 		.4byte	.LLST12
+ 1343 0659 1C       		.uleb128 0x1c
+ 1344 065a 6900     		.ascii	"i\000"
+ 1345 065c 01       		.byte	0x1
+ 1346 065d B0       		.byte	0xb0
+ 1347 065e CE000000 		.4byte	0xce
+ 1348 0662 92020000 		.4byte	.LLST13
+ 1349 0666 22       		.uleb128 0x22
+ 1350 0667 10000000 		.4byte	.LVL53
+ 1351 066b B0050000 		.4byte	0x5b0
+ 1352 066f 79060000 		.4byte	0x679
+ 1353 0673 20       		.uleb128 0x20
+ 1354 0674 01       		.uleb128 0x1
+ 1355 0675 50       		.byte	0x50
+ 1356 0676 01       		.uleb128 0x1
+ 1357 0677 30       		.byte	0x30
+ 1358 0678 00       		.byte	0
+ 1359 0679 1E       		.uleb128 0x1e
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 29
+
+
+ 1360 067a 18000000 		.4byte	.LVL54
+ 1361 067e 4B070000 		.4byte	0x74b
+ 1362 0682 22       		.uleb128 0x22
+ 1363 0683 22000000 		.4byte	.LVL55
+ 1364 0687 56070000 		.4byte	0x756
+ 1365 068b 9D060000 		.4byte	0x69d
+ 1366 068f 20       		.uleb128 0x20
+ 1367 0690 01       		.uleb128 0x1
+ 1368 0691 50       		.byte	0x50
+ 1369 0692 09       		.uleb128 0x9
+ 1370 0693 74       		.byte	0x74
+ 1371 0694 00       		.sleb128 0
+ 1372 0695 33       		.byte	0x33
+ 1373 0696 24       		.byte	0x24
+ 1374 0697 74       		.byte	0x74
+ 1375 0698 00       		.sleb128 0
+ 1376 0699 22       		.byte	0x22
+ 1377 069a 32       		.byte	0x32
+ 1378 069b 24       		.byte	0x24
+ 1379 069c 00       		.byte	0
+ 1380 069d 1E       		.uleb128 0x1e
+ 1381 069e 2A000000 		.4byte	.LVL56
+ 1382 06a2 61070000 		.4byte	0x761
+ 1383 06a6 22       		.uleb128 0x22
+ 1384 06a7 38000000 		.4byte	.LVL57
+ 1385 06ab 6C070000 		.4byte	0x76c
+ 1386 06af BD060000 		.4byte	0x6bd
+ 1387 06b3 20       		.uleb128 0x20
+ 1388 06b4 01       		.uleb128 0x1
+ 1389 06b5 50       		.byte	0x50
+ 1390 06b6 05       		.uleb128 0x5
+ 1391 06b7 03       		.byte	0x3
+ 1392 06b8 00000000 		.4byte	.LC0
+ 1393 06bc 00       		.byte	0
+ 1394 06bd 22       		.uleb128 0x22
+ 1395 06be 62000000 		.4byte	.LVL60
+ 1396 06c2 35070000 		.4byte	0x735
+ 1397 06c6 D1060000 		.4byte	0x6d1
+ 1398 06ca 20       		.uleb128 0x20
+ 1399 06cb 01       		.uleb128 0x1
+ 1400 06cc 51       		.byte	0x51
+ 1401 06cd 02       		.uleb128 0x2
+ 1402 06ce 08       		.byte	0x8
+ 1403 06cf 20       		.byte	0x20
+ 1404 06d0 00       		.byte	0
+ 1405 06d1 1F       		.uleb128 0x1f
+ 1406 06d2 6C000000 		.4byte	.LVL61
+ 1407 06d6 35070000 		.4byte	0x735
+ 1408 06da 20       		.uleb128 0x20
+ 1409 06db 01       		.uleb128 0x1
+ 1410 06dc 51       		.byte	0x51
+ 1411 06dd 02       		.uleb128 0x2
+ 1412 06de 08       		.byte	0x8
+ 1413 06df 24       		.byte	0x24
+ 1414 06e0 00       		.byte	0
+ 1415 06e1 00       		.byte	0
+ 1416 06e2 24       		.uleb128 0x24
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 30
+
+
+ 1417 06e3 3A000000 		.4byte	.LASF77
+ 1418 06e7 01       		.byte	0x1
+ 1419 06e8 2F       		.byte	0x2f
+ 1420 06e9 CE000000 		.4byte	0xce
+ 1421 06ed 05       		.uleb128 0x5
+ 1422 06ee 03       		.byte	0x3
+ 1423 06ef 00000000 		.4byte	entry_cnt
+ 1424 06f3 25       		.uleb128 0x25
+ 1425 06f4 75040000 		.4byte	.LASF93
+ 1426 06f8 0F       		.byte	0xf
+ 1427 06f9 3B       		.byte	0x3b
+ 1428 06fa AA050000 		.4byte	0x5aa
+ 1429 06fe 26       		.uleb128 0x26
+ 1430 06ff 2D040000 		.4byte	.LASF78
+ 1431 0703 2D040000 		.4byte	.LASF78
+ 1432 0707 0A       		.byte	0xa
+ 1433 0708 44       		.byte	0x44
+ 1434 0709 26       		.uleb128 0x26
+ 1435 070a 59040000 		.4byte	.LASF79
+ 1436 070e 59040000 		.4byte	.LASF79
+ 1437 0712 0B       		.byte	0xb
+ 1438 0713 1C       		.byte	0x1c
+ 1439 0714 26       		.uleb128 0x26
+ 1440 0715 25000000 		.4byte	.LASF80
+ 1441 0719 25000000 		.4byte	.LASF80
+ 1442 071d 08       		.byte	0x8
+ 1443 071e B6       		.byte	0xb6
+ 1444 071f 26       		.uleb128 0x26
+ 1445 0720 9E010000 		.4byte	.LASF81
+ 1446 0724 9E010000 		.4byte	.LASF81
+ 1447 0728 0C       		.byte	0xc
+ 1448 0729 32       		.byte	0x32
+ 1449 072a 26       		.uleb128 0x26
+ 1450 072b 60030000 		.4byte	.LASF82
+ 1451 072f 60030000 		.4byte	.LASF82
+ 1452 0733 08       		.byte	0x8
+ 1453 0734 A4       		.byte	0xa4
+ 1454 0735 26       		.uleb128 0x26
+ 1455 0736 A7040000 		.4byte	.LASF83
+ 1456 073a A7040000 		.4byte	.LASF83
+ 1457 073e 0D       		.byte	0xd
+ 1458 073f F2       		.byte	0xf2
+ 1459 0740 26       		.uleb128 0x26
+ 1460 0741 93000000 		.4byte	.LASF84
+ 1461 0745 93000000 		.4byte	.LASF84
+ 1462 0749 0C       		.byte	0xc
+ 1463 074a 39       		.byte	0x39
+ 1464 074b 26       		.uleb128 0x26
+ 1465 074c 6F050000 		.4byte	.LASF85
+ 1466 0750 6F050000 		.4byte	.LASF85
+ 1467 0754 0D       		.byte	0xd
+ 1468 0755 58       		.byte	0x58
+ 1469 0756 26       		.uleb128 0x26
+ 1470 0757 92040000 		.4byte	.LASF86
+ 1471 075b 92040000 		.4byte	.LASF86
+ 1472 075f 0D       		.byte	0xd
+ 1473 0760 52       		.byte	0x52
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 31
+
+
+ 1474 0761 26       		.uleb128 0x26
+ 1475 0762 F5030000 		.4byte	.LASF87
+ 1476 0766 F5030000 		.4byte	.LASF87
+ 1477 076a 0E       		.byte	0xe
+ 1478 076b 20       		.byte	0x20
+ 1479 076c 26       		.uleb128 0x26
+ 1480 076d 13020000 		.4byte	.LASF88
+ 1481 0771 13020000 		.4byte	.LASF88
+ 1482 0775 0E       		.byte	0xe
+ 1483 0776 26       		.byte	0x26
+ 1484 0777 00       		.byte	0
+ 1485              		.section	.debug_abbrev,"",%progbits
+ 1486              	.Ldebug_abbrev0:
+ 1487 0000 01       		.uleb128 0x1
+ 1488 0001 11       		.uleb128 0x11
+ 1489 0002 01       		.byte	0x1
+ 1490 0003 25       		.uleb128 0x25
+ 1491 0004 0E       		.uleb128 0xe
+ 1492 0005 13       		.uleb128 0x13
+ 1493 0006 0B       		.uleb128 0xb
+ 1494 0007 03       		.uleb128 0x3
+ 1495 0008 0E       		.uleb128 0xe
+ 1496 0009 1B       		.uleb128 0x1b
+ 1497 000a 0E       		.uleb128 0xe
+ 1498 000b 55       		.uleb128 0x55
+ 1499 000c 17       		.uleb128 0x17
+ 1500 000d 11       		.uleb128 0x11
+ 1501 000e 01       		.uleb128 0x1
+ 1502 000f 10       		.uleb128 0x10
+ 1503 0010 17       		.uleb128 0x17
+ 1504 0011 00       		.byte	0
+ 1505 0012 00       		.byte	0
+ 1506 0013 02       		.uleb128 0x2
+ 1507 0014 24       		.uleb128 0x24
+ 1508 0015 00       		.byte	0
+ 1509 0016 0B       		.uleb128 0xb
+ 1510 0017 0B       		.uleb128 0xb
+ 1511 0018 3E       		.uleb128 0x3e
+ 1512 0019 0B       		.uleb128 0xb
+ 1513 001a 03       		.uleb128 0x3
+ 1514 001b 0E       		.uleb128 0xe
+ 1515 001c 00       		.byte	0
+ 1516 001d 00       		.byte	0
+ 1517 001e 03       		.uleb128 0x3
+ 1518 001f 16       		.uleb128 0x16
+ 1519 0020 00       		.byte	0
+ 1520 0021 03       		.uleb128 0x3
+ 1521 0022 0E       		.uleb128 0xe
+ 1522 0023 3A       		.uleb128 0x3a
+ 1523 0024 0B       		.uleb128 0xb
+ 1524 0025 3B       		.uleb128 0x3b
+ 1525 0026 0B       		.uleb128 0xb
+ 1526 0027 49       		.uleb128 0x49
+ 1527 0028 13       		.uleb128 0x13
+ 1528 0029 00       		.byte	0
+ 1529 002a 00       		.byte	0
+ 1530 002b 04       		.uleb128 0x4
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 32
+
+
+ 1531 002c 24       		.uleb128 0x24
+ 1532 002d 00       		.byte	0
+ 1533 002e 0B       		.uleb128 0xb
+ 1534 002f 0B       		.uleb128 0xb
+ 1535 0030 3E       		.uleb128 0x3e
+ 1536 0031 0B       		.uleb128 0xb
+ 1537 0032 03       		.uleb128 0x3
+ 1538 0033 08       		.uleb128 0x8
+ 1539 0034 00       		.byte	0
+ 1540 0035 00       		.byte	0
+ 1541 0036 05       		.uleb128 0x5
+ 1542 0037 0F       		.uleb128 0xf
+ 1543 0038 00       		.byte	0
+ 1544 0039 0B       		.uleb128 0xb
+ 1545 003a 0B       		.uleb128 0xb
+ 1546 003b 00       		.byte	0
+ 1547 003c 00       		.byte	0
+ 1548 003d 06       		.uleb128 0x6
+ 1549 003e 13       		.uleb128 0x13
+ 1550 003f 01       		.byte	0x1
+ 1551 0040 0B       		.uleb128 0xb
+ 1552 0041 0B       		.uleb128 0xb
+ 1553 0042 3A       		.uleb128 0x3a
+ 1554 0043 0B       		.uleb128 0xb
+ 1555 0044 3B       		.uleb128 0x3b
+ 1556 0045 0B       		.uleb128 0xb
+ 1557 0046 01       		.uleb128 0x1
+ 1558 0047 13       		.uleb128 0x13
+ 1559 0048 00       		.byte	0
+ 1560 0049 00       		.byte	0
+ 1561 004a 07       		.uleb128 0x7
+ 1562 004b 0D       		.uleb128 0xd
+ 1563 004c 00       		.byte	0
+ 1564 004d 03       		.uleb128 0x3
+ 1565 004e 0E       		.uleb128 0xe
+ 1566 004f 3A       		.uleb128 0x3a
+ 1567 0050 0B       		.uleb128 0xb
+ 1568 0051 3B       		.uleb128 0x3b
+ 1569 0052 0B       		.uleb128 0xb
+ 1570 0053 49       		.uleb128 0x49
+ 1571 0054 13       		.uleb128 0x13
+ 1572 0055 0B       		.uleb128 0xb
+ 1573 0056 0B       		.uleb128 0xb
+ 1574 0057 0D       		.uleb128 0xd
+ 1575 0058 0B       		.uleb128 0xb
+ 1576 0059 0C       		.uleb128 0xc
+ 1577 005a 0B       		.uleb128 0xb
+ 1578 005b 38       		.uleb128 0x38
+ 1579 005c 0B       		.uleb128 0xb
+ 1580 005d 00       		.byte	0
+ 1581 005e 00       		.byte	0
+ 1582 005f 08       		.uleb128 0x8
+ 1583 0060 0D       		.uleb128 0xd
+ 1584 0061 00       		.byte	0
+ 1585 0062 03       		.uleb128 0x3
+ 1586 0063 08       		.uleb128 0x8
+ 1587 0064 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 33
+
+
+ 1588 0065 0B       		.uleb128 0xb
+ 1589 0066 3B       		.uleb128 0x3b
+ 1590 0067 0B       		.uleb128 0xb
+ 1591 0068 49       		.uleb128 0x49
+ 1592 0069 13       		.uleb128 0x13
+ 1593 006a 0B       		.uleb128 0xb
+ 1594 006b 0B       		.uleb128 0xb
+ 1595 006c 0D       		.uleb128 0xd
+ 1596 006d 0B       		.uleb128 0xb
+ 1597 006e 0C       		.uleb128 0xc
+ 1598 006f 0B       		.uleb128 0xb
+ 1599 0070 38       		.uleb128 0x38
+ 1600 0071 0B       		.uleb128 0xb
+ 1601 0072 00       		.byte	0
+ 1602 0073 00       		.byte	0
+ 1603 0074 09       		.uleb128 0x9
+ 1604 0075 17       		.uleb128 0x17
+ 1605 0076 01       		.byte	0x1
+ 1606 0077 0B       		.uleb128 0xb
+ 1607 0078 0B       		.uleb128 0xb
+ 1608 0079 3A       		.uleb128 0x3a
+ 1609 007a 0B       		.uleb128 0xb
+ 1610 007b 3B       		.uleb128 0x3b
+ 1611 007c 0B       		.uleb128 0xb
+ 1612 007d 01       		.uleb128 0x1
+ 1613 007e 13       		.uleb128 0x13
+ 1614 007f 00       		.byte	0
+ 1615 0080 00       		.byte	0
+ 1616 0081 0A       		.uleb128 0xa
+ 1617 0082 0D       		.uleb128 0xd
+ 1618 0083 00       		.byte	0
+ 1619 0084 03       		.uleb128 0x3
+ 1620 0085 08       		.uleb128 0x8
+ 1621 0086 3A       		.uleb128 0x3a
+ 1622 0087 0B       		.uleb128 0xb
+ 1623 0088 3B       		.uleb128 0x3b
+ 1624 0089 0B       		.uleb128 0xb
+ 1625 008a 49       		.uleb128 0x49
+ 1626 008b 13       		.uleb128 0x13
+ 1627 008c 00       		.byte	0
+ 1628 008d 00       		.byte	0
+ 1629 008e 0B       		.uleb128 0xb
+ 1630 008f 0D       		.uleb128 0xd
+ 1631 0090 00       		.byte	0
+ 1632 0091 03       		.uleb128 0x3
+ 1633 0092 0E       		.uleb128 0xe
+ 1634 0093 3A       		.uleb128 0x3a
+ 1635 0094 0B       		.uleb128 0xb
+ 1636 0095 3B       		.uleb128 0x3b
+ 1637 0096 0B       		.uleb128 0xb
+ 1638 0097 49       		.uleb128 0x49
+ 1639 0098 13       		.uleb128 0x13
+ 1640 0099 00       		.byte	0
+ 1641 009a 00       		.byte	0
+ 1642 009b 0C       		.uleb128 0xc
+ 1643 009c 16       		.uleb128 0x16
+ 1644 009d 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 34
+
+
+ 1645 009e 03       		.uleb128 0x3
+ 1646 009f 0E       		.uleb128 0xe
+ 1647 00a0 3A       		.uleb128 0x3a
+ 1648 00a1 0B       		.uleb128 0xb
+ 1649 00a2 3B       		.uleb128 0x3b
+ 1650 00a3 05       		.uleb128 0x5
+ 1651 00a4 49       		.uleb128 0x49
+ 1652 00a5 13       		.uleb128 0x13
+ 1653 00a6 00       		.byte	0
+ 1654 00a7 00       		.byte	0
+ 1655 00a8 0D       		.uleb128 0xd
+ 1656 00a9 0F       		.uleb128 0xf
+ 1657 00aa 00       		.byte	0
+ 1658 00ab 0B       		.uleb128 0xb
+ 1659 00ac 0B       		.uleb128 0xb
+ 1660 00ad 49       		.uleb128 0x49
+ 1661 00ae 13       		.uleb128 0x13
+ 1662 00af 00       		.byte	0
+ 1663 00b0 00       		.byte	0
+ 1664 00b1 0E       		.uleb128 0xe
+ 1665 00b2 26       		.uleb128 0x26
+ 1666 00b3 00       		.byte	0
+ 1667 00b4 49       		.uleb128 0x49
+ 1668 00b5 13       		.uleb128 0x13
+ 1669 00b6 00       		.byte	0
+ 1670 00b7 00       		.byte	0
+ 1671 00b8 0F       		.uleb128 0xf
+ 1672 00b9 04       		.uleb128 0x4
+ 1673 00ba 01       		.byte	0x1
+ 1674 00bb 0B       		.uleb128 0xb
+ 1675 00bc 0B       		.uleb128 0xb
+ 1676 00bd 49       		.uleb128 0x49
+ 1677 00be 13       		.uleb128 0x13
+ 1678 00bf 3A       		.uleb128 0x3a
+ 1679 00c0 0B       		.uleb128 0xb
+ 1680 00c1 3B       		.uleb128 0x3b
+ 1681 00c2 0B       		.uleb128 0xb
+ 1682 00c3 01       		.uleb128 0x1
+ 1683 00c4 13       		.uleb128 0x13
+ 1684 00c5 00       		.byte	0
+ 1685 00c6 00       		.byte	0
+ 1686 00c7 10       		.uleb128 0x10
+ 1687 00c8 28       		.uleb128 0x28
+ 1688 00c9 00       		.byte	0
+ 1689 00ca 03       		.uleb128 0x3
+ 1690 00cb 0E       		.uleb128 0xe
+ 1691 00cc 1C       		.uleb128 0x1c
+ 1692 00cd 0B       		.uleb128 0xb
+ 1693 00ce 00       		.byte	0
+ 1694 00cf 00       		.byte	0
+ 1695 00d0 11       		.uleb128 0x11
+ 1696 00d1 26       		.uleb128 0x26
+ 1697 00d2 00       		.byte	0
+ 1698 00d3 00       		.byte	0
+ 1699 00d4 00       		.byte	0
+ 1700 00d5 12       		.uleb128 0x12
+ 1701 00d6 15       		.uleb128 0x15
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 35
+
+
+ 1702 00d7 01       		.byte	0x1
+ 1703 00d8 27       		.uleb128 0x27
+ 1704 00d9 19       		.uleb128 0x19
+ 1705 00da 49       		.uleb128 0x49
+ 1706 00db 13       		.uleb128 0x13
+ 1707 00dc 01       		.uleb128 0x1
+ 1708 00dd 13       		.uleb128 0x13
+ 1709 00de 00       		.byte	0
+ 1710 00df 00       		.byte	0
+ 1711 00e0 13       		.uleb128 0x13
+ 1712 00e1 05       		.uleb128 0x5
+ 1713 00e2 00       		.byte	0
+ 1714 00e3 49       		.uleb128 0x49
+ 1715 00e4 13       		.uleb128 0x13
+ 1716 00e5 00       		.byte	0
+ 1717 00e6 00       		.byte	0
+ 1718 00e7 14       		.uleb128 0x14
+ 1719 00e8 13       		.uleb128 0x13
+ 1720 00e9 01       		.byte	0x1
+ 1721 00ea 03       		.uleb128 0x3
+ 1722 00eb 0E       		.uleb128 0xe
+ 1723 00ec 0B       		.uleb128 0xb
+ 1724 00ed 0B       		.uleb128 0xb
+ 1725 00ee 3A       		.uleb128 0x3a
+ 1726 00ef 0B       		.uleb128 0xb
+ 1727 00f0 3B       		.uleb128 0x3b
+ 1728 00f1 0B       		.uleb128 0xb
+ 1729 00f2 01       		.uleb128 0x1
+ 1730 00f3 13       		.uleb128 0x13
+ 1731 00f4 00       		.byte	0
+ 1732 00f5 00       		.byte	0
+ 1733 00f6 15       		.uleb128 0x15
+ 1734 00f7 0D       		.uleb128 0xd
+ 1735 00f8 00       		.byte	0
+ 1736 00f9 03       		.uleb128 0x3
+ 1737 00fa 0E       		.uleb128 0xe
+ 1738 00fb 3A       		.uleb128 0x3a
+ 1739 00fc 0B       		.uleb128 0xb
+ 1740 00fd 3B       		.uleb128 0x3b
+ 1741 00fe 0B       		.uleb128 0xb
+ 1742 00ff 49       		.uleb128 0x49
+ 1743 0100 13       		.uleb128 0x13
+ 1744 0101 38       		.uleb128 0x38
+ 1745 0102 0B       		.uleb128 0xb
+ 1746 0103 00       		.byte	0
+ 1747 0104 00       		.byte	0
+ 1748 0105 16       		.uleb128 0x16
+ 1749 0106 0D       		.uleb128 0xd
+ 1750 0107 00       		.byte	0
+ 1751 0108 03       		.uleb128 0x3
+ 1752 0109 08       		.uleb128 0x8
+ 1753 010a 3A       		.uleb128 0x3a
+ 1754 010b 0B       		.uleb128 0xb
+ 1755 010c 3B       		.uleb128 0x3b
+ 1756 010d 0B       		.uleb128 0xb
+ 1757 010e 49       		.uleb128 0x49
+ 1758 010f 13       		.uleb128 0x13
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 36
+
+
+ 1759 0110 38       		.uleb128 0x38
+ 1760 0111 0B       		.uleb128 0xb
+ 1761 0112 00       		.byte	0
+ 1762 0113 00       		.byte	0
+ 1763 0114 17       		.uleb128 0x17
+ 1764 0115 15       		.uleb128 0x15
+ 1765 0116 01       		.byte	0x1
+ 1766 0117 27       		.uleb128 0x27
+ 1767 0118 19       		.uleb128 0x19
+ 1768 0119 01       		.uleb128 0x1
+ 1769 011a 13       		.uleb128 0x13
+ 1770 011b 00       		.byte	0
+ 1771 011c 00       		.byte	0
+ 1772 011d 18       		.uleb128 0x18
+ 1773 011e 2E       		.uleb128 0x2e
+ 1774 011f 01       		.byte	0x1
+ 1775 0120 3F       		.uleb128 0x3f
+ 1776 0121 19       		.uleb128 0x19
+ 1777 0122 03       		.uleb128 0x3
+ 1778 0123 0E       		.uleb128 0xe
+ 1779 0124 3A       		.uleb128 0x3a
+ 1780 0125 0B       		.uleb128 0xb
+ 1781 0126 3B       		.uleb128 0x3b
+ 1782 0127 0B       		.uleb128 0xb
+ 1783 0128 27       		.uleb128 0x27
+ 1784 0129 19       		.uleb128 0x19
+ 1785 012a 49       		.uleb128 0x49
+ 1786 012b 13       		.uleb128 0x13
+ 1787 012c 11       		.uleb128 0x11
+ 1788 012d 01       		.uleb128 0x1
+ 1789 012e 12       		.uleb128 0x12
+ 1790 012f 06       		.uleb128 0x6
+ 1791 0130 40       		.uleb128 0x40
+ 1792 0131 18       		.uleb128 0x18
+ 1793 0132 9742     		.uleb128 0x2117
+ 1794 0134 19       		.uleb128 0x19
+ 1795 0135 01       		.uleb128 0x1
+ 1796 0136 13       		.uleb128 0x13
+ 1797 0137 00       		.byte	0
+ 1798 0138 00       		.byte	0
+ 1799 0139 19       		.uleb128 0x19
+ 1800 013a 05       		.uleb128 0x5
+ 1801 013b 00       		.byte	0
+ 1802 013c 03       		.uleb128 0x3
+ 1803 013d 08       		.uleb128 0x8
+ 1804 013e 3A       		.uleb128 0x3a
+ 1805 013f 0B       		.uleb128 0xb
+ 1806 0140 3B       		.uleb128 0x3b
+ 1807 0141 0B       		.uleb128 0xb
+ 1808 0142 49       		.uleb128 0x49
+ 1809 0143 13       		.uleb128 0x13
+ 1810 0144 02       		.uleb128 0x2
+ 1811 0145 17       		.uleb128 0x17
+ 1812 0146 00       		.byte	0
+ 1813 0147 00       		.byte	0
+ 1814 0148 1A       		.uleb128 0x1a
+ 1815 0149 05       		.uleb128 0x5
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 37
+
+
+ 1816 014a 00       		.byte	0
+ 1817 014b 03       		.uleb128 0x3
+ 1818 014c 0E       		.uleb128 0xe
+ 1819 014d 3A       		.uleb128 0x3a
+ 1820 014e 0B       		.uleb128 0xb
+ 1821 014f 3B       		.uleb128 0x3b
+ 1822 0150 0B       		.uleb128 0xb
+ 1823 0151 49       		.uleb128 0x49
+ 1824 0152 13       		.uleb128 0x13
+ 1825 0153 02       		.uleb128 0x2
+ 1826 0154 17       		.uleb128 0x17
+ 1827 0155 00       		.byte	0
+ 1828 0156 00       		.byte	0
+ 1829 0157 1B       		.uleb128 0x1b
+ 1830 0158 34       		.uleb128 0x34
+ 1831 0159 00       		.byte	0
+ 1832 015a 03       		.uleb128 0x3
+ 1833 015b 0E       		.uleb128 0xe
+ 1834 015c 3A       		.uleb128 0x3a
+ 1835 015d 0B       		.uleb128 0xb
+ 1836 015e 3B       		.uleb128 0x3b
+ 1837 015f 0B       		.uleb128 0xb
+ 1838 0160 49       		.uleb128 0x49
+ 1839 0161 13       		.uleb128 0x13
+ 1840 0162 02       		.uleb128 0x2
+ 1841 0163 17       		.uleb128 0x17
+ 1842 0164 00       		.byte	0
+ 1843 0165 00       		.byte	0
+ 1844 0166 1C       		.uleb128 0x1c
+ 1845 0167 34       		.uleb128 0x34
+ 1846 0168 00       		.byte	0
+ 1847 0169 03       		.uleb128 0x3
+ 1848 016a 08       		.uleb128 0x8
+ 1849 016b 3A       		.uleb128 0x3a
+ 1850 016c 0B       		.uleb128 0xb
+ 1851 016d 3B       		.uleb128 0x3b
+ 1852 016e 0B       		.uleb128 0xb
+ 1853 016f 49       		.uleb128 0x49
+ 1854 0170 13       		.uleb128 0x13
+ 1855 0171 02       		.uleb128 0x2
+ 1856 0172 17       		.uleb128 0x17
+ 1857 0173 00       		.byte	0
+ 1858 0174 00       		.byte	0
+ 1859 0175 1D       		.uleb128 0x1d
+ 1860 0176 0B       		.uleb128 0xb
+ 1861 0177 01       		.byte	0x1
+ 1862 0178 11       		.uleb128 0x11
+ 1863 0179 01       		.uleb128 0x1
+ 1864 017a 12       		.uleb128 0x12
+ 1865 017b 06       		.uleb128 0x6
+ 1866 017c 01       		.uleb128 0x1
+ 1867 017d 13       		.uleb128 0x13
+ 1868 017e 00       		.byte	0
+ 1869 017f 00       		.byte	0
+ 1870 0180 1E       		.uleb128 0x1e
+ 1871 0181 898201   		.uleb128 0x4109
+ 1872 0184 00       		.byte	0
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 38
+
+
+ 1873 0185 11       		.uleb128 0x11
+ 1874 0186 01       		.uleb128 0x1
+ 1875 0187 31       		.uleb128 0x31
+ 1876 0188 13       		.uleb128 0x13
+ 1877 0189 00       		.byte	0
+ 1878 018a 00       		.byte	0
+ 1879 018b 1F       		.uleb128 0x1f
+ 1880 018c 898201   		.uleb128 0x4109
+ 1881 018f 01       		.byte	0x1
+ 1882 0190 11       		.uleb128 0x11
+ 1883 0191 01       		.uleb128 0x1
+ 1884 0192 31       		.uleb128 0x31
+ 1885 0193 13       		.uleb128 0x13
+ 1886 0194 00       		.byte	0
+ 1887 0195 00       		.byte	0
+ 1888 0196 20       		.uleb128 0x20
+ 1889 0197 8A8201   		.uleb128 0x410a
+ 1890 019a 00       		.byte	0
+ 1891 019b 02       		.uleb128 0x2
+ 1892 019c 18       		.uleb128 0x18
+ 1893 019d 9142     		.uleb128 0x2111
+ 1894 019f 18       		.uleb128 0x18
+ 1895 01a0 00       		.byte	0
+ 1896 01a1 00       		.byte	0
+ 1897 01a2 21       		.uleb128 0x21
+ 1898 01a3 0B       		.uleb128 0xb
+ 1899 01a4 01       		.byte	0x1
+ 1900 01a5 55       		.uleb128 0x55
+ 1901 01a6 17       		.uleb128 0x17
+ 1902 01a7 00       		.byte	0
+ 1903 01a8 00       		.byte	0
+ 1904 01a9 22       		.uleb128 0x22
+ 1905 01aa 898201   		.uleb128 0x4109
+ 1906 01ad 01       		.byte	0x1
+ 1907 01ae 11       		.uleb128 0x11
+ 1908 01af 01       		.uleb128 0x1
+ 1909 01b0 31       		.uleb128 0x31
+ 1910 01b1 13       		.uleb128 0x13
+ 1911 01b2 01       		.uleb128 0x1
+ 1912 01b3 13       		.uleb128 0x13
+ 1913 01b4 00       		.byte	0
+ 1914 01b5 00       		.byte	0
+ 1915 01b6 23       		.uleb128 0x23
+ 1916 01b7 2E       		.uleb128 0x2e
+ 1917 01b8 01       		.byte	0x1
+ 1918 01b9 3F       		.uleb128 0x3f
+ 1919 01ba 19       		.uleb128 0x19
+ 1920 01bb 03       		.uleb128 0x3
+ 1921 01bc 0E       		.uleb128 0xe
+ 1922 01bd 3A       		.uleb128 0x3a
+ 1923 01be 0B       		.uleb128 0xb
+ 1924 01bf 3B       		.uleb128 0x3b
+ 1925 01c0 0B       		.uleb128 0xb
+ 1926 01c1 27       		.uleb128 0x27
+ 1927 01c2 19       		.uleb128 0x19
+ 1928 01c3 11       		.uleb128 0x11
+ 1929 01c4 01       		.uleb128 0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 39
+
+
+ 1930 01c5 12       		.uleb128 0x12
+ 1931 01c6 06       		.uleb128 0x6
+ 1932 01c7 40       		.uleb128 0x40
+ 1933 01c8 18       		.uleb128 0x18
+ 1934 01c9 9742     		.uleb128 0x2117
+ 1935 01cb 19       		.uleb128 0x19
+ 1936 01cc 01       		.uleb128 0x1
+ 1937 01cd 13       		.uleb128 0x13
+ 1938 01ce 00       		.byte	0
+ 1939 01cf 00       		.byte	0
+ 1940 01d0 24       		.uleb128 0x24
+ 1941 01d1 34       		.uleb128 0x34
+ 1942 01d2 00       		.byte	0
+ 1943 01d3 03       		.uleb128 0x3
+ 1944 01d4 0E       		.uleb128 0xe
+ 1945 01d5 3A       		.uleb128 0x3a
+ 1946 01d6 0B       		.uleb128 0xb
+ 1947 01d7 3B       		.uleb128 0x3b
+ 1948 01d8 0B       		.uleb128 0xb
+ 1949 01d9 49       		.uleb128 0x49
+ 1950 01da 13       		.uleb128 0x13
+ 1951 01db 02       		.uleb128 0x2
+ 1952 01dc 18       		.uleb128 0x18
+ 1953 01dd 00       		.byte	0
+ 1954 01de 00       		.byte	0
+ 1955 01df 25       		.uleb128 0x25
+ 1956 01e0 34       		.uleb128 0x34
+ 1957 01e1 00       		.byte	0
+ 1958 01e2 03       		.uleb128 0x3
+ 1959 01e3 0E       		.uleb128 0xe
+ 1960 01e4 3A       		.uleb128 0x3a
+ 1961 01e5 0B       		.uleb128 0xb
+ 1962 01e6 3B       		.uleb128 0x3b
+ 1963 01e7 0B       		.uleb128 0xb
+ 1964 01e8 49       		.uleb128 0x49
+ 1965 01e9 13       		.uleb128 0x13
+ 1966 01ea 3F       		.uleb128 0x3f
+ 1967 01eb 19       		.uleb128 0x19
+ 1968 01ec 3C       		.uleb128 0x3c
+ 1969 01ed 19       		.uleb128 0x19
+ 1970 01ee 00       		.byte	0
+ 1971 01ef 00       		.byte	0
+ 1972 01f0 26       		.uleb128 0x26
+ 1973 01f1 2E       		.uleb128 0x2e
+ 1974 01f2 00       		.byte	0
+ 1975 01f3 3F       		.uleb128 0x3f
+ 1976 01f4 19       		.uleb128 0x19
+ 1977 01f5 3C       		.uleb128 0x3c
+ 1978 01f6 19       		.uleb128 0x19
+ 1979 01f7 6E       		.uleb128 0x6e
+ 1980 01f8 0E       		.uleb128 0xe
+ 1981 01f9 03       		.uleb128 0x3
+ 1982 01fa 0E       		.uleb128 0xe
+ 1983 01fb 3A       		.uleb128 0x3a
+ 1984 01fc 0B       		.uleb128 0xb
+ 1985 01fd 3B       		.uleb128 0x3b
+ 1986 01fe 0B       		.uleb128 0xb
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 40
+
+
+ 1987 01ff 00       		.byte	0
+ 1988 0200 00       		.byte	0
+ 1989 0201 00       		.byte	0
+ 1990              		.section	.debug_loc,"",%progbits
+ 1991              	.Ldebug_loc0:
+ 1992              	.LLST0:
+ 1993 0000 00000000 		.4byte	.LVL0
+ 1994 0004 3A000000 		.4byte	.LVL5
+ 1995 0008 0100     		.2byte	0x1
+ 1996 000a 50       		.byte	0x50
+ 1997 000b 3A000000 		.4byte	.LVL5
+ 1998 000f 30010000 		.4byte	.LVL38
+ 1999 0013 0100     		.2byte	0x1
+ 2000 0015 57       		.byte	0x57
+ 2001 0016 30010000 		.4byte	.LVL38
+ 2002 001a 32010000 		.4byte	.LVL39
+ 2003 001e 0100     		.2byte	0x1
+ 2004 0020 50       		.byte	0x50
+ 2005 0021 32010000 		.4byte	.LVL39
+ 2006 0025 36010000 		.4byte	.LVL40
+ 2007 0029 0400     		.2byte	0x4
+ 2008 002b F3       		.byte	0xf3
+ 2009 002c 01       		.uleb128 0x1
+ 2010 002d 50       		.byte	0x50
+ 2011 002e 9F       		.byte	0x9f
+ 2012 002f 36010000 		.4byte	.LVL40
+ 2013 0033 3C010000 		.4byte	.LVL41
+ 2014 0037 0100     		.2byte	0x1
+ 2015 0039 57       		.byte	0x57
+ 2016 003a 3C010000 		.4byte	.LVL41
+ 2017 003e 48010000 		.4byte	.LFE37
+ 2018 0042 0400     		.2byte	0x4
+ 2019 0044 F3       		.byte	0xf3
+ 2020 0045 01       		.uleb128 0x1
+ 2021 0046 50       		.byte	0x50
+ 2022 0047 9F       		.byte	0x9f
+ 2023 0048 00000000 		.4byte	0
+ 2024 004c 00000000 		.4byte	0
+ 2025              	.LLST1:
+ 2026 0050 00000000 		.4byte	.LVL0
+ 2027 0054 47000000 		.4byte	.LVL6-1
+ 2028 0058 0100     		.2byte	0x1
+ 2029 005a 51       		.byte	0x51
+ 2030 005b 47000000 		.4byte	.LVL6-1
+ 2031 005f 9A000000 		.4byte	.LVL16
+ 2032 0063 0100     		.2byte	0x1
+ 2033 0065 58       		.byte	0x58
+ 2034 0066 9A000000 		.4byte	.LVL16
+ 2035 006a AC000000 		.4byte	.LVL18
+ 2036 006e 0100     		.2byte	0x1
+ 2037 0070 51       		.byte	0x51
+ 2038 0071 AC000000 		.4byte	.LVL18
+ 2039 0075 30010000 		.4byte	.LVL38
+ 2040 0079 0100     		.2byte	0x1
+ 2041 007b 58       		.byte	0x58
+ 2042 007c 30010000 		.4byte	.LVL38
+ 2043 0080 36010000 		.4byte	.LVL40
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 41
+
+
+ 2044 0084 0100     		.2byte	0x1
+ 2045 0086 51       		.byte	0x51
+ 2046 0087 36010000 		.4byte	.LVL40
+ 2047 008b 3C010000 		.4byte	.LVL41
+ 2048 008f 0100     		.2byte	0x1
+ 2049 0091 58       		.byte	0x58
+ 2050 0092 00000000 		.4byte	0
+ 2051 0096 00000000 		.4byte	0
+ 2052              	.LLST2:
+ 2053 009a 12000000 		.4byte	.LVL1
+ 2054 009e 30010000 		.4byte	.LVL38
+ 2055 00a2 0100     		.2byte	0x1
+ 2056 00a4 56       		.byte	0x56
+ 2057 00a5 36010000 		.4byte	.LVL40
+ 2058 00a9 3C010000 		.4byte	.LVL41
+ 2059 00ad 0100     		.2byte	0x1
+ 2060 00af 56       		.byte	0x56
+ 2061 00b0 00000000 		.4byte	0
+ 2062 00b4 00000000 		.4byte	0
+ 2063              	.LLST3:
+ 2064 00b8 12000000 		.4byte	.LVL1
+ 2065 00bc 16000000 		.4byte	.LVL2
+ 2066 00c0 0200     		.2byte	0x2
+ 2067 00c2 30       		.byte	0x30
+ 2068 00c3 9F       		.byte	0x9f
+ 2069 00c4 16000000 		.4byte	.LVL2
+ 2070 00c8 2C000000 		.4byte	.LVL3
+ 2071 00cc 0100     		.2byte	0x1
+ 2072 00ce 53       		.byte	0x53
+ 2073 00cf 2E000000 		.4byte	.LVL4
+ 2074 00d3 3A000000 		.4byte	.LVL5
+ 2075 00d7 0100     		.2byte	0x1
+ 2076 00d9 53       		.byte	0x53
+ 2077 00da 3A000000 		.4byte	.LVL5
+ 2078 00de 98000000 		.4byte	.LVL15
+ 2079 00e2 0100     		.2byte	0x1
+ 2080 00e4 54       		.byte	0x54
+ 2081 00e5 9A000000 		.4byte	.LVL16
+ 2082 00e9 AC000000 		.4byte	.LVL18
+ 2083 00ed 0100     		.2byte	0x1
+ 2084 00ef 54       		.byte	0x54
+ 2085 00f0 AC000000 		.4byte	.LVL18
+ 2086 00f4 C0000000 		.4byte	.LVL20
+ 2087 00f8 0100     		.2byte	0x1
+ 2088 00fa 53       		.byte	0x53
+ 2089 00fb C2000000 		.4byte	.LVL21
+ 2090 00ff C4000000 		.4byte	.LVL22
+ 2091 0103 0100     		.2byte	0x1
+ 2092 0105 53       		.byte	0x53
+ 2093 0106 C4000000 		.4byte	.LVL22
+ 2094 010a C6000000 		.4byte	.LVL23
+ 2095 010e 0100     		.2byte	0x1
+ 2096 0110 54       		.byte	0x54
+ 2097 0111 C8000000 		.4byte	.LVL24
+ 2098 0115 D2000000 		.4byte	.LVL25
+ 2099 0119 0100     		.2byte	0x1
+ 2100 011b 53       		.byte	0x53
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 42
+
+
+ 2101 011c 00000000 		.4byte	0
+ 2102 0120 00000000 		.4byte	0
+ 2103              	.LLST4:
+ 2104 0124 80000000 		.4byte	.LVL12
+ 2105 0128 96000000 		.4byte	.LVL14
+ 2106 012c 0100     		.2byte	0x1
+ 2107 012e 55       		.byte	0x55
+ 2108 012f A4000000 		.4byte	.LVL17
+ 2109 0133 AC000000 		.4byte	.LVL18
+ 2110 0137 0100     		.2byte	0x1
+ 2111 0139 55       		.byte	0x55
+ 2112 013a AC000000 		.4byte	.LVL18
+ 2113 013e C4000000 		.4byte	.LVL22
+ 2114 0142 0100     		.2byte	0x1
+ 2115 0144 54       		.byte	0x54
+ 2116 0145 C4000000 		.4byte	.LVL22
+ 2117 0149 C8000000 		.4byte	.LVL24
+ 2118 014d 0100     		.2byte	0x1
+ 2119 014f 55       		.byte	0x55
+ 2120 0150 C8000000 		.4byte	.LVL24
+ 2121 0154 30010000 		.4byte	.LVL38
+ 2122 0158 0100     		.2byte	0x1
+ 2123 015a 54       		.byte	0x54
+ 2124 015b 36010000 		.4byte	.LVL40
+ 2125 015f 3C010000 		.4byte	.LVL41
+ 2126 0163 0100     		.2byte	0x1
+ 2127 0165 54       		.byte	0x54
+ 2128 0166 3C010000 		.4byte	.LVL41
+ 2129 016a 48010000 		.4byte	.LFE37
+ 2130 016e 0100     		.2byte	0x1
+ 2131 0170 50       		.byte	0x50
+ 2132 0171 00000000 		.4byte	0
+ 2133 0175 00000000 		.4byte	0
+ 2134              	.LLST5:
+ 2135 0179 3A000000 		.4byte	.LVL5
+ 2136 017d 7E000000 		.4byte	.LVL11
+ 2137 0181 0200     		.2byte	0x2
+ 2138 0183 30       		.byte	0x30
+ 2139 0184 9F       		.byte	0x9f
+ 2140 0185 7E000000 		.4byte	.LVL11
+ 2141 0189 84000000 		.4byte	.LVL13
+ 2142 018d 0100     		.2byte	0x1
+ 2143 018f 53       		.byte	0x53
+ 2144 0190 96000000 		.4byte	.LVL14
+ 2145 0194 9A000000 		.4byte	.LVL16
+ 2146 0198 0100     		.2byte	0x1
+ 2147 019a 53       		.byte	0x53
+ 2148 019b 00000000 		.4byte	0
+ 2149 019f 00000000 		.4byte	0
+ 2150              	.LLST6:
+ 2151 01a3 48000000 		.4byte	.LVL6
+ 2152 01a7 66000000 		.4byte	.LVL7
+ 2153 01ab 0100     		.2byte	0x1
+ 2154 01ad 50       		.byte	0x50
+ 2155 01ae 70000000 		.4byte	.LVL9
+ 2156 01b2 7C000000 		.4byte	.LVL10
+ 2157 01b6 0100     		.2byte	0x1
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 43
+
+
+ 2158 01b8 50       		.byte	0x50
+ 2159 01b9 00000000 		.4byte	0
+ 2160 01bd 00000000 		.4byte	0
+ 2161              	.LLST7:
+ 2162 01c1 E0000000 		.4byte	.LVL28
+ 2163 01c5 EA000000 		.4byte	.LVL29
+ 2164 01c9 0100     		.2byte	0x1
+ 2165 01cb 50       		.byte	0x50
+ 2166 01cc EA000000 		.4byte	.LVL29
+ 2167 01d0 30010000 		.4byte	.LVL38
+ 2168 01d4 0100     		.2byte	0x1
+ 2169 01d6 55       		.byte	0x55
+ 2170 01d7 36010000 		.4byte	.LVL40
+ 2171 01db 3C010000 		.4byte	.LVL41
+ 2172 01df 0100     		.2byte	0x1
+ 2173 01e1 55       		.byte	0x55
+ 2174 01e2 00000000 		.4byte	0
+ 2175 01e6 00000000 		.4byte	0
+ 2176              	.LLST8:
+ 2177 01ea EE000000 		.4byte	.LVL30
+ 2178 01ee F2000000 		.4byte	.LVL31
+ 2179 01f2 0100     		.2byte	0x1
+ 2180 01f4 50       		.byte	0x50
+ 2181 01f5 12010000 		.4byte	.LVL35
+ 2182 01f9 1C010000 		.4byte	.LVL36
+ 2183 01fd 0100     		.2byte	0x1
+ 2184 01ff 50       		.byte	0x50
+ 2185 0200 00000000 		.4byte	0
+ 2186 0204 00000000 		.4byte	0
+ 2187              	.LLST9:
+ 2188 0208 00000000 		.4byte	.LVL42
+ 2189 020c 0C000000 		.4byte	.LVL44
+ 2190 0210 0100     		.2byte	0x1
+ 2191 0212 50       		.byte	0x50
+ 2192 0213 0C000000 		.4byte	.LVL44
+ 2193 0217 42000000 		.4byte	.LVL50
+ 2194 021b 0100     		.2byte	0x1
+ 2195 021d 56       		.byte	0x56
+ 2196 021e 42000000 		.4byte	.LVL50
+ 2197 0222 4C000000 		.4byte	.LFE39
+ 2198 0226 0400     		.2byte	0x4
+ 2199 0228 F3       		.byte	0xf3
+ 2200 0229 01       		.uleb128 0x1
+ 2201 022a 50       		.byte	0x50
+ 2202 022b 9F       		.byte	0x9f
+ 2203 022c 00000000 		.4byte	0
+ 2204 0230 00000000 		.4byte	0
+ 2205              	.LLST10:
+ 2206 0234 08000000 		.4byte	.LVL43
+ 2207 0238 42000000 		.4byte	.LVL50
+ 2208 023c 0100     		.2byte	0x1
+ 2209 023e 57       		.byte	0x57
+ 2210 023f 00000000 		.4byte	0
+ 2211 0243 00000000 		.4byte	0
+ 2212              	.LLST11:
+ 2213 0247 08000000 		.4byte	.LVL43
+ 2214 024b 0C000000 		.4byte	.LVL44
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 44
+
+
+ 2215 024f 0200     		.2byte	0x2
+ 2216 0251 30       		.byte	0x30
+ 2217 0252 9F       		.byte	0x9f
+ 2218 0253 0C000000 		.4byte	.LVL44
+ 2219 0257 36000000 		.4byte	.LVL48
+ 2220 025b 0100     		.2byte	0x1
+ 2221 025d 54       		.byte	0x54
+ 2222 025e 38000000 		.4byte	.LVL49
+ 2223 0262 42000000 		.4byte	.LVL50
+ 2224 0266 0100     		.2byte	0x1
+ 2225 0268 54       		.byte	0x54
+ 2226 0269 00000000 		.4byte	0
+ 2227 026d 00000000 		.4byte	0
+ 2228              	.LLST12:
+ 2229 0271 00000000 		.4byte	.LVL51
+ 2230 0275 0C000000 		.4byte	.LVL52
+ 2231 0279 0100     		.2byte	0x1
+ 2232 027b 50       		.byte	0x50
+ 2233 027c 0C000000 		.4byte	.LVL52
+ 2234 0280 88000000 		.4byte	.LFE38
+ 2235 0284 0400     		.2byte	0x4
+ 2236 0286 F3       		.byte	0xf3
+ 2237 0287 01       		.uleb128 0x1
+ 2238 0288 50       		.byte	0x50
+ 2239 0289 9F       		.byte	0x9f
+ 2240 028a 00000000 		.4byte	0
+ 2241 028e 00000000 		.4byte	0
+ 2242              	.LLST13:
+ 2243 0292 4C000000 		.4byte	.LVL58
+ 2244 0296 50000000 		.4byte	.LVL59
+ 2245 029a 0200     		.2byte	0x2
+ 2246 029c 30       		.byte	0x30
+ 2247 029d 9F       		.byte	0x9f
+ 2248 029e 50000000 		.4byte	.LVL59
+ 2249 02a2 6E000000 		.4byte	.LVL62
+ 2250 02a6 0100     		.2byte	0x1
+ 2251 02a8 54       		.byte	0x54
+ 2252 02a9 70000000 		.4byte	.LVL63
+ 2253 02ad 7A000000 		.4byte	.LVL64
+ 2254 02b1 0100     		.2byte	0x1
+ 2255 02b3 54       		.byte	0x54
+ 2256 02b4 00000000 		.4byte	0
+ 2257 02b8 00000000 		.4byte	0
+ 2258              		.section	.debug_aranges,"",%progbits
+ 2259 0000 2C000000 		.4byte	0x2c
+ 2260 0004 0200     		.2byte	0x2
+ 2261 0006 00000000 		.4byte	.Ldebug_info0
+ 2262 000a 04       		.byte	0x4
+ 2263 000b 00       		.byte	0
+ 2264 000c 0000     		.2byte	0
+ 2265 000e 0000     		.2byte	0
+ 2266 0010 00000000 		.4byte	.LFB37
+ 2267 0014 48010000 		.4byte	.LFE37-.LFB37
+ 2268 0018 00000000 		.4byte	.LFB39
+ 2269 001c 4C000000 		.4byte	.LFE39-.LFB39
+ 2270 0020 00000000 		.4byte	.LFB38
+ 2271 0024 88000000 		.4byte	.LFE38-.LFB38
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 45
+
+
+ 2272 0028 00000000 		.4byte	0
+ 2273 002c 00000000 		.4byte	0
+ 2274              		.section	.debug_ranges,"",%progbits
+ 2275              	.Ldebug_ranges0:
+ 2276 0000 A6000000 		.4byte	.LBB3
+ 2277 0004 C4000000 		.4byte	.LBE3
+ 2278 0008 C8000000 		.4byte	.LBB4
+ 2279 000c 30010000 		.4byte	.LBE4
+ 2280 0010 36010000 		.4byte	.LBB5
+ 2281 0014 38010000 		.4byte	.LBE5
+ 2282 0018 00000000 		.4byte	0
+ 2283 001c 00000000 		.4byte	0
+ 2284 0020 00000000 		.4byte	.LFB37
+ 2285 0024 48010000 		.4byte	.LFE37
+ 2286 0028 00000000 		.4byte	.LFB39
+ 2287 002c 4C000000 		.4byte	.LFE39
+ 2288 0030 00000000 		.4byte	.LFB38
+ 2289 0034 88000000 		.4byte	.LFE38
+ 2290 0038 00000000 		.4byte	0
+ 2291 003c 00000000 		.4byte	0
+ 2292              		.section	.debug_line,"",%progbits
+ 2293              	.Ldebug_line0:
+ 2294 0000 94030000 		.section	.debug_str,"MS",%progbits,1
+ 2294      0200A902 
+ 2294      00000201 
+ 2294      FB0E0D00 
+ 2294      01010101 
+ 2295              	.LASF52:
+ 2296 0000 6C765F69 		.ascii	"lv_img_decoder_open_f_t\000"
+ 2296      6D675F64 
+ 2296      65636F64 
+ 2296      65725F6F 
+ 2296      70656E5F 
+ 2297              	.LASF56:
+ 2298 0018 636F6C6F 		.ascii	"color\000"
+ 2298      7200
+ 2299              	.LASF58:
+ 2300 001e 68656164 		.ascii	"header\000"
+ 2300      657200
+ 2301              	.LASF80:
+ 2302 0025 6C765F69 		.ascii	"lv_img_decoder_close\000"
+ 2302      6D675F64 
+ 2302      65636F64 
+ 2302      65725F63 
+ 2302      6C6F7365 
+ 2303              	.LASF77:
+ 2304 003a 656E7472 		.ascii	"entry_cnt\000"
+ 2304      795F636E 
+ 2304      7400
+ 2305              	.LASF54:
+ 2306 0044 5F6C765F 		.ascii	"_lv_img_decoder_dsc\000"
+ 2306      696D675F 
+ 2306      6465636F 
+ 2306      6465725F 
+ 2306      64736300 
+ 2307              	.LASF47:
+ 2308 0058 696E666F 		.ascii	"info_cb\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 46
+
+
+ 2308      5F636200 
+ 2309              	.LASF4:
+ 2310 0060 73686F72 		.ascii	"short int\000"
+ 2310      7420696E 
+ 2310      7400
+ 2311              	.LASF90:
+ 2312 006a 6C76676C 		.ascii	"lvgl\\src\\lv_draw\\lv_img_cache.c\000"
+ 2312      5C737263 
+ 2312      5C6C765F 
+ 2312      64726177 
+ 2312      5C6C765F 
+ 2313              	.LASF32:
+ 2314 008a 73697A65 		.ascii	"sizetype\000"
+ 2314      74797065 
+ 2314      00
+ 2315              	.LASF84:
+ 2316 0093 6C765F74 		.ascii	"lv_tick_elaps\000"
+ 2316      69636B5F 
+ 2316      656C6170 
+ 2316      7300
+ 2317              	.LASF67:
+ 2318 00a1 6C696665 		.ascii	"life\000"
+ 2318      00
+ 2319              	.LASF68:
+ 2320 00a6 6C765F69 		.ascii	"lv_img_cache_entry_t\000"
+ 2320      6D675F63 
+ 2320      61636865 
+ 2320      5F656E74 
+ 2320      72795F74 
+ 2321              	.LASF74:
+ 2322 00bb 6C765F69 		.ascii	"lv_img_cache_invalidate_src\000"
+ 2322      6D675F63 
+ 2322      61636865 
+ 2322      5F696E76 
+ 2322      616C6964 
+ 2323              	.LASF41:
+ 2324 00d7 4C565F49 		.ascii	"LV_IMG_SRC_VARIABLE\000"
+ 2324      4D475F53 
+ 2324      52435F56 
+ 2324      41524941 
+ 2324      424C4500 
+ 2325              	.LASF5:
+ 2326 00eb 5F5F7569 		.ascii	"__uint16_t\000"
+ 2326      6E743136 
+ 2326      5F7400
+ 2327              	.LASF46:
+ 2328 00f6 6C765F69 		.ascii	"lv_img_decoder_info_f_t\000"
+ 2328      6D675F64 
+ 2328      65636F64 
+ 2328      65725F69 
+ 2328      6E666F5F 
+ 2329              	.LASF26:
+ 2330 010e 626C7565 		.ascii	"blue\000"
+ 2330      00
+ 2331              	.LASF48:
+ 2332 0113 6F70656E 		.ascii	"open_cb\000"
+ 2332      5F636200 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 47
+
+
+ 2333              	.LASF65:
+ 2334 011b 6C765F69 		.ascii	"lv_img_decoder_dsc_t\000"
+ 2334      6D675F64 
+ 2334      65636F64 
+ 2334      65725F64 
+ 2334      73635F74 
+ 2335              	.LASF16:
+ 2336 0130 75696E74 		.ascii	"uint8_t\000"
+ 2336      385F7400 
+ 2337              	.LASF22:
+ 2338 0138 75696E74 		.ascii	"uintptr_t\000"
+ 2338      7074725F 
+ 2338      7400
+ 2339              	.LASF62:
+ 2340 0142 6C765F69 		.ascii	"lv_img_decoder_read_line_f_t\000"
+ 2340      6D675F64 
+ 2340      65636F64 
+ 2340      65725F72 
+ 2340      6561645F 
+ 2341              	.LASF29:
+ 2342 015f 6C765F63 		.ascii	"lv_color16_t\000"
+ 2342      6F6C6F72 
+ 2342      31365F74 
+ 2342      00
+ 2343              	.LASF37:
+ 2344 016c 616C7761 		.ascii	"always_zero\000"
+ 2344      79735F7A 
+ 2344      65726F00 
+ 2345              	.LASF51:
+ 2346 0178 75736572 		.ascii	"user_data\000"
+ 2346      5F646174 
+ 2346      6100
+ 2347              	.LASF92:
+ 2348 0182 5F6C765F 		.ascii	"_lv_img_cache_open\000"
+ 2348      696D675F 
+ 2348      63616368 
+ 2348      655F6F70 
+ 2348      656E00
+ 2349              	.LASF73:
+ 2350 0195 6F70656E 		.ascii	"open_res\000"
+ 2350      5F726573 
+ 2350      00
+ 2351              	.LASF81:
+ 2352 019e 6C765F74 		.ascii	"lv_tick_get\000"
+ 2352      69636B5F 
+ 2352      67657400 
+ 2353              	.LASF11:
+ 2354 01aa 6C6F6E67 		.ascii	"long long int\000"
+ 2354      206C6F6E 
+ 2354      6720696E 
+ 2354      7400
+ 2355              	.LASF36:
+ 2356 01b8 6C765F72 		.ascii	"lv_res_t\000"
+ 2356      65735F74 
+ 2356      00
+ 2357              	.LASF64:
+ 2358 01c1 6C765F69 		.ascii	"lv_img_decoder_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 48
+
+
+ 2358      6D675F64 
+ 2358      65636F64 
+ 2358      65725F74 
+ 2358      00
+ 2359              	.LASF44:
+ 2360 01d2 4C565F49 		.ascii	"LV_IMG_SRC_UNKNOWN\000"
+ 2360      4D475F53 
+ 2360      52435F55 
+ 2360      4E4B4E4F 
+ 2360      574E00
+ 2361              	.LASF72:
+ 2362 01e5 745F7374 		.ascii	"t_start\000"
+ 2362      61727400 
+ 2363              	.LASF60:
+ 2364 01ed 74696D65 		.ascii	"time_to_open\000"
+ 2364      5F746F5F 
+ 2364      6F70656E 
+ 2364      00
+ 2365              	.LASF8:
+ 2366 01fa 6C6F6E67 		.ascii	"long int\000"
+ 2366      20696E74 
+ 2366      00
+ 2367              	.LASF53:
+ 2368 0203 5F6C765F 		.ascii	"_lv_img_decoder\000"
+ 2368      696D675F 
+ 2368      6465636F 
+ 2368      64657200 
+ 2369              	.LASF88:
+ 2370 0213 6C765F64 		.ascii	"lv_debug_log_error\000"
+ 2370      65627567 
+ 2370      5F6C6F67 
+ 2370      5F657272 
+ 2370      6F7200
+ 2371              	.LASF55:
+ 2372 0226 6465636F 		.ascii	"decoder\000"
+ 2372      64657200 
+ 2373              	.LASF45:
+ 2374 022e 6C765F69 		.ascii	"lv_img_src_t\000"
+ 2374      6D675F73 
+ 2374      72635F74 
+ 2374      00
+ 2375              	.LASF24:
+ 2376 023b 6C765F69 		.ascii	"lv_img_decoder_user_data_t\000"
+ 2376      6D675F64 
+ 2376      65636F64 
+ 2376      65725F75 
+ 2376      7365725F 
+ 2377              	.LASF31:
+ 2378 0256 6C6F6E67 		.ascii	"long double\000"
+ 2378      20646F75 
+ 2378      626C6500 
+ 2379              	.LASF1:
+ 2380 0262 756E7369 		.ascii	"unsigned char\000"
+ 2380      676E6564 
+ 2380      20636861 
+ 2380      7200
+ 2381              	.LASF28:
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 49
+
+
+ 2382 0270 66756C6C 		.ascii	"full\000"
+ 2382      00
+ 2383              	.LASF0:
+ 2384 0275 7369676E 		.ascii	"signed char\000"
+ 2384      65642063 
+ 2384      68617200 
+ 2385              	.LASF21:
+ 2386 0281 75696E74 		.ascii	"uint64_t\000"
+ 2386      36345F74 
+ 2386      00
+ 2387              	.LASF13:
+ 2388 028a 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2388      206C6F6E 
+ 2388      6720756E 
+ 2388      7369676E 
+ 2388      65642069 
+ 2389              	.LASF20:
+ 2390 02a1 75696E74 		.ascii	"uint32_t\000"
+ 2390      33325F74 
+ 2390      00
+ 2391              	.LASF59:
+ 2392 02aa 696D675F 		.ascii	"img_data\000"
+ 2392      64617461 
+ 2392      00
+ 2393              	.LASF30:
+ 2394 02b3 6C765F63 		.ascii	"lv_color_t\000"
+ 2394      6F6C6F72 
+ 2394      5F7400
+ 2395              	.LASF18:
+ 2396 02be 75696E74 		.ascii	"uint16_t\000"
+ 2396      31365F74 
+ 2396      00
+ 2397              	.LASF10:
+ 2398 02c7 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2398      20756E73 
+ 2398      69676E65 
+ 2398      6420696E 
+ 2398      7400
+ 2399              	.LASF49:
+ 2400 02d9 72656164 		.ascii	"read_line_cb\000"
+ 2400      5F6C696E 
+ 2400      655F6362 
+ 2400      00
+ 2401              	.LASF39:
+ 2402 02e6 6C765F69 		.ascii	"lv_img_header_t\000"
+ 2402      6D675F68 
+ 2402      65616465 
+ 2402      725F7400 
+ 2403              	.LASF57:
+ 2404 02f6 7372635F 		.ascii	"src_type\000"
+ 2404      74797065 
+ 2404      00
+ 2405              	.LASF69:
+ 2406 02ff 63616368 		.ascii	"cache\000"
+ 2406      6500
+ 2407              	.LASF61:
+ 2408 0305 6572726F 		.ascii	"error_msg\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 50
+
+
+ 2408      725F6D73 
+ 2408      6700
+ 2409              	.LASF70:
+ 2410 030f 63616368 		.ascii	"cached_src\000"
+ 2410      65645F73 
+ 2410      726300
+ 2411              	.LASF33:
+ 2412 031a 63686172 		.ascii	"char\000"
+ 2412      00
+ 2413              	.LASF19:
+ 2414 031f 696E7433 		.ascii	"int32_t\000"
+ 2414      325F7400 
+ 2415              	.LASF76:
+ 2416 0327 6E65775F 		.ascii	"new_entry_cnt\000"
+ 2416      656E7472 
+ 2416      795F636E 
+ 2416      7400
+ 2417              	.LASF7:
+ 2418 0335 5F5F696E 		.ascii	"__int32_t\000"
+ 2418      7433325F 
+ 2418      7400
+ 2419              	.LASF6:
+ 2420 033f 73686F72 		.ascii	"short unsigned int\000"
+ 2420      7420756E 
+ 2420      7369676E 
+ 2420      65642069 
+ 2420      6E7400
+ 2421              	.LASF17:
+ 2422 0352 696E7431 		.ascii	"int16_t\000"
+ 2422      365F7400 
+ 2423              	.LASF40:
+ 2424 035a 5F426F6F 		.ascii	"_Bool\000"
+ 2424      6C00
+ 2425              	.LASF82:
+ 2426 0360 6C765F69 		.ascii	"lv_img_decoder_open\000"
+ 2426      6D675F64 
+ 2426      65636F64 
+ 2426      65725F6F 
+ 2426      70656E00 
+ 2427              	.LASF35:
+ 2428 0374 4C565F52 		.ascii	"LV_RES_OK\000"
+ 2428      45535F4F 
+ 2428      4B00
+ 2429              	.LASF12:
+ 2430 037e 5F5F7569 		.ascii	"__uint64_t\000"
+ 2430      6E743634 
+ 2430      5F7400
+ 2431              	.LASF42:
+ 2432 0389 4C565F49 		.ascii	"LV_IMG_SRC_FILE\000"
+ 2432      4D475F53 
+ 2432      52435F46 
+ 2432      494C4500 
+ 2433              	.LASF25:
+ 2434 0399 67726565 		.ascii	"green_h\000"
+ 2434      6E5F6800 
+ 2435              	.LASF14:
+ 2436 03a1 5F5F7569 		.ascii	"__uintptr_t\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 51
+
+
+ 2436      6E747074 
+ 2436      725F7400 
+ 2437              	.LASF27:
+ 2438 03ad 67726565 		.ascii	"green_l\000"
+ 2438      6E5F6C00 
+ 2439              	.LASF91:
+ 2440 03b5 433A5C55 		.ascii	"C:\\Users\\strap\\Documents\\Creator\\test_lvgl\\il"
+ 2440      73657273 
+ 2440      5C737472 
+ 2440      61705C44 
+ 2440      6F63756D 
+ 2441 03e2 69393334 		.ascii	"i9341_master.cydsn\000"
+ 2441      315F6D61 
+ 2441      73746572 
+ 2441      2E637964 
+ 2441      736E00
+ 2442              	.LASF87:
+ 2443 03f5 6C765F64 		.ascii	"lv_debug_check_null\000"
+ 2443      65627567 
+ 2443      5F636865 
+ 2443      636B5F6E 
+ 2443      756C6C00 
+ 2444              	.LASF63:
+ 2445 0409 6C765F69 		.ascii	"lv_img_decoder_close_f_t\000"
+ 2445      6D675F64 
+ 2445      65636F64 
+ 2445      65725F63 
+ 2445      6C6F7365 
+ 2446              	.LASF9:
+ 2447 0422 5F5F7569 		.ascii	"__uint32_t\000"
+ 2447      6E743332 
+ 2447      5F7400
+ 2448              	.LASF78:
+ 2449 042d 6C765F69 		.ascii	"lv_img_src_get_type\000"
+ 2449      6D675F73 
+ 2449      72635F67 
+ 2449      65745F74 
+ 2449      79706500 
+ 2450              	.LASF43:
+ 2451 0441 4C565F49 		.ascii	"LV_IMG_SRC_SYMBOL\000"
+ 2451      4D475F53 
+ 2451      52435F53 
+ 2451      594D424F 
+ 2451      4C00
+ 2452              	.LASF71:
+ 2453 0453 6D617463 		.ascii	"match\000"
+ 2453      6800
+ 2454              	.LASF79:
+ 2455 0459 73747263 		.ascii	"strcmp\000"
+ 2455      6D7000
+ 2456              	.LASF3:
+ 2457 0460 5F5F696E 		.ascii	"__int16_t\000"
+ 2457      7431365F 
+ 2457      7400
+ 2458              	.LASF23:
+ 2459 046a 6C765F63 		.ascii	"lv_coord_t\000"
+ 2459      6F6F7264 
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 52
+
+
+ 2459      5F7400
+ 2460              	.LASF93:
+ 2461 0475 5F6C765F 		.ascii	"_lv_img_cache_array\000"
+ 2461      696D675F 
+ 2461      63616368 
+ 2461      655F6172 
+ 2461      72617900 
+ 2462              	.LASF50:
+ 2463 0489 636C6F73 		.ascii	"close_cb\000"
+ 2463      655F6362 
+ 2463      00
+ 2464              	.LASF86:
+ 2465 0492 6C765F6D 		.ascii	"lv_mem_alloc\000"
+ 2465      656D5F61 
+ 2465      6C6C6F63 
+ 2465      00
+ 2466              	.LASF66:
+ 2467 049f 6465635F 		.ascii	"dec_dsc\000"
+ 2467      64736300 
+ 2468              	.LASF83:
+ 2469 04a7 5F6C765F 		.ascii	"_lv_memset_00\000"
+ 2469      6D656D73 
+ 2469      65745F30 
+ 2469      3000
+ 2470              	.LASF75:
+ 2471 04b5 6C765F69 		.ascii	"lv_img_cache_set_size\000"
+ 2471      6D675F63 
+ 2471      61636865 
+ 2471      5F736574 
+ 2471      5F73697A 
+ 2472              	.LASF89:
+ 2473 04cb 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2473      43313120 
+ 2473      352E342E 
+ 2473      31203230 
+ 2473      31363036 
+ 2474 04fe 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2474      20726576 
+ 2474      6973696F 
+ 2474      6E203233 
+ 2474      37373135 
+ 2475 0531 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2475      66756E63 
+ 2475      74696F6E 
+ 2475      2D736563 
+ 2475      74696F6E 
+ 2476              	.LASF15:
+ 2477 0559 756E7369 		.ascii	"unsigned int\000"
+ 2477      676E6564 
+ 2477      20696E74 
+ 2477      00
+ 2478              	.LASF38:
+ 2479 0566 72657365 		.ascii	"reserved\000"
+ 2479      72766564 
+ 2479      00
+ 2480              	.LASF85:
+ 2481 056f 6C765F6D 		.ascii	"lv_mem_free\000"
+ARM GAS  C:\Users\strap\AppData\Local\Temp\ccj0ynMF.s 			page 53
+
+
+ 2481      656D5F66 
+ 2481      72656500 
+ 2482              	.LASF34:
+ 2483 057b 4C565F52 		.ascii	"LV_RES_INV\000"
+ 2483      45535F49 
+ 2483      4E5600
+ 2484              	.LASF2:
+ 2485 0586 5F5F7569 		.ascii	"__uint8_t\000"
+ 2485      6E74385F 
+ 2485      7400
+ 2486              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
